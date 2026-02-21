@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@layer base {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "K2D", sans-serif;
+    }
+
+    html,
+    body {
+        height: 100vh;
+        width: 100vw;
+    }
+
+    #root {
+        height: 100%;
+        width: 100%;
+    }
+}
+
+@theme {
+    /* Size */
+    --text-largeSize: 34px;
+    --text-bigSize: 28px;
+    --text-mediumSize: 24px;
+    --text-normalSize: 18px;
+    --text-smallSize: 14px;
+    --text-tinySize: 10px;
+
+    /* Main color */
+    --color-mainColor: #499C40;
+
+    /* Light mode */
+    --color-bg: #f6f6f6;
+
+    /* Darkmode */
+}
