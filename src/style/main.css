@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @layer base {
     * {
@@ -6,6 +7,8 @@
         padding: 0;
         box-sizing: border-box;
         font-family: "K2D", sans-serif;
+        color: #3e3f46;
+        transition: 0.5s;
     }
 
     html,
@@ -22,6 +25,7 @@
 
 @theme {
     /* Size */
+    --text-hugeSize: 46px;
     --text-largeSize: 34px;
     --text-bigSize: 28px;
     --text-mediumSize: 24px;
@@ -29,11 +33,27 @@
     --text-smallSize: 14px;
     --text-tinySize: 10px;
 
-    /* Main color */
+    /* Padding */
+    --spacing-twoSidePadding: 120px;
+    --spacing-topPadding: 20px;
+    --spacing-BottomPadding: 20px;
+
+    /* Border radius */
+    --radius-big: 15px;
+    --radius-medium: 15px;
+    --radius-normal: 10px;
+    --radius-small: 5px;
+
+    /* Color */
     --color-mainColor: #499C40;
+    --color-mainColorRGB: rgba(73,156,64,0.25);
+    
+    --color-lightDark: #3e3f46;
+    --color-gray: #808080;
+    --color-lightGray: #d3d3d3;
 
     /* Light mode */
-    --color-bg: #f6f6f6;
+    --color-bgLight: #f6f6f6;
 
     /* Darkmode */
 }
