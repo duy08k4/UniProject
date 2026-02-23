@@ -9,7 +9,7 @@ interface SignUpDirect_interface {
 const SignUpDirect: React.FC<SignUpDirect_interface> = ({content}) => {
   return (
     <StyledWrapper>
-      <button id='signupdirect' className="cssbuttons-io-button">
+      <button id='signupdirect' className="cssbuttons-io-button max-sm:text-mobile-smallSize! max-sm:h-full! max-sm:py-2.5!">
         {content}
         <div className="icon">
           <svg height={24} width={24} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

@@ -12,7 +12,7 @@ const ProjectDirect: React.FC<ProjectDirect_interface> = ({ content }) => {
                 <span className="circle" aria-hidden="true">
                     <span className="icon arrow" />
                 </span>
-                <span className="button-text flex gap-2.5 dark:text-white!">
+                <span className="button-text flex gap-2.5 dark:text-white! max-sm:text-mobile-smallSize">
                     {content}
                 </span>
             </button>
