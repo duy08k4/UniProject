@@ -51,7 +51,7 @@ const Project: React.FC = () => {
                     <h1 className="text-hugeSize font-semibold uppercase dark:text-white max-sm:text-mobile-hugeSize">Đồ án tốt nghiệp</h1>
                 </div>
 
-                <div className="min-h-8 flex items-center-safe gap-10 max-sm:flex-col max-sm:gap-5">
+                <div className={`min-h-8 flex items-center-safe gap-10 max-sm:flex-col max-sm:gap-5 ${!showFilter && "max-sm:gap-2.5!"}`}>
                     <span className="flex-1 max-sm:w-full">
                         <input type="text" placeholder="Tìm kiếm..." className="w-full text-smallSize border-[0.5px] border-lightGray shadow-[0_0_12px_rgba(0,0,0,0.1)] px-5 py-2 rounded-small dark:text-white" />
                     </span>
@@ -116,8 +116,8 @@ const Project: React.FC = () => {
                         </select>
                     </span>
 
-                    <div className="">
-                        <button className="bg-mainColor text-white font-medium px-5 py-1.5 rounded-small hover:cursor-pointer max-sm:text-mobile-normalSize">Tìm kiếm</button>
+                    <div className="max-sm:w-full">
+                        <button className="w-full bg-mainColor text-white font-medium px-5 py-1.5 rounded-small hover:cursor-pointer max-sm:text-mobile-normalSize">Tìm kiếm</button>
                     </div>
 
                 </div>

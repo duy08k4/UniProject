@@ -6,8 +6,8 @@ import DbHeroImage from "../../assets/DbHeroImage.svg"
 import DarkModeDBHeroImage from "../../assets/DbHeroImage_DarkMode.png"
 
 // Component
-import SignUpDirect from "./SignUpDirect.comp"
-import ProjectDirect from "./ProjectDirect.comp"
+import SignUpDirect from "../components/SignUpDirect.comp"
+import ProjectDirect from "../components/ProjectDirect.comp"
 
 const objectiveContent: string[] = [
     "Quản lý tập trung đồ án tốt nghiệp",
@@ -45,9 +45,9 @@ const Home: React.FC = () => {
 
                 {/* Hero section */}
                 <div className="flex flex-col gap-10 items-center-safe mt-topPadding max-sm:gap-5">
-                    <h1 className="uppercase flex gap-3.5 font-bold text-[48px] dark:text-white max-sm:text-mobile-hugeSize max-sm:block">
+                    <h1 className="uppercase flex gap-2.5 font-bold text-[48px] dark:text-white max-sm:text-mobile-hugeSize max-sm:block">
                         hệ thống quản lý 
-                        <p className="max-sm:dark:text-gray">đồ án tốt nghiệp</p>
+                        <p className="text-black dark:text-white max-sm:dark:text-gray">đồ án tốt nghiệp</p>
 
                     </h1>
                     <p className="uppercase text-mainColor text-mediumSize font-light max-sm:text-mobile-mediumSize">khoa môi trường và tài nguyên</p>

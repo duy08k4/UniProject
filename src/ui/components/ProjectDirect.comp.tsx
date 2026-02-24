@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 interface ProjectDirect_interface {
@@ -6,9 +7,11 @@ interface ProjectDirect_interface {
 }
 
 const ProjectDirect: React.FC<ProjectDirect_interface> = ({ content }) => {
+    const navigate = useNavigate()
+
     return (
         <StyledWrapper>
-            <button className="learn-more">
+            <button className="learn-more" onClick={() => { navigate("/projects") }}>
                 <span className="circle" aria-hidden="true">
                     <span className="icon arrow" />
                 </span>

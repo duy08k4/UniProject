@@ -3,10 +3,10 @@ import { NavLink, Outlet, useLocation } from "react-router-dom"
 import { useEffect, useRef, useState } from "react"
 
 // Component
-import ToggleTheme from "./ToggleTheme.comp"
+import ToggleTheme from "../components/ToggleTheme.comp"
 
 // Assets
-import UniLogo from "../assets/UniLogo.png"
+import UniLogo from "../../assets/UniLogo.png"
 
 const LandingPageLayout: React.FC = () => {
     const navigation = useLocation()
@@ -87,10 +87,10 @@ const LandingPageLayout: React.FC = () => {
                             Đồ án sinh viên
                         </NavLink>
 
-                        <NavLink to="" end
+                        {/* <NavLink to="/contact" end
                             className={`text-normalSize px-5 py-1.5 rounded-normal dark:text-white ${navState.contact && "bg-mainColorRGB text-mainColor font-bold dark:text-mainColor!"} max-sm:text-mobile-normalSize max-sm:py-3.5 max-sm:rounded-none`}>
                             Liên hệ
-                        </NavLink>
+                        </NavLink> */}
                     </nav>
 
                     <ToggleTheme />
@@ -118,7 +118,7 @@ const LandingPageLayout: React.FC = () => {
             </div>
 
             {/* Footer */}
-            <footer className="w-full h-10! border-t-2 border-lightGray flex flex-col items-center-safe justify-center-safe py-5 dark:border-gray">
+            <footer className="w-full h-fit border-t-2 border-lightGray flex flex-col items-center-safe justify-center-safe py-5 dark:border-gray">
                 <p className="dark:text-white max-sm:text-mobile-smallSize">Thiết kế và xây dựng bởi <b><i className="dark:text-mainColor max-sm:text-mobile-smallSize">WallDy</i></b></p>
                 <p className="dark:text-white max-sm:text-mobile-smallSize">&copy; 2026 UniProject. Tất cả các quyền được bảo lưu.</p>
             </footer>

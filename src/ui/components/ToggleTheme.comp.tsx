@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 import { useEffect, useState } from "react";
+import { useLocation } from 'react-router-dom';
 
 type Theme = "light" | "dark" | "system";
 

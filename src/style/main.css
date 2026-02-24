@@ -18,10 +18,10 @@
     * {
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
         font-family: "K2D", sans-serif;
         color: #3e3f46;
         transition: 0.5s;
+        box-sizing: border-box !important;
     }
 
     html,

@@ -1,19 +1,30 @@
 import { Route, Routes } from "react-router-dom"
 
 // Component
-import LandingPageLayout from "./landing_page/Layout"
+import { useTheme } from "./ui/components/ToggleTheme.comp"
 
-import Home from "./landing_page/home/Home"
-import Project from "./landing_page/project/Project"
+import LandingPageLayout from "./ui/layouts/Layout"
+import AuthLayout from "./ui/layouts/AuthLayout"
+
+import Home from "./ui/pages/Home"
+import Project from "./ui/pages/Project"
+import Contact from "./ui/pages/Contact"
+import SignIn from "./ui/pages/SignIn"
 
 function App() {
+  useTheme();
   return (
     <Routes>
       <Route element={<LandingPageLayout />}>
         <Route index element={<Home />} />
         <Route path="projects" element={<Project />} />
+        <Route path="contact" element={<Contact />} />
       </Route>
 
+      <Route path="auth" element={<AuthLayout />}>
+        <Route path="sign-in" element={<SignIn />} />
+        <Route path="sign-up" />
+      </Route>
     </Routes>
   )
 }
