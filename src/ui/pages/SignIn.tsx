@@ -22,13 +22,13 @@ const SignIn: React.FC = () => {
                 <div className="w-full flex flex-col gap-3.5">
                     <span className="w-full">
                         <p className="font-medium dark:text-white">Gmail</p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray px-2.5 py-2.5 rounded-small dark:text-white" placeholder="VD: nguyenvana@gmail.com" />
+                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white" placeholder="VD: nguyenvana@gmail.com" />
                     </span>
 
                     <span className="w-full">
                         <p className="font-medium dark:text-white">Mật khẩu</p>
                         <span className="relative w-full h-fit">
-                            <input type={showPassword ? "text" : "password"} className="w-full border-[0.5px] border-lightGray pl-2.5 py-2.5 pr-10 rounded-small dark:text-white" placeholder="VD: nguyenvana@gmail.com" />
+                            <input type={showPassword ? "text" : "password"} className="w-full border-[0.5px] border-lightGray dark:border-gray pl-2.5 py-2.5 pr-10 rounded-small dark:text-white" placeholder="VD: nguyenvana@gmail.com" />
                             {showPassword ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="absolute top-1/2 -translate-y-1/2 size-5 right-3.5 fill-gray hover:cursor-pointer" onClick={() => { setShowPassword(!showPassword) }}>
                                     <path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
@@ -61,7 +61,7 @@ const SignIn: React.FC = () => {
                 <div className="flex justify-center-safe items-center-safe">
                     <p className="font-medium dark:text-white">
                         Bạn chưa có tài khoản? {" "}
-                        <NavLink to="">
+                        <NavLink to="/auth/sign-up">
                             <i><u className="text-mainColor">Đăng ký tài khoản</u></i>
                         </NavLink>
                     </p>

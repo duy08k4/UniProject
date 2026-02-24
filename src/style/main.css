@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@custom-variant dark (&:where([data-theme=light], [data-theme=dark] *));
 
 @layer utilities {
 
@@ -84,6 +84,7 @@
     --color-gray: #808080;
     --color-lightGray: #d3d3d3;
     --color-red: #ff0000;
+    --color-redRGB: rgba(255, 0, 0, 0.25);
 
     /* Light mode */
     --color-bgLight: #f6f6f6;

@@ -9,7 +9,9 @@ import AuthLayout from "./ui/layouts/AuthLayout"
 import Home from "./ui/pages/Home"
 import Project from "./ui/pages/Project"
 import Contact from "./ui/pages/Contact"
+
 import SignIn from "./ui/pages/SignIn"
+import SignUp from "./ui/pages/SignUp"
 
 function App() {
   useTheme();
@@ -23,7 +25,7 @@ function App() {
 
       <Route path="auth" element={<AuthLayout />}>
         <Route path="sign-in" element={<SignIn />} />
-        <Route path="sign-up" />
+        <Route path="sign-up" element={<SignUp />} />
       </Route>
     </Routes>
   )
