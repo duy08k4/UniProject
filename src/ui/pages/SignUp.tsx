@@ -118,8 +118,8 @@ const SignUp: React.FC = () => {
         }
 
     return (
-        <div className="h-full w-full flex justify-center-safe items-center-safe gap-10">
-            <div className="h-fit w-[450px] flex flex-col gap-5 px-10 py-15 rounded-normal shadow-[0_0_50px_20px_rgba(128,128,128,0.25)]">
+        <div className="h-full w-full flex justify-center-safe items-center-safe gap-10 max-sm:flex max-sm:flex-col">
+            <div className="h-fit w-[450px] flex flex-col gap-5 px-10 py-15 rounded-normal shadow-[0_0_50px_20px_rgba(128,128,128,0.25)] max-sm:w-full max-sm:px-5 max-sm:py-10">
                 <div className="flex flex-col items-center-safe gap-3.5">
                     <img src={UniLogo} className="h-10" loading="lazy" />
                     <span className="flex flex-col items-center-safe">
@@ -130,32 +130,32 @@ const SignUp: React.FC = () => {
 
                 <div className="w-full flex flex-col gap-3.5">
                     <span className="w-full">
-                        <p className="font-medium dark:text-white">Họ và tên</p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white" onChange={handleChange("fullName")} placeholder="VD: Nguyễn Văn A" />
+                        <p className="font-medium dark:text-white">Họ và tên <b className="text-red">*</b></p>
+                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("fullName")} placeholder="VD: Nguyễn Văn A" />
                     </span>
 
                     <span className="w-full">
-                        <p className="font-medium dark:text-white">Gmail</p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white" onChange={handleChange("gmail")} placeholder="VD: nguyenvana@gmail.com" />
+                        <p className="font-medium dark:text-white">Gmail <b className="text-red">*</b></p>
+                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("gmail")} placeholder="VD: nguyenvana@gmail.com" />
                     </span>
 
                     <span className="w-full">
-                        <p className="font-medium dark:text-white">Mập khẩu</p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white" onChange={handleChange("password")} placeholder="..." />
+                        <p className="font-medium dark:text-white">Mập khẩu <b className="text-red">*</b></p>
+                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("password")} placeholder="..." />
                     </span>
 
                     <span className="w-full">
-                        <p className="font-medium dark:text-white">Nhập lại mật khẩu</p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white" onChange={handleChange("confirmPassword")} placeholder="..." />
+                        <p className="font-medium dark:text-white">Nhập lại mật khẩu <b className="text-red">*</b></p>
+                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("confirmPassword")} placeholder="..." />
                     </span>
                 </div>
 
                 <div className="w-full">
-                    <button className="hoverBtn w-full bg-mainColor text-white py-2.5 rounded-small hover:cursor-pointer">Đăng ký</button>
+                    <button className="hoverBtn w-full bg-mainColor text-white py-2.5 rounded-small hover:cursor-pointer max-sm:text-smallSize">Đăng ký</button>
                 </div>
 
                 <div className="flex justify-center-safe items-center-safe">
-                    <p className="font-medium dark:text-white">
+                    <p className="font-medium dark:text-white max-sm:text-smallSize">
                         Đã có tài khoản? {" "}
                         <NavLink to="/auth/sign-in">
                             <i><u className="text-mainColor">Đăng nhập</u></i>
@@ -164,7 +164,7 @@ const SignUp: React.FC = () => {
                 </div>
             </div>
 
-            <div className="h-fit w-[400px] flex flex-col gap-5 shadow-[0_0_50px_20px_rgba(128,128,128,0.25)] px-10 py-10 rounded-normal">
+            <div className="h-fit w-[400px] flex flex-col gap-5 shadow-[0_0_50px_20px_rgba(128,128,128,0.25)] px-10 py-10 rounded-normal max-sm:w-full">
                 <h1 className="text-center text-bigSize font-medium dark:text-white">Kiểm tra thông tin</h1>
 
                 <div className="">
