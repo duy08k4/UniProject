@@ -3,38 +3,46 @@ import type React from "react"
 // Image
 import ProjectDemo from "../../assets/ProjectDemo.png"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 interface ProjectCard_interface {
     key: any
 }
 
 const ProjectCard: React.FC<ProjectCard_interface> = ({ key }) => {
+    const navigate = useNavigate()
+
     return (
-        <div key={key} className="h-fit flex flex-col gap-3.5 shadow-[0_0_12px_rgba(0,0,0,0.1)] p-3.5 border-[0.5px] border-lightGray rounded-medium hover:cursor-pointer hover:border-mainColor hover:shadow-[0_0_12px_2px_rgba(73,156,64,0.75)] dark:border-none dark:bg-lightDark dark:hover:shadow-[0_0_12px_2px_rgba(255,255,255,0.75)]">
-            <span className="h-56 overflow-hidden w-full bg-lightGray rounded-normal">
+        <div key={key} onClick={() => { navigate("/projects/123") }} className="h-fit flex flex-col gap-5 shadow-[0_0_12px_rgba(0,0,0,0.1)] p-3.5 border-[0.5px] border-lightGray rounded-medium hover:cursor-pointer hover:border-mainColor hover:shadow-[0_0_12px_2px_rgba(73,156,64,0.75)] dark:border-none dark:bg-lightDark dark:hover:shadow-[0_0_12px_2px_rgba(255,255,255,0.75)]">
+            {/* <span className="h-56 overflow-hidden w-full bg-lightGray rounded-normal">
                 <img src={ProjectDemo} className="object-cover object-center" alt="" loading="lazy" />
-            </span>
+            </span> */}
 
-            <span className="flex flex-col">
-                <h4 className="text-mediumSize font-semibold dark:text-white max-sm:text-mobile-bigSize">Tên đề tài</h4>
-
-                <span className="flex gap-3.5 items-center-safe">
-                    <p className="font-light dark:text-white max-sm:text-mobile-normalSize">Tác giả: Nguyễn Văn A</p>
-                    <span className="h-2.5 aspect-square bg-mainColor rounded-full"></span>
-                    <p className="font-light dark:text-white max-sm:text-mobile-normalSize">Khóa luận</p>
+            <span className="flex flex-col gap-5">
+                <h4 className="text-mediumSize font-semibold dark:text-white max-sm:text-mobile-bigSize uppercase">XÂY DỰNG TRANG WEB HỖ TRỢ
+                    KHOA MÔI TRƯỜNG VÀ TÀI NGUYÊN QUẢN LÝ
+                    ĐỒ ÁN TỐT NGHIỆP CỦA SINH VIÊN
+                    </h4>
+                <span>
+                    <span className="flex gap-3.5 items-center-safe">
+                        <p className="font-light dark:text-white max-sm:text-mobile-normalSize">Tác giả: Nguyễn Văn A</p>
+                        <span className="h-2.5 aspect-square bg-mainColor rounded-full"></span>
+                        <p className="font-light dark:text-white max-sm:text-mobile-normalSize">Khóa luận</p>
+                    </span>
+                    
+                    <p className="font-light dark:text-white max-sm:text-mobile-normalSize">Ngày nộp: 00/00/0000</p>
                 </span>
-                <p className="font-light dark:text-white max-sm:text-mobile-normalSize">Ngày nộp: 00/00/0000</p>
             </span>
 
             <span className="flex items-center-safe gap-2.5">
                 <button className="hoverBtn font-medium text-mainColor flex-1 bg-mainColorRGB py-2.5 rounded-normal max-sm:text-mobile-smallSize">Xem đồ án</button>
 
-                <button className="hoverBtn font-medium flex-1 text-white flex items-center-safe justify-center-safe gap-2.5 bg-mainColor py-2.5 rounded-normal max-sm:text-mobile-smallSize">
+                {/* <button className="hoverBtn font-medium flex-1 text-white flex items-center-safe justify-center-safe gap-2.5 bg-mainColor py-2.5 rounded-normal max-sm:text-mobile-smallSize">
                     Tải xuống
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="white" className="size-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                     </svg>
-                </button>
+                </button> */}
             </span>
         </div>
     )

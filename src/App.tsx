@@ -10,6 +10,8 @@ import Home from "./ui/pages/Home"
 import Project from "./ui/pages/Project"
 import Contact from "./ui/pages/Contact"
 
+import ProjectDetail from "./ui/pages/ProjectDetail"
+
 import SignIn from "./ui/pages/SignIn"
 import SignUp from "./ui/pages/SignUp"
 
@@ -22,6 +24,7 @@ function App() {
         <Route path="projects" element={<Project />} />
         <Route path="contact" element={<Contact />} />
       </Route>
+      <Route path="projects/:project-id" element={<ProjectDetail />} />
 
       <Route path="auth" element={<AuthLayout />}>
         <Route path="sign-in" element={<SignIn />} />
