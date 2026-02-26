@@ -5,6 +5,7 @@ import { useTheme } from "./ui/components/ToggleTheme.comp"
 
 import LandingPageLayout from "./ui/layouts/Layout"
 import AuthLayout from "./ui/layouts/AuthLayout"
+import SuperAdminLayout from "./ui/layouts/SuperAdminLayout"
 
 import Home from "./ui/pages/Home"
 import Project from "./ui/pages/Project"
@@ -16,6 +17,10 @@ import SignIn from "./ui/pages/SignIn"
 import SignUp from "./ui/pages/SignUp"
 import RequireResetPassword from "./ui/pages/RequireResetPassword"
 import ResetPassword from "./ui/pages/ResetPassword"
+
+// Super admin
+import Overview from "./ui/pages/superadmin/Overview"
+import UserManagement from "./ui/pages/superadmin/UserManagement"
 
 function App() {
   useTheme();
@@ -33,6 +38,11 @@ function App() {
         <Route path="sign-up" element={<SignUp />} />
         <Route path="require-reset" element={<RequireResetPassword />} />
         <Route path="reset-password" element={<ResetPassword />} />
+      </Route>
+
+      <Route path="super-admin" element={<SuperAdminLayout />} >
+        <Route path="overview" element={<Overview />} />
+        <Route path="users" element={<UserManagement />} />
       </Route>
     </Routes>
   )

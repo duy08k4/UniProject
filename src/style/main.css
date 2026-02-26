@@ -70,6 +70,8 @@
 
     --spacing-mobile-twoSidePadding: 40px;
 
+    --spacing-mainTwoSidePadding: 40px;
+
     /* Border radius */
     --radius-big: 20px;
     --radius-medium: 15px;
@@ -87,7 +89,7 @@
     --color-redRGB: rgba(255, 0, 0, 0.25);
 
     /* Light mode */
-    --color-bgLight: #f6f6f6;
+    --color-bgLight: #ffffff;
 
     /* Darkmode */
     --color-bgDark: #171717;
