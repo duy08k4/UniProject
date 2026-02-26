@@ -1,7 +1,7 @@
 import type React from "react"
 
 // Image
-import ProjectDemo from "../../assets/ProjectDemo.png"
+// import ProjectDemo from "../../assets/ProjectDemo.png"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 

@@ -1,69 +1,19 @@
 import type React from "react"
-import { NavLink } from "react-router-dom"
-
-import UniLogo from "../../assets/UniLogo.png"
 import { useState } from "react"
-
-export type formValidationConfig_type = Record<string, {
-    label: string,
-    rules: Array<{
-        message: string,
-        validate: (value: string) => boolean
-    }>
-}>
+import type { formValidationConfig_type } from "./SignUp"
 
 type FormValues = {
-    fullName: string
-    gmail: string
     password: string,
     confirmPassword: string
 }
 
-const SignUp: React.FC = () => {
+const ResetPassword: React.FC = () => {
     const [formValues, setFormValues] = useState<FormValues>({
-        fullName: "",
-        gmail: "",
         password: "",
         confirmPassword: ""
     })
 
     const formValidationConfig: formValidationConfig_type = {
-        fullName: {
-            label: "Họ và tên",
-            rules: [
-                {
-                    message: "Không được để trống",
-                    validate: (value: string) => value.trim().length > 0
-                },
-                {
-                    message: " Độ dài 10 đến 50 ký tự",
-                    validate: (value: string) => value.trim().length >= 10 && value.trim().length <= 50
-                },
-                {
-                    message: "Không chứa số",
-                    validate: (value: string) => !/\d/.test(value) && value.trim().length > 0
-                },
-                {
-                    message: "Không chứa ký tự đặc biệt",
-                    validate: (value: string) =>
-                        /^[a-zA-ZÀ-ỹ\s]+$/.test(value)
-                }
-            ]
-        },
-        gmail: {
-            label: "Gmail",
-            rules: [
-                {
-                    message: "Không được để trống",
-                    validate: (value: string) => value.trim().length > 0
-                },
-                {
-                    message: "Đúng định dạng email",
-                    validate: (value: string) =>
-                        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-                }
-            ]
-        },
         password: {
             label: "Mật khẩu",
             rules: [
@@ -121,46 +71,26 @@ const SignUp: React.FC = () => {
         <div className="h-full w-full flex justify-center-safe items-center-safe gap-10 max-sm:flex max-sm:flex-col">
             <div className="h-fit w-[450px] flex flex-col gap-5 px-10 py-15 rounded-normal shadow-[0_0_50px_20px_rgba(128,128,128,0.25)] max-sm:w-full max-sm:px-5 max-sm:py-10">
                 <div className="flex flex-col items-center-safe gap-3.5">
-                    <img src={UniLogo} className="h-10" loading="lazy" />
                     <span className="flex flex-col items-center-safe">
-                        <h1 className="font-semibold text-bigSize uppercase dark:text-white">Đăng ký</h1>
-                        <p className="text-gray">Vui lòng cung cấp mật khẩu mới </p>
+                        <h1 className="font-semibold text-bigSize uppercase dark:text-white">Đặt lại mật khẩu</h1>
+                        <p className="text-gray">Vui lòng điền đầy đủ thông tin </p>
                     </span>
                 </div>
 
                 <div className="w-full flex flex-col gap-3.5">
                     <span className="w-full">
-                        <p className="font-medium dark:text-white">Họ và tên <b className="text-red">*</b></p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("fullName")} placeholder="VD: Nguyễn Văn A" />
-                    </span>
-
-                    <span className="w-full">
-                        <p className="font-medium dark:text-white">Gmail <b className="text-red">*</b></p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("gmail")} placeholder="VD: nguyenvana@gmail.com" />
-                    </span>
-
-                    <span className="w-full">
                         <p className="font-medium dark:text-white">Mập khẩu <b className="text-red">*</b></p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("password")} placeholder="..." />
+                        <input type="password" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("password")} placeholder="..." />
                     </span>
 
                     <span className="w-full">
                         <p className="font-medium dark:text-white">Nhập lại mật khẩu <b className="text-red">*</b></p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("confirmPassword")} placeholder="..." />
+                        <input type="password" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("confirmPassword")} placeholder="..." />
                     </span>
                 </div>
 
                 <div className="w-full">
-                    <button className="hoverBtn w-full bg-mainColor text-white py-2.5 rounded-small hover:cursor-pointer max-sm:text-smallSize">Đăng ký</button>
-                </div>
-
-                <div className="flex justify-center-safe items-center-safe">
-                    <p className="font-medium dark:text-white max-sm:text-smallSize">
-                        Đã có tài khoản? {" "}
-                        <NavLink to="/auth/sign-in">
-                            <i><u className="text-mainColor">Đăng nhập</u></i>
-                        </NavLink>
-                    </p>
+                    <button className="hoverBtn w-full bg-mainColor text-white py-2.5 rounded-small hover:cursor-pointer max-sm:text-smallSize">Cập nhật</button>
                 </div>
             </div>
 
@@ -203,6 +133,7 @@ const SignUp: React.FC = () => {
             </div>
         </div >
     )
+
 }
 
-export default SignUp
+export default ResetPassword

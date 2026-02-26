@@ -14,6 +14,8 @@ import ProjectDetail from "./ui/pages/ProjectDetail"
 
 import SignIn from "./ui/pages/SignIn"
 import SignUp from "./ui/pages/SignUp"
+import RequireResetPassword from "./ui/pages/RequireResetPassword"
+import ResetPassword from "./ui/pages/ResetPassword"
 
 function App() {
   useTheme();
@@ -29,6 +31,8 @@ function App() {
       <Route path="auth" element={<AuthLayout />}>
         <Route path="sign-in" element={<SignIn />} />
         <Route path="sign-up" element={<SignUp />} />
+        <Route path="require-reset" element={<RequireResetPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
       </Route>
     </Routes>
   )
