@@ -1,15 +1,15 @@
 import type React from "react"
-import UserDetailPopup from "../../components/UserDetailPopup"
+import ClassDetailPopup from "../../components/ClassDetailPopup"
 import { useState } from "react"
 
-const UserManagement: React.FC = () => {
+const ClassManagement: React.FC = () => {
     const [isOpenPopup, setIsOpenPopup] = useState<boolean>(false)
 
     return (
         <div className="w-full flex flex-col gap-5 py-mainTwoSidePadding">
             <div className="w-full h-fit">
-                <h1 className="text-hugeSize font-semibold dark:text-white">Quản lý người dùng</h1>
-                <p className="text-normalSize text-gray">Quản lý tất cả người dùng của hệ thống</p>
+                <h1 className="text-hugeSize font-semibold dark:text-white">Quản lý lớp học</h1>
+                <p className="text-normalSize text-gray">Quản lý tất cả lớp học của hệ thống</p>
             </div>
 
             <div className="w-full flex flex-col gap-5">
@@ -19,7 +19,7 @@ const UserManagement: React.FC = () => {
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
 
-                        <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white" placeholder="Tìm kiếm tên hoặc gmail..." />
+                        <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white" placeholder="Tìm kiếm tên lớp..." />
                         <span id="underlineInput" className="absolute bottom-0 left-0 bg-mainColor dark:bg-white w-0 h-px"></span>
                     </span>
 
@@ -28,6 +28,7 @@ const UserManagement: React.FC = () => {
 
                         <select className="w-48 border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white max-sm:text-mobile-smallSize max-sm:w-full">
                             <option value="">Hoạt động</option>
+                            <option value="">Chờ duyệt</option>
                             <option value="">Đình chỉ</option>
                             <option value="">Đã xóa</option>
                         </select>
@@ -35,7 +36,7 @@ const UserManagement: React.FC = () => {
 
                     <span className="flex gap-1.5 items-center-safe">
                         <p className="font-bold dark:text-white">Số lượng:</p>
-                        <p className="dark:text-white">10 user</p>
+                        <p className="dark:text-white">10 lớp</p>
                     </span>
 
                     <span className="flex-1 flex justify-end-safe items-center-safe gap-1.5">
@@ -61,21 +62,23 @@ const UserManagement: React.FC = () => {
                         <table className="w-full bg-transparent">
                             <colgroup>
                                 <col className="w-[5%]" />
-                                <col className="w-[22%]" />
-                                <col className="w-[23%]" />
+                                <col className="w-[20%]" />
+                                <col className="w-[15%]" />
                                 <col className="w-[10%]" />
-                                <col className="w-[15%]" />
-                                <col className="w-[15%]" />
+                                <col className="w-[20%]" />
+                                <col className="w-[10%]" />
+                                <col className="w-[10%]" />
                                 <col className="w-[10%]" />
                             </colgroup>
 
                             <tr className="">
                                 <th className="text-left px-3.5 py-2.5"><input type="checkbox" /></th>
-                                <th className="text-left dark:text-white">Tên</th>
-                                <th className="text-left dark:text-white">Email</th>
-                                <th className="text-left dark:text-white">Vai trò</th>
+                                <th className="text-left dark:text-white">Tên lớp</th>
+                                <th className="text-left dark:text-white">Chuyên ngành</th>
+                                <th className="text-left dark:text-white">Mã tham gia</th>
+                                <th className="text-left dark:text-white">Chủ phòng</th>
                                 <th className="text-left dark:text-white">Trạng thái</th>
-                                <th className="text-left dark:text-white">Tham gia</th>
+                                <th className="text-left dark:text-white">Ngày tạo</th>
                                 <th className="text-left dark:text-white"></th>
                             </tr>
 
@@ -83,9 +86,10 @@ const UserManagement: React.FC = () => {
                                 return (
                                     <tr className="hover:bg-lightGray hover:cursor-pointer [&_td]:text-gray border-t-[0.5px] border-lightGray dark:border-gray">
                                         <td className="px-3.5 py-5"><input type="checkbox" /></td>
-                                        <td>Tran Ba Tuong Duy</td>
-                                        <td>duytran.290804@gmail.com</td>
-                                        <td>user</td>
+                                        <td>Lớp đồ án 22HM</td>
+                                        <td>Hệ Thống Thông Tin</td>
+                                        <td>abcxyz</td>
+                                        <td>nguyenvana@gmail.com</td>
                                         <td>Hoạt động</td>
                                         <td>26-02-2026</td>
                                         <td>
@@ -118,10 +122,10 @@ const UserManagement: React.FC = () => {
                 </div>
             </div>
 
-            {isOpenPopup && <UserDetailPopup togglePopup={() => setIsOpenPopup(false)} />}
+            {isOpenPopup && <ClassDetailPopup togglePopup={() => setIsOpenPopup(false)} />}
 
         </div>
     )
 }
 
-export default UserManagement
+export default ClassManagement

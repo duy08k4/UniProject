@@ -21,6 +21,7 @@ import ResetPassword from "./ui/pages/ResetPassword"
 // Super admin
 import Overview from "./ui/pages/superadmin/Overview"
 import UserManagement from "./ui/pages/superadmin/UserManagement"
+import ClassManagement from "./ui/pages/superadmin/ClassManagement"
 
 function App() {
   useTheme();
@@ -43,6 +44,7 @@ function App() {
       <Route path="super-admin" element={<SuperAdminLayout />} >
         <Route path="overview" element={<Overview />} />
         <Route path="users" element={<UserManagement />} />
+        <Route path="classes" element={<ClassManagement />} />
       </Route>
     </Routes>
   )
