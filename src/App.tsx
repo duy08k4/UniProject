@@ -23,6 +23,7 @@ import Overview from "./ui/pages/superadmin/Overview"
 import UserManagement from "./ui/pages/superadmin/UserManagement"
 import ClassManagement from "./ui/pages/superadmin/ClassManagement"
 import Milestones from "./ui/pages/superadmin/Milestones"
+import FormManagement from "./ui/pages/superadmin/FormManagement"
 
 function App() {
   useTheme();
@@ -47,6 +48,7 @@ function App() {
         <Route path="users" element={<UserManagement />} />
         <Route path="classes" element={<ClassManagement />} />
         <Route path="milestones" element={<Milestones />} />
+        <Route path="forms" element={<FormManagement />} />
       </Route>
     </Routes>
   )
