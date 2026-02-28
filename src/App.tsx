@@ -22,6 +22,7 @@ import ResetPassword from "./ui/pages/ResetPassword"
 import Overview from "./ui/pages/superadmin/Overview"
 import UserManagement from "./ui/pages/superadmin/UserManagement"
 import ClassManagement from "./ui/pages/superadmin/ClassManagement"
+import Milestones from "./ui/pages/superadmin/Milestones"
 
 function App() {
   useTheme();
@@ -45,6 +46,7 @@ function App() {
         <Route path="overview" element={<Overview />} />
         <Route path="users" element={<UserManagement />} />
         <Route path="classes" element={<ClassManagement />} />
+        <Route path="milestones" element={<Milestones />} />
       </Route>
     </Routes>
   )
