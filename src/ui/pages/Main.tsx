@@ -1,16 +1,21 @@
 import type React from "react"
 import { NavLink } from "react-router-dom"
-import uniqolor from "uniqolor"
+import { useState } from "react"
 
 // Image
 import UniLogo from "../../assets/UniLogo.png"
 
 // Component
 import ToggleTheme from "../components/ToggleTheme.comp"
+import NewClassForm from "../components/NewClassForm"
+import JoinClassForm from "../components/JoinClassForm"
 
 const Main: React.FC = () => {
+    const [isNewClassForm, setIsNewClassForm] = useState<boolean>(false)
+    const [isJoinClassForm, setIsJoinClassForm] = useState<boolean>(false)
+
     return (
-        <div className="h-full flex-1 flex flex-col gap-2.5 dark:bg-bgDark">
+        <div className="h-full flex-1 flex flex-col dark:bg-bgDark">
             <header className="w-full border-b-[0.5px] border-lightGray dark:border-gray flex justify-between px-[300px] max-sm:px-mobile-twoSidePadding py-5">
                 <NavLink to="/" className="h-10 flex items-end-safe gap-2.5">
                     <img src={UniLogo} loading="lazy" className="h-full max-sm:h-10 max-sm:w-10" />
@@ -27,20 +32,20 @@ const Main: React.FC = () => {
                 </span>
             </header>
 
-            <div className="h-full flex-1 px-[300px] max-sm:px-mobile-twoSidePadding overflow-auto">
+            <div className="h-full flex-1 px-[300px] max-sm:px-mobile-twoSidePadding overflow-auto pb-5">
                 <div className="sticky top-0 left-0 w-full bg-bgLight dark:bg-bgDark flex max-sm:flex-col items-center-safe gap-5 max-sm:gap-2.5 py-5 z-10">
                     <span className="relative w-full flex items-center-safe px-2.5 rounded-small shadow-[0_0_10px_rgba(128,128,128,0.25)] dark:bg-black">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" className="size-6 dark:stroke-white">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
 
-                        <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white" placeholder="Tìm kiếm tên hoặc gmail..." />
+                        <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white" placeholder="Tìm kiếm tên lớp hoặc gmail chủ phòng..." />
                         <span id="underlineInput" className="absolute bottom-0 left-0 bg-mainColor dark:bg-white w-0 h-px"></span>
                     </span>
 
                     <span className="flex max-sm:w-full gap-1.5 items-center-safe">
-                        <button className="flex-1 border-[0.5px] border-lightGray dark:border-gray dark:text-white px-5 py-2 rounded-small text-nowrap max-sm:text-mobile-normalSize">Tham gia lớp</button>
-                        <button className="flex-1 bg-mainColor text-white font-medium px-5 py-2 rounded-small text-nowrap max-sm:text-mobile-normalSize">Tạo lớp</button>
+                        <button className="flex-1 border-[0.5px] border-lightGray dark:border-gray dark:text-white px-5 py-2 rounded-small text-nowrap max-sm:text-mobile-normalSize hoverBtn" onClick={() => { setIsJoinClassForm(!isJoinClassForm) }}>Tham gia lớp</button>
+                        <button className="flex-1 bg-mainColor text-white font-medium px-5 py-2 rounded-small text-nowrap max-sm:text-mobile-normalSize hoverBtn" onClick={() => { setIsNewClassForm(!isNewClassForm) }}>Tạo lớp</button>
                     </span>
                 </div>
 
@@ -51,10 +56,10 @@ const Main: React.FC = () => {
                             <p className="text-normalSize max-sm:text-mobile-normalSize font-medium text-gray">Các lớp học bạn đã tạo và quản lý</p>
                         </span>
 
-                        <div className="grid grid-cols-3 max-sm:grid-cols-1 gap-5 px">
+                        <div className="grid grid-cols-3 max-sm:grid-cols-1 gap-5">
                             {Array(9).fill(0).map(() => {
                                 return (
-                                    <span className="flex flex-col gap-2.5 shadow-[0_0_20px_rgba(128,128,128,0.25)] px-3.5 py-5 rounded-small">
+                                    <span className="flex flex-col gap-2.5 shadow-[0_0_20px_rgba(128,128,128,0.25)] px-3.5 py-5 rounded-small hover:cursor-pointer hover:shadow-[0_0_10px_2px_rgba(128,128,128,0.75)]">
                                         <span className="flex flex-col gap-1.5">
                                             <h4 className="text-mediumSize max-sm:text-mobile-mediumSizeSize font-bold line-clamp-2 dark:text-white">Web Development Fundamentals</h4>
                                             <span className="w-fit text-smallSize max-sm:text-mobile-smallSize text-white font-semibold bg-mainColor px-2.5 py-1 rounded-small">Chủ lớp</span>
@@ -88,7 +93,7 @@ const Main: React.FC = () => {
                         <div className="grid grid-cols-3 max-sm:grid-cols-1 gap-5">
                             {Array(9).fill(0).map(() => {
                                 return (
-                                    <span className="flex flex-col gap-2.5 shadow-[0_0_20px_rgba(128,128,128,0.25)] px-3.5 py-5 rounded-small">
+                                    <span className="flex flex-col gap-2.5 shadow-[0_0_20px_rgba(128,128,128,0.25)] px-3.5 py-5 rounded-small hover:cursor-pointer hover:shadow-[0_0_10px_2px_rgba(128,128,128,0.75)]">
                                         <span className="flex flex-col gap-1.5">
                                             <h4 className="text-mediumSize max-sm:text-mobile-mediumSize font-bold line-clamp-1 dark:text-white">Web Development Fundamentals</h4>
                                             <span className="w-fit text-smallSize max-sm:text-mobile-smallSize text-mainColor font-bold border-[0.5px] border-mainColor px-2.5 py-1 rounded-small">Thành viên</span>
@@ -119,6 +124,13 @@ const Main: React.FC = () => {
                 <p className="dark:text-white max-sm:text-mobile-smallSize">Thiết kế và xây dựng bởi <b><i className="dark:text-mainColor max-sm:text-mobile-smallSize">WallDy</i></b></p>
                 <p className="dark:text-white max-sm:text-mobile-smallSize">&copy; 2026 UniProject. Tất cả các quyền được bảo lưu.</p>
             </footer>
+            {isNewClassForm && (
+                <NewClassForm toggleForm={() => { setIsNewClassForm(!isNewClassForm) }} />
+            )}
+
+            {isJoinClassForm && (
+                <JoinClassForm toggleForm={() => { setIsJoinClassForm(!isJoinClassForm) }} />
+            )}
         </div>
     )
 }
