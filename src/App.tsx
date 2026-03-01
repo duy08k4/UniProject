@@ -25,6 +25,8 @@ import ClassManagement from "./ui/pages/superadmin/ClassManagement"
 import Milestones from "./ui/pages/superadmin/Milestones"
 import FormManagement from "./ui/pages/superadmin/FormManagement"
 
+import Main from "./ui/pages/Main"
+
 function App() {
   useTheme();
   return (
@@ -49,6 +51,10 @@ function App() {
         <Route path="classes" element={<ClassManagement />} />
         <Route path="milestones" element={<Milestones />} />
         <Route path="forms" element={<FormManagement />} />
+      </Route>
+
+      <Route path="main">
+        <Route index element={<Main />} />
       </Route>
     </Routes>
   )
