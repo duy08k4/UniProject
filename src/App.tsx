@@ -6,6 +6,7 @@ import { useTheme } from "./ui/components/ToggleTheme.comp"
 import LandingPageLayout from "./ui/layouts/Layout"
 import AuthLayout from "./ui/layouts/AuthLayout"
 import SuperAdminLayout from "./ui/layouts/SuperAdminLayout"
+import RoomAdminLayout from "./ui/layouts/RoomAdminLayout"
 
 import Home from "./ui/pages/Home"
 import Project from "./ui/pages/Project"
@@ -25,7 +26,9 @@ import ClassManagement from "./ui/pages/superadmin/ClassManagement"
 import Milestones from "./ui/pages/superadmin/Milestones"
 import FormManagement from "./ui/pages/superadmin/FormManagement"
 
+// Main
 import Main from "./ui/pages/Main"
+import RAOverview from "./ui/pages/roomadmin/RAOverview"
 
 function App() {
   useTheme();
@@ -55,6 +58,9 @@ function App() {
 
       <Route path="main">
         <Route index element={<Main />} />
+        <Route path="class/:classId" element={<RoomAdminLayout />}>
+          <Route index element={<RAOverview />} />
+        </Route>
       </Route>
     </Routes>
   )
