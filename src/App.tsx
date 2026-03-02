@@ -26,6 +26,7 @@ import ClassManagement from "./ui/pages/superadmin/SAClassManagement"
 import Milestones from "./ui/pages/superadmin/SAMilestones"
 import FormManagement from "./ui/pages/superadmin/SAFormManagement"
 import SAScoreBoardManagement from "./ui/pages/superadmin/SAScoreBoardManagement"
+import SASubmission from "./ui/pages/superadmin/SASubmission"
 
 // Main
 import Main from "./ui/pages/Main"
@@ -57,6 +58,7 @@ function App() {
         <Route path="milestones" element={<Milestones />} />
         <Route path="forms" element={<FormManagement />} />
         <Route path="scoreboards" element={<SAScoreBoardManagement />} />
+        <Route path="submission" element={<SASubmission />} />
       </Route>
 
       <Route path="main">

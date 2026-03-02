@@ -84,7 +84,7 @@ const ClassManagement: React.FC = () => {
 
                             {Array(20).fill(0).map(() => {
                                 return (
-                                    <tr className="hover:bg-lightGray hover:cursor-pointer [&_td]:text-gray border-t-[0.5px] border-lightGray dark:border-gray">
+                                    <tr className="hover:bg-lightGray dark:hover:bg-darkGray hover:cursor-pointer [&_td]:text-gray border-t-[0.5px] border-lightGray dark:border-gray">
                                         <td className="px-3.5 py-5"><input type="checkbox" /></td>
                                         <td>Lớp đồ án 22HM</td>
                                         <td>Hệ Thống Thông Tin</td>

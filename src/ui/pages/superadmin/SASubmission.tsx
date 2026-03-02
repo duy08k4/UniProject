@@ -1,11 +1,11 @@
 import type React from "react"
 
-const Milestones: React.FC = () => {
+const SASubmission: React.FC = () => {
     return (
         <div className="w-full flex flex-col gap-5 py-mainTwoSidePadding">
             <div className="w-full h-fit">
-                <h1 className="text-hugeSize font-semibold dark:text-white">Quản lý cột mốc</h1>
-                <p className="text-normalSize text-gray">Quản lý các cột mốc của các quy trình thực hiện đồ án</p>
+                <h1 className="text-hugeSize font-semibold dark:text-white">Quản lý bài nộp</h1>
+                <p className="text-normalSize text-gray">Quản lý tất cả file báo cáo do sinh viên nộp</p>
             </div>
 
             <div className="w-full flex flex-col gap-5">
@@ -15,23 +15,13 @@ const Milestones: React.FC = () => {
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
 
-                        <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white" placeholder="Tìm kiếm tên cột mốc hoặc tên lớp..." />
+                        <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white" placeholder="Tìm kiếm tên đề tài hoặc gmail sinh viên..." />
                         <span id="underlineInput" className="absolute bottom-0 left-0 bg-mainColor dark:bg-white w-0 h-px"></span>
-                    </span>
-
-                    <span className="flex items-center-safe gap-1.5">
-                        <p className="font-bold dark:text-white">Ngành:</p>
-
-                        <select className="w-48 border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white max-sm:text-mobile-smallSize max-sm:w-full">
-                            <option value="">Ngành 1</option>
-                            <option value="">Ngành 2</option>
-                            <option value="">Ngành 3</option>
-                        </select>
                     </span>
 
                     <span className="flex gap-1.5 items-center-safe">
                         <p className="font-bold dark:text-white">Số lượng:</p>
-                        <p className="dark:text-white">10 quy trình</p>
+                        <p className="dark:text-white">10 file</p>
                     </span>
 
                     <span className="flex-1 flex justify-end-safe items-center-safe gap-1.5">
@@ -59,31 +49,31 @@ const Milestones: React.FC = () => {
                                 <col className="w-[5%]" />
                                 <col className="w-[20%]" />
                                 <col className="w-[20%]" />
+                                <col className="w-[10%]" />
+                                <col className="w-[20%]" />
                                 <col className="w-[15%]" />
-                                <col className="w-[12%]" />
-                                <col className="w-[18%]" />
                                 <col className="w-[10%]" />
                             </colgroup>
 
                             <tr className="">
-                                <th className="text-left px-3.5 py-2.5"><input type="checkbox"/></th>
-                                <th className="text-left dark:text-white">Tên cột mốc</th>
+                                <th className="text-left px-3.5 py-2.5"><input type="checkbox" /></th>
+                                <th className="text-left dark:text-white">Tên đề tài</th>
+                                <th className="text-left dark:text-white">Sinh viên thực hiện</th>
+                                <th className="text-center dark:text-white">Trạng thái</th>
                                 <th className="text-left dark:text-white">Lớp</th>
-                                <th className="text-left dark:text-white">Ngành</th>
-                                <th className="text-center dark:text-white">Thứ tự</th>
-                                <th className="text-left dark:text-white">Người tạo</th>
+                                <th className="text-left dark:text-white">Ngày nộp</th>
                                 <th className="text-left dark:text-white"></th>
                             </tr>
 
-                            {Array(20).fill(0).map((_, index) => {
+                            {Array(20).fill(0).map(() => {
                                 return (
                                     <tr className="hover:bg-lightGray dark:hover:bg-darkGray hover:cursor-pointer [&_td]:text-gray border-t-[0.5px] border-lightGray dark:border-gray">
                                         <td className="px-3.5 py-5"><input type="checkbox" /></td>
-                                        <td>Cột mốc {index}</td>
-                                        <td>Lớp đồ án 22HM</td>
-                                        <td>Hệ Thống Thông Tin</td>
-                                        <td className="text-center">1</td>
-                                        <td>nguyenvana@gmail.com</td>
+                                        <td className="py-2.5"><p className="line-clamp-3 dark:text-gray">Xây dựng trang web hỗ trợ khoa môi trường và tài nguyên quản lý đồ án tốt nghiệp sinh viên</p></td>
+                                        <td>duytran.290804@gmail.com</td>
+                                        <td className="text-center">Đã nộp</td>
+                                        <td>Đây là tên lớp học</td>
+                                        <td>26-02-2026</td>
                                         <td>
                                             <button className="p-2.5 border-[0.5px] border-lightGray dark:border-gray rounded-normal" title="Xem">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" className="size-4 dark:stroke-white">
@@ -93,9 +83,9 @@ const Milestones: React.FC = () => {
 
                                             </button>
 
-                                            <button className="p-2.5 border-[0.5px] border-lightGray dark:border-gray rounded-normal ml-2.5" title="Đình chỉ">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" className="size-4 dark:stroke-white">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.181 8.68a4.503 4.503 0 0 1 1.903 6.405m-9.768-2.782L3.56 14.06a4.5 4.5 0 0 0 6.364 6.365l3.129-3.129m5.614-5.615 1.757-1.757a4.5 4.5 0 0 0-6.364-6.365l-4.5 4.5c-.258.26-.479.541-.661.84m1.903 6.405a4.495 4.495 0 0 1-1.242-.88 4.483 4.483 0 0 1-1.062-1.683m6.587 2.345 5.907 5.907m-5.907-5.907L8.898 8.898M2.991 2.99 8.898 8.9" />
+                                            <button className="p-2.5 border-[0.5px] border-lightGray dark:border-gray rounded-normal ml-2.5" title="Tải xuống">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-4 dark:stroke-white">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                                                 </svg>
                                             </button>
 
@@ -120,4 +110,4 @@ const Milestones: React.FC = () => {
     )
 }
 
-export default Milestones
+export default SASubmission
