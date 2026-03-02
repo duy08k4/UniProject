@@ -29,6 +29,7 @@ import FormManagement from "./ui/pages/superadmin/FormManagement"
 // Main
 import Main from "./ui/pages/Main"
 import RAOverview from "./ui/pages/roomadmin/RAOverview"
+import RAMilestones from "./ui/pages/roomadmin/RAMilestones"
 
 function App() {
   useTheme();
@@ -60,6 +61,7 @@ function App() {
         <Route index element={<Main />} />
         <Route path="class/:classId" element={<RoomAdminLayout />}>
           <Route index element={<RAOverview />} />
+          <Route path="milestones" element={<RAMilestones />}></Route>
         </Route>
       </Route>
     </Routes>
