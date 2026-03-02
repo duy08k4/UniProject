@@ -20,11 +20,12 @@ import RequireResetPassword from "./ui/pages/RequireResetPassword"
 import ResetPassword from "./ui/pages/ResetPassword"
 
 // Super admin
-import Overview from "./ui/pages/superadmin/Overview"
-import UserManagement from "./ui/pages/superadmin/UserManagement"
-import ClassManagement from "./ui/pages/superadmin/ClassManagement"
-import Milestones from "./ui/pages/superadmin/Milestones"
-import FormManagement from "./ui/pages/superadmin/FormManagement"
+import Overview from "./ui/pages/superadmin/SAOverview"
+import UserManagement from "./ui/pages/superadmin/SAUserManagement"
+import ClassManagement from "./ui/pages/superadmin/SAClassManagement"
+import Milestones from "./ui/pages/superadmin/SAMilestones"
+import FormManagement from "./ui/pages/superadmin/SAFormManagement"
+import SAScoreBoardManagement from "./ui/pages/superadmin/SAScoreBoardManagement"
 
 // Main
 import Main from "./ui/pages/Main"
@@ -55,13 +56,14 @@ function App() {
         <Route path="classes" element={<ClassManagement />} />
         <Route path="milestones" element={<Milestones />} />
         <Route path="forms" element={<FormManagement />} />
+        <Route path="scoreboards" element={<SAScoreBoardManagement />} />
       </Route>
 
       <Route path="main">
         <Route index element={<Main />} />
         <Route path="class/:classId" element={<RoomAdminLayout />}>
           <Route index element={<RAOverview />} />
-          <Route path="milestones" element={<RAMilestones />}></Route>
+          <Route path="milestones" element={<RAMilestones />} />
         </Route>
       </Route>
     </Routes>
