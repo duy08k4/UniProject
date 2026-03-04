@@ -33,6 +33,7 @@ import Main from "./ui/pages/Main"
 import RAOverview from "./ui/pages/roomadmin/RAOverview"
 import RAMembers from "./ui/pages/roomadmin/RAMembers"
 import RAMilestones from "./ui/pages/roomadmin/RAMilestones"
+import RAForms from "./ui/pages/roomadmin/RAForms"
 
 function App() {
   useTheme();
@@ -68,6 +69,7 @@ function App() {
           <Route index element={<RAOverview />} />
           <Route path="members" element={<RAMembers />} />
           <Route path="milestones" element={<RAMilestones />} />
+          <Route path="forms" element={<RAForms />} />
         </Route>
       </Route>
     </Routes>
