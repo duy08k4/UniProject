@@ -34,6 +34,8 @@ import RAOverview from "./ui/pages/roomadmin/RAOverview"
 import RAMembers from "./ui/pages/roomadmin/RAMembers"
 import RAMilestones from "./ui/pages/roomadmin/RAMilestones"
 import RAForms from "./ui/pages/roomadmin/RAForms"
+import RAScoreboards from "./ui/pages/roomadmin/RAScoreboards"
+import RAScoreboardsDetail from "./ui/pages/roomadmin/RAScoreboardsDetail"
 
 function App() {
   useTheme();
@@ -70,6 +72,11 @@ function App() {
           <Route path="members" element={<RAMembers />} />
           <Route path="milestones" element={<RAMilestones />} />
           <Route path="forms" element={<RAForms />} />
+          <Route path="scoreboards">
+            <Route index element={<RAScoreboards />} />
+            <Route path=":boardId" element={<RAScoreboardsDetail />} />
+          </Route>
+          
         </Route>
       </Route>
     </Routes>
