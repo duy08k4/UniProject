@@ -31,6 +31,7 @@ import SASubmission from "./ui/pages/superadmin/SASubmission"
 // Main
 import Main from "./ui/pages/Main"
 import RAOverview from "./ui/pages/roomadmin/RAOverview"
+import RAMembers from "./ui/pages/roomadmin/RAMembers"
 import RAMilestones from "./ui/pages/roomadmin/RAMilestones"
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
         <Route index element={<Main />} />
         <Route path="class/:classId" element={<RoomAdminLayout />}>
           <Route index element={<RAOverview />} />
+          <Route path="members" element={<RAMembers />} />
           <Route path="milestones" element={<RAMilestones />} />
         </Route>
       </Route>
