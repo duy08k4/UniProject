@@ -1,15 +1,90 @@
 import { Route, Routes } from "react-router-dom"
 
 // Component
-import LandingPageLayout from "./landing_page/Layout"
+import { useTheme } from "./ui/components/ToggleTheme.comp"
 
-import Home from "./landing_page/home/Home"
+import LandingPageLayout from "./ui/layouts/Layout"
+import AuthLayout from "./ui/layouts/AuthLayout"
+import SuperAdminLayout from "./ui/layouts/SuperAdminLayout"
+import RoomAdminLayout from "./ui/layouts/RoomAdminLayout"
+
+import Home from "./ui/pages/Home"
+import Project from "./ui/pages/Project"
+import Contact from "./ui/pages/Contact"
+
+import ProjectDetail from "./ui/pages/ProjectDetail"
+
+import SignIn from "./ui/pages/SignIn"
+import SignUp from "./ui/pages/SignUp"
+import RequireResetPassword from "./ui/pages/RequireResetPassword"
+import ResetPassword from "./ui/pages/ResetPassword"
+
+// Super admin
+import Overview from "./ui/pages/superadmin/SAOverview"
+import UserManagement from "./ui/pages/superadmin/SAUserManagement"
+import ClassManagement from "./ui/pages/superadmin/SAClassManagement"
+import Milestones from "./ui/pages/superadmin/SAMilestones"
+import FormManagement from "./ui/pages/superadmin/SAFormManagement"
+import SAScoreBoardManagement from "./ui/pages/superadmin/SAScoreBoardManagement"
+import SASubmission from "./ui/pages/superadmin/SASubmission"
+
+// Main
+import Main from "./ui/pages/Main"
+import RAOverview from "./ui/pages/roomadmin/RAOverview"
+import RAMembers from "./ui/pages/roomadmin/RAMembers"
+import RAMilestones from "./ui/pages/roomadmin/RAMilestones"
+import RAForms from "./ui/pages/roomadmin/RAForms"
+import RAScoreboards from "./ui/pages/roomadmin/RAScoreboards"
+import RAScoreboardsDetail from "./ui/pages/roomadmin/RAScoreboardsDetail"
+import RASubmissions from "./ui/pages/roomadmin/RASubmissions"
+import RASubmissionDetail from "./ui/pages/roomadmin/RASubmissionDetail"
 
 function App() {
+  useTheme();
   return (
     <Routes>
       <Route element={<LandingPageLayout />}>
         <Route index element={<Home />} />
+        <Route path="projects" element={<Project />} />
+        <Route path="contact" element={<Contact />} />
+      </Route>
+      <Route path="projects/:project-id" element={<ProjectDetail />} />
+
+      <Route path="auth" element={<AuthLayout />}>
+        <Route path="sign-in" element={<SignIn />} />
+        <Route path="sign-up" element={<SignUp />} />
+        <Route path="require-reset" element={<RequireResetPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
+      </Route>
+
+      <Route path="super-admin" element={<SuperAdminLayout />} >
+        <Route path="overview" element={<Overview />} />
+        <Route path="users" element={<UserManagement />} />
+        <Route path="classes" element={<ClassManagement />} />
+        <Route path="milestones" element={<Milestones />} />
+        <Route path="forms" element={<FormManagement />} />
+        <Route path="scoreboards" element={<SAScoreBoardManagement />} />
+        <Route path="submission" element={<SASubmission />} />
+      </Route>
+
+      <Route path="main">
+        <Route index element={<Main />} />
+        <Route path="class/:classId" element={<RoomAdminLayout />}>
+          <Route index element={<RAOverview />} />
+          <Route path="members" element={<RAMembers />} />
+          <Route path="milestones" element={<RAMilestones />} />
+          <Route path="forms" element={<RAForms />} />
+          <Route path="scoreboards">
+            <Route index element={<RAScoreboards />} />
+            <Route path=":boardId" element={<RAScoreboardsDetail />} />
+          </Route>
+
+          <Route path="submission">
+            <Route index element={<RASubmissions />} />
+            <Route path=":formId" element={<RASubmissionDetail />} />
+          </Route>
+          
+        </Route>
       </Route>
     </Routes>
   )
