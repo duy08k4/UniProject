@@ -2,7 +2,7 @@ import type React from "react"
 import { useState } from "react"
 
 const RAMembers: React.FC = () => {
-    const [isOpenPopup, setIsOpenPopup] = useState<boolean>(false)
+    const [_, setIsOpenPopup] = useState<boolean>(false)
 
     return (
         <div className="w-full flex flex-col gap-5 py-mainTwoSidePadding">
