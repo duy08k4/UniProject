@@ -1,11 +1,27 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme=light], [data-theme=dark] *));
+
+@layer utilities {
+
+    .no-spinner::-webkit-outer-spin-button,
+    .no-spinner::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .no-spinner {
+        -moz-appearance: textfield;
+    }
+}
 
 @layer base {
     * {
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
         font-family: "K2D", sans-serif;
+        color: #3e3f46;
+        transition: 0.5s;
+        box-sizing: border-box !important;
     }
 
     html,
@@ -18,22 +34,64 @@
         height: 100%;
         width: 100%;
     }
+
+    .hoverBtn:hover {
+        cursor: pointer;
+        filter: brightness(1.2);
+    }
+
+    input {
+        outline: none !important;
+    }
 }
 
 @theme {
     /* Size */
+    --text-hugeSize: 46px;
     --text-largeSize: 34px;
     --text-bigSize: 28px;
-    --text-mediumSize: 24px;
+    --text-mediumSize: 22px;
     --text-normalSize: 18px;
     --text-smallSize: 14px;
     --text-tinySize: 10px;
 
-    /* Main color */
+    --text-mobile-hugeSize: 34px;
+    --text-mobile-largeSize: 28px;
+    --text-mobile-bigSize: 22px;
+    --text-mobile-mediumSize: 20px;
+    --text-mobile-normalSize: 14px;
+    --text-mobile-smallSize: 12px;
+    --text-mobile-tinySize: 10px;
+
+    /* Padding */
+    --spacing-twoSidePadding: 120px;
+    --spacing-topPadding: 20px;
+    --spacing-BottomPadding: 20px;
+
+    --spacing-mobile-twoSidePadding: 40px;
+
+    --spacing-mainTwoSidePadding: 40px;
+
+    /* Border radius */
+    --radius-big: 20px;
+    --radius-medium: 15px;
+    --radius-normal: 10px;
+    --radius-small: 5px;
+
+    /* Color */
     --color-mainColor: #499C40;
+    --color-mainColorRGB: rgba(73, 156, 64, 0.25);
+
+    --color-lightDark: #262626;
+    --color-gray: #808080;
+    --color-lightGray: #d3d3d3;
+    --color-darkGray: #333333;
+    --color-red: #ff0000;
+    --color-redRGB: rgba(255, 0, 0, 0.25);
 
     /* Light mode */
-    --color-bg: #f6f6f6;
+    --color-bgLight: #ffffff;
 
     /* Darkmode */
+    --color-bgDark: #171717;
 }
