@@ -1,7 +1,6 @@
 import type React from "react"
 
 // Chart
-import { PieChart, Pie } from "recharts"
 import PieChartComponent from "../../components/PieChart.comp"
 
 const Overview: React.FC = () => {
