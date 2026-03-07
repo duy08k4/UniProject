@@ -202,12 +202,12 @@ const RASubmissionDetail: React.FC = () => {
                     <>
                         {/* Backdrop */}
                         <div 
-                            className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-[2px] z-[100] transition-opacity animate-in fade-in duration-300"
+                            className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-[2px] z-100 transition-opacity animate-in fade-in duration-300"
                             onClick={() => setSelectedStudent(null)}
                         />
                         
                         {/* Drawer Container */}
-                        <div className="fixed top-0 right-0 h-full w-full max-w-[500px] bg-white dark:bg-lightDark z-[101] shadow-[-10px_0_50px_rgba(0,0,0,0.15)] flex flex-col animate-in slide-in-from-right duration-300">
+                        <div className="fixed top-0 right-0 h-full w-full max-w-[500px] bg-white dark:bg-lightDark z-101 shadow-[-10px_0_50px_rgba(0,0,0,0.15)] flex flex-col animate-in slide-in-from-right duration-300">
                             {/* Drawer Header - Fixed */}
                             <div className="p-6 border-b border-gray/5 flex justify-between items-center-safe bg-white dark:bg-lightDark">
                                 <button

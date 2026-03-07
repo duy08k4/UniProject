@@ -110,7 +110,7 @@ const RASubmissions: React.FC = () => {
                         </div>
 
                         {/* Divider */}
-                        <div className="h-[1px] w-full bg-gray/10 dark:bg-white/5 my-1" />
+                        <div className="h-px w-full bg-gray/10 dark:bg-white/5 my-1" />
 
                         {/* Stats Section */}
                         <div className="grid grid-cols-3 gap-4">
