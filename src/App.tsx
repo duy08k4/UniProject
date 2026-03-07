@@ -43,6 +43,7 @@ import RASubmissionDetail from "./ui/pages/roomadmin/RASubmissionDetail"
 
 // Student
 import RoomStudentLayout from "./ui/layouts/RoomStudentLayout"
+import SDMilestones from "./ui/pages/student/SDMilestones"
 import SDMembers from "./ui/pages/student/SDMembers"
 
 function App() {
@@ -95,6 +96,7 @@ function App() {
 
         {/* Student */}
         <Route path="student/class/:classId" element={<RoomStudentLayout />}>
+        <Route index element={<SDMilestones />} />
           <Route path="members" element={<SDMembers />} />
         </Route>
 
