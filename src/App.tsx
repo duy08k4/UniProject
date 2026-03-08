@@ -45,6 +45,7 @@ import RASubmissionDetail from "./ui/pages/roomadmin/RASubmissionDetail"
 import RoomStudentLayout from "./ui/layouts/RoomStudentLayout"
 import SDMilestones from "./ui/pages/student/SDMilestones"
 import SDMembers from "./ui/pages/student/SDMembers"
+import SDScoreboards from "./ui/pages/student/SDScoreboards"
 
 function App() {
   useTheme();
@@ -96,8 +97,9 @@ function App() {
 
         {/* Student */}
         <Route path="student/class/:classId" element={<RoomStudentLayout />}>
-        <Route index element={<SDMilestones />} />
+          <Route index element={<SDMilestones />} />
           <Route path="members" element={<SDMembers />} />
+          <Route path="scoreboards" element={<SDScoreboards />}/>
         </Route>
 
         {/* Lecturer */}
