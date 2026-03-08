@@ -42,13 +42,13 @@ const SDMembers: React.FC = () => {
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
 
-                        <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white text-smallSize" placeholder="Tìm kiếm tên hoặc email..." />
+                        <input type="text" className="h-12 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white text-smallSize" placeholder="Tìm kiếm tên hoặc email..." />
                         <span id="underlineInput" className="absolute bottom-0 left-0 bg-mainColor dark:bg-white w-0 h-[2px] transition-all duration-300"></span>
                     </span>
 
                     <span className="flex items-center-safe gap-1.5">
                         <p className="font-bold dark:text-white text-smallSize">Vai trò:</p>
-                        <select className="w-40 border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-black text-smallSize outline-none focus:border-mainColor">
+                        <select className="w-40 h-12 border-[0.5px] border-lightGray px-2.5 rounded-small dark:text-white dark:bg-black text-smallSize outline-none focus:border-mainColor">
                             <option value="">Tất cả</option>
                             <option value="">Giảng viên</option>
                             <option value="">Sinh viên</option>
