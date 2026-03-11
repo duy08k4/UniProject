@@ -26,7 +26,6 @@ const RAMilestones: React.FC = () => {
                             <h3 className="text-normalSize font-bold dark:text-white">Cung cấp thông tin đề tài</h3>
                             <p className="text-smallSize text-gray font-light">Đây là mô tả của tiến trình</p>
                             <div className="flex gap-5 text-smallSize font-semibold mt-1">
-                                <p>Thông báo: 10</p>
                                 <p>Biểu mẫu: 10</p>
                             </div>
                             <div className="flex gap-10 text-smallSize font-semibold mt-2">
@@ -65,7 +64,6 @@ const RAMilestones: React.FC = () => {
                             <h3 className="text-normalSize font-bold dark:text-white">Nộp đề cương KL/TL</h3>
                             <p className="text-smallSize text-gray font-light">Đây là mô tả của tiến trình</p>
                             <div className="flex gap-5 text-smallSize font-semibold mt-1">
-                                <p>Thông báo: 10</p>
                                 <p>Biểu mẫu: 10</p>
                             </div>
                             <div className="flex gap-10 text-smallSize font-semibold mt-2">
