@@ -48,6 +48,11 @@ import SDMembers from "./ui/pages/student/SDMembers"
 import SDScoreboards from "./ui/pages/student/SDScoreboards"
 import SDSubmission from "./ui/pages/student/SDSubmission"
 
+// Lecturer
+import RoomLecturerLayout from "./ui/layouts/RoomLecturerLayout"
+import LTScoreboards from "./ui/pages/lecturer/LTScoreboards"
+import LTCommittee from "./ui/pages/lecturer/LTCommittee"
+
 function App() {
   useTheme();
   return (
@@ -105,6 +110,12 @@ function App() {
         </Route>
 
         {/* Lecturer */}
+        <Route path="lecturer/class/:classId" element={<RoomLecturerLayout />}>
+          <Route index element={<SDMilestones />} />
+          <Route path="members" element={<SDMembers />} />
+          <Route path="committee" element={<LTCommittee />} />
+          <Route path="committee-scoreboards" element={<LTScoreboards />}/>
+        </Route>
 
 
       </Route>
