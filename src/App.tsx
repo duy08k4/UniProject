@@ -30,6 +30,8 @@ import SASubmission from "./ui/pages/superadmin/SASubmission"
 
 // Main
 import Main from "./ui/pages/Main"
+
+// Room admin
 import RAOverview from "./ui/pages/roomadmin/RAOverview"
 import RAMembers from "./ui/pages/roomadmin/RAMembers"
 import RAMilestones from "./ui/pages/roomadmin/RAMilestones"
@@ -38,6 +40,18 @@ import RAScoreboards from "./ui/pages/roomadmin/RAScoreboards"
 import RAScoreboardsDetail from "./ui/pages/roomadmin/RAScoreboardsDetail"
 import RASubmissions from "./ui/pages/roomadmin/RASubmissions"
 import RASubmissionDetail from "./ui/pages/roomadmin/RASubmissionDetail"
+
+// Student
+import RoomStudentLayout from "./ui/layouts/RoomStudentLayout"
+import SDMilestones from "./ui/pages/student/SDMilestones"
+import SDMembers from "./ui/pages/student/SDMembers"
+import SDScoreboards from "./ui/pages/student/SDScoreboards"
+import SDSubmission from "./ui/pages/student/SDSubmission"
+
+// Lecturer
+import RoomLecturerLayout from "./ui/layouts/RoomLecturerLayout"
+import LTScoreboards from "./ui/pages/lecturer/LTScoreboards"
+import LTCommittee from "./ui/pages/lecturer/LTCommittee"
 
 function App() {
   useTheme();
@@ -69,7 +83,9 @@ function App() {
 
       <Route path="main">
         <Route index element={<Main />} />
-        <Route path="class/:classId" element={<RoomAdminLayout />}>
+
+        {/* Room admin */}
+        <Route path="admin/class/:classId" element={<RoomAdminLayout />}>
           <Route index element={<RAOverview />} />
           <Route path="members" element={<RAMembers />} />
           <Route path="milestones" element={<RAMilestones />} />
@@ -83,8 +99,25 @@ function App() {
             <Route index element={<RASubmissions />} />
             <Route path=":formId" element={<RASubmissionDetail />} />
           </Route>
-          
         </Route>
+
+        {/* Student */}
+        <Route path="student/class/:classId" element={<RoomStudentLayout />}>
+          <Route index element={<SDMilestones />} />
+          <Route path="members" element={<SDMembers />} />
+          <Route path="scoreboards" element={<SDScoreboards />}/>
+          <Route path="submission" element={<SDSubmission />} />
+        </Route>
+
+        {/* Lecturer */}
+        <Route path="lecturer/class/:classId" element={<RoomLecturerLayout />}>
+          <Route index element={<SDMilestones />} />
+          <Route path="members" element={<SDMembers />} />
+          <Route path="committee" element={<LTCommittee />} />
+          <Route path="committee-scoreboards" element={<LTScoreboards />}/>
+        </Route>
+
+
       </Route>
     </Routes>
   )
