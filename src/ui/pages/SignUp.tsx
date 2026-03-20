@@ -4,6 +4,13 @@ import { NavLink } from "react-router-dom"
 import UniLogo from "../../assets/UniLogo.png"
 import { useState } from "react"
 
+// Spinner
+import { ScaleLoader } from 'react-spinners'
+
+// Service
+import { AuthService } from "../../services/auth/auth.service"
+import { toast } from "sonner"
+
 export type formValidationConfig_type = Record<string, {
     label: string,
     rules: Array<{
@@ -27,6 +34,8 @@ const SignUp: React.FC = () => {
         confirmPassword: ""
     })
 
+    const [isSignUp, setIsSignUp] = useState<boolean>(false)
+
     const formValidationConfig: formValidationConfig_type = {
         fullName: {
             label: "Họ và tên",
@@ -45,8 +54,7 @@ const SignUp: React.FC = () => {
                 },
                 {
                     message: "Không chứa ký tự đặc biệt",
-                    validate: (value: string) =>
-                        /^[a-zA-ZÀ-ỹ\s]+$/.test(value)
+                    validate: (value: string) => /^[a-zA-ZÀ-ỹ\s]+$/.test(value)
                 }
             ]
         },
@@ -117,6 +125,27 @@ const SignUp: React.FC = () => {
             }))
         }
 
+    const handleSignup = async () => {
+        if (isFormValid) {
+            setIsSignUp(true)
+            const result = await AuthService.signUp(formValues)
+
+            if (result) {
+                const emptyForm = {
+                    fullName: "",
+                    gmail: "",
+                    password: "",
+                    confirmPassword: ""
+                }
+                setFormValues({ ...emptyForm })
+            }
+
+            setIsSignUp(false)
+        } else {
+            toast.info("Vui lòng điền đầy đủ thông tin")
+        }
+    }
+
     return (
         <div className="h-full w-full flex justify-center-safe items-center-safe gap-10 max-sm:flex max-sm:flex-col">
             <div className="h-fit w-[450px] flex flex-col gap-5 px-10 py-15 rounded-normal shadow-[0_0_50px_20px_rgba(128,128,128,0.25)] max-sm:w-full max-sm:px-5 max-sm:py-10">
@@ -131,33 +160,35 @@ const SignUp: React.FC = () => {
                 <div className="w-full flex flex-col gap-3.5">
                     <span className="w-full">
                         <p className="font-medium dark:text-white">Họ và tên <b className="text-red">*</b></p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("fullName")} placeholder="VD: Nguyễn Văn A" />
+                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("fullName")} value={formValues.fullName} placeholder="VD: Nguyễn Văn A" />
                     </span>
 
                     <span className="w-full">
                         <p className="font-medium dark:text-white">Gmail <b className="text-red">*</b></p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("gmail")} placeholder="VD: nguyenvana@gmail.com" />
+                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("gmail")} value={formValues.gmail} placeholder="VD: nguyenvana@gmail.com" />
                     </span>
 
                     <span className="w-full">
                         <p className="font-medium dark:text-white">Mập khẩu <b className="text-red">*</b></p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("password")} placeholder="..." />
+                        <input type="password" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("password")} value={formValues.password} placeholder="..." />
                     </span>
 
                     <span className="w-full">
                         <p className="font-medium dark:text-white">Nhập lại mật khẩu <b className="text-red">*</b></p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("confirmPassword")} placeholder="..." />
+                        <input type="password" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("confirmPassword")} value={formValues.confirmPassword} placeholder="..." />
                     </span>
                 </div>
 
                 <div className="w-full">
-                    <button className="hoverBtn w-full bg-mainColor text-white py-2.5 rounded-small hover:cursor-pointer max-sm:text-smallSize">Đăng ký</button>
+                    <button onClick={handleSignup} className="hoverBtn w-full bg-mainColor text-white py-2.5 rounded-small hover:cursor-pointer max-sm:text-smallSize" disabled={isSignUp}>
+                        {isSignUp ? <><ScaleLoader height={10} width={4} color="white" /></> : <>Đăng ký</>}
+                    </button>
                 </div>
 
                 <div className="flex justify-center-safe items-center-safe">
                     <p className="font-medium dark:text-white max-sm:text-smallSize">
                         Đã có tài khoản? {" "}
-                        <NavLink to="/auth/sign-in">
+                        <NavLink to={!isSignUp ? "/auth/sign-in" : ""}>
                             <i><u className="text-mainColor">Đăng nhập</u></i>
                         </NavLink>
                     </p>
@@ -179,12 +210,12 @@ const SignUp: React.FC = () => {
                                     return (
                                         <span className="flex items-center-safe gap-2.5">
                                             {isValid ? (
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" className="size-5 stroke-mainColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="size-5 stroke-mainColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                                 </svg>
                                             ) : (
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" className="size-5 stroke-red">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="size-5 stroke-red">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                                                 </svg>
                                             )}
 

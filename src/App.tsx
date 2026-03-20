@@ -27,6 +27,7 @@ import Milestones from "./ui/pages/superadmin/SAMilestones"
 import FormManagement from "./ui/pages/superadmin/SAFormManagement"
 import SAScoreBoardManagement from "./ui/pages/superadmin/SAScoreBoardManagement"
 import SASubmission from "./ui/pages/superadmin/SASubmission"
+import SARolePermission from "./ui/pages/superadmin/SARolePermission"
 
 // Main
 import Main from "./ui/pages/Main"
@@ -79,6 +80,7 @@ function App() {
         <Route path="forms" element={<FormManagement />} />
         <Route path="scoreboards" element={<SAScoreBoardManagement />} />
         <Route path="submission" element={<SASubmission />} />
+        <Route path="permission" element={<SARolePermission />} />
       </Route>
 
       <Route path="main">
@@ -116,8 +118,6 @@ function App() {
           <Route path="committee" element={<LTCommittee />} />
           <Route path="committee-scoreboards" element={<LTScoreboards />}/>
         </Route>
-
-
       </Route>
     </Routes>
   )

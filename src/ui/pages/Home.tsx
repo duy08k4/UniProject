@@ -8,6 +8,7 @@ import DarkModeDBHeroImage from "../../assets/DbHeroImage_DarkMode.png"
 // Component
 import SignUpDirect from "../components/SignUpDirect.comp"
 import ProjectDirect from "../components/ProjectDirect.comp"
+import { NavLink } from "react-router-dom"
 
 const objectiveContent: string[] = [
     "Quản lý tập trung đồ án tốt nghiệp",
@@ -52,13 +53,13 @@ const Home: React.FC = () => {
                     </h1>
                     <p className="uppercase text-mainColor text-mediumSize font-light max-sm:text-mobile-mediumSize">khoa môi trường và tài nguyên</p>
                     <nav className="flex gap-2.5 max-sm:mt-5">
-                        <button className="text-mainColor font-bold bg-mainColorRGB px-10 rounded-normal flex items-center-safe gap-2.5 hover:cursor-pointer max-sm:text-mobile-smallSize max-sm:py-2.5">
+                        <NavLink to='/auth/sign-in' className="text-mainColor font-bold bg-mainColorRGB px-10 rounded-normal flex items-center-safe gap-2.5 hover:cursor-pointer max-sm:text-mobile-smallSize max-sm:py-2.5">
                             Truy cập
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" className="size-6 stroke-mainColor">
-                                <path strokeLinecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-6 stroke-mainColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
                             </svg>
 
-                        </button>
+                        </NavLink>
                         <SignUpDirect content="Tạo tài khoản UNI" />
                     </nav>
                 </div>
