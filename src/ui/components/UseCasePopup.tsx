@@ -1,0 +1,73 @@
+import type React from "react"
+
+interface UseCasePopup_Interface {
+    togglePopup: () => void
+}
+
+const UseCasePopup: React.FC<UseCasePopup_Interface> = ({ togglePopup }) => {
+    return (
+        <div className="fixed top-0 left-0 h-full w-full bg-[rgba(0,0,0,0.75)] flex justify-center-safe items-center-safe z-[100]">
+            <div className="w-1/3 h-fit max-h-4/5 bg-bgLight dark:bg-bgDark flex flex-col gap-6 py-8 px-10 rounded-normal shadow-2xl">
+                <div className="border-b-[0.5px] border-lightGray pb-4">
+                    <h1 className="text-bigSize font-bold dark:text-white">Thêm Use Case mới</h1>
+                    <p className="text-normalSize text-gray">Tạo Use Case để định nghĩa các chức năng của hệ thống</p>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1.5">
+                        <label className="font-bold dark:text-white">Mã Use Case:</label>
+                        <input 
+                            type="text" 
+                            className="w-full border-[0.5px] border-lightGray px-3 py-2 rounded-small dark:bg-black dark:text-white outline-none focus:border-mainColor focus:ring-1 focus:ring-mainColor" 
+                            placeholder="Ví dụ: CLS_APV" 
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="font-bold dark:text-white">Module:</label>
+                        <input 
+                            type="text" 
+                            className="w-full border-[0.5px] border-lightGray px-3 py-2 rounded-small dark:bg-black dark:text-white outline-none focus:border-mainColor focus:ring-1 focus:ring-mainColor" 
+                            placeholder="Ví dụ: Auth, Class, Scoreboard" 
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="font-bold dark:text-white">Độ ưu tiên:</label>
+                        <select className="w-full border-[0.5px] border-lightGray px-3 py-2 rounded-small dark:bg-black dark:text-white outline-none focus:border-mainColor">
+                            <option value="must_have">Bắt buộc (Must have)</option>
+                            <option value="should_have">Nên có (Should have)</option>
+                            <option value="could_have">Có thể có (Could have)</option>
+                            <option value="won't_have">Không có (Won't have)</option>
+                        </select>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="font-bold dark:text-white">Mô tả:</label>
+                        <textarea 
+                            className="w-full border-[0.5px] border-lightGray px-3 py-2 rounded-small dark:bg-black dark:text-white outline-none focus:border-mainColor h-24 resize-none" 
+                            placeholder="Ví dụ: Duyệt lớp học mới"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div className="w-full flex justify-end-safe gap-3 mt-4">
+                    <button 
+                        className="px-6 py-2.5 rounded-small font-medium border-[0.5px] border-lightGray dark:text-white hover:bg-lightGray dark:hover:bg-darkGray transition-all" 
+                        onClick={togglePopup}
+                    >
+                        Hủy
+                    </button>
+                    <button 
+                        className="bg-mainColor text-white px-8 py-2.5 rounded-small font-medium hoverBtn shadow-lg shadow-mainColorRGB"
+                        onClick={togglePopup}
+                    >
+                        Tạo Use Case
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default UseCasePopup
