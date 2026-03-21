@@ -6,9 +6,15 @@ export interface AuthSlice {
     user: {
         info: {
             id: string | null,
-            email: string | null,
+            supabase_id: string | null,
             full_name: string | null,
-            role: string | null
+            email: string | null,
+            is_banned: boolean,
+            is_deleted: boolean,
+            role: string | null,
+            phone_number: string | null,
+            created_at: string | null,
+            updated_at: string | null
         },
         auth: boolean
     }
@@ -18,9 +24,15 @@ const initialState: AuthSlice = {
     user: {
         info: {
             id: "",
-            email: "",
+            supabase_id: "",
             full_name: "",
-            role: ""
+            email: "",
+            is_banned: false,
+            is_deleted: false,
+            role: "",
+            phone_number: "",
+            created_at: "",
+            updated_at: ""
         },
         auth: false
     }
