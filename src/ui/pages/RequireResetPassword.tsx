@@ -1,13 +1,14 @@
 import type React from "react"
+import { NavLink } from "react-router-dom"
 
 const RequireResetPassword: React.FC = () => {
     return (
         <div className="h-full w-full flex justify-center-safe items-center-safe">
-            <div className="h-fit w-[450px] flex flex-col gap-2.5 px-10 py-15 rounded-normal shadow-[0_0_50px_20px_rgba(128,128,128,0.25)] max-sm:px-5 max-sm:py-10">
+            <div className="h-fit w-[450px] flex flex-col gap-2.5 px-10 py-10 rounded-normal shadow-[0_0_50px_20px_rgba(128,128,128,0.25)] max-sm:px-5 max-sm:py-10">
                 <div className="flex flex-col items-center-safe gap-3.5">
                     <span className="flex flex-col items-center-safe">
                         <h1 className="font-semibold text-bigSize uppercase dark:text-white">Xác nhận gmail</h1>
-                        <p className="text-gray">Vui lòng cung cấp gmail</p>
+                        <p className="text-gray">Vui lòng cung cấp Gmail</p>
                     </span>
                 </div>
 
@@ -20,6 +21,12 @@ const RequireResetPassword: React.FC = () => {
 
                 <div className="w-full">
                     <button className="w-full bg-mainColor text-white py-2.5 rounded-small max-sm:py-2 max-sm:text-smallSize">Xác nhận</button>
+                </div>
+
+                <div className="flex justify-center-safe items-center-safe mt-5">
+                    <NavLink to="/auth/sign-in">
+                        <i><u className="text-mainColor">Quay lại trang đăng nhập</u></i>
+                    </NavLink>
                 </div>
             </div>
         </div>
