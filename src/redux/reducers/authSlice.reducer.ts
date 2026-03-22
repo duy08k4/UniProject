@@ -16,7 +16,8 @@ export interface AuthSlice {
             created_at: string | null,
             updated_at: string | null
         },
-        auth: boolean
+        auth: boolean,
+        sessionCheck: boolean
     }
 }
 
@@ -34,7 +35,8 @@ const initialState: AuthSlice = {
             created_at: "",
             updated_at: ""
         },
-        auth: false
+        auth: false,
+        sessionCheck: false
     }
 }
 
@@ -43,10 +45,30 @@ export const authSlice = createSlice({
     initialState,
     reducers: {
         // Update user data
-        updateUser: (state, action: PayloadAction<SignInResponse["data"]>) => {
-            state.user = {
-                info: action.payload,
-                auth: action.payload.id ? true : false
+        updateUser: (state, action: PayloadAction<SignInResponse["data"] | null>) => {
+            if (action.payload) {
+                state.user = {
+                    info: action.payload,
+                    auth: action.payload.id ? true : false,
+                    sessionCheck: true
+                }
+            } else {
+                state.user = {
+                    info: {
+                        id: "",
+                        supabase_id: "",
+                        full_name: "",
+                        email: "",
+                        is_banned: false,
+                        is_deleted: false,
+                        role: "",
+                        phone_number: "",
+                        created_at: "",
+                        updated_at: ""
+                    },
+                    auth: false,
+                    sessionCheck: false
+                }
             }
         }
     }

@@ -9,10 +9,21 @@ import UniLogo from "../../assets/UniLogo.png"
 import ToggleTheme from "../components/ToggleTheme.comp"
 import NewClassForm from "../components/NewClassForm"
 import JoinClassForm from "../components/JoinClassForm"
+import { useSelector } from "react-redux"
+import type { RootState } from "../../redux/store"
+import { AuthService } from "../../services/auth/auth.service"
 
 const Main: React.FC = () => {
     const [isNewClassForm, setIsNewClassForm] = useState<boolean>(false)
     const [isJoinClassForm, setIsJoinClassForm] = useState<boolean>(false)
+
+    // Redux
+    const userData = useSelector((state: RootState) => state.auth.user)
+
+    // Handler
+    const handleSignout = async () => {
+        const result = await AuthService.signOut()
+    }
 
     return (
         <div className="h-full flex-1 flex flex-col dark:bg-bgDark">
@@ -26,9 +37,17 @@ const Main: React.FC = () => {
                     <ToggleTheme />
 
                     <span className="flex items-center-safe gap-2.5">
-                        <p className="h-10 aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium">UA</p>
-                        <p className="text-nowrap font-bold dark:text-white max-sm:hidden">UniAdmin</p>
+                        <p className="h-10 aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium">
+                            {userData.info.full_name ? userData.info.full_name.split("")[0].split("")[0] : "U"}
+                        </p>
+                        <p className="text-nowrap font-bold dark:text-white max-sm:hidden">{userData.info.full_name}</p>
                     </span>
+
+                    <button className="hoverBtn bg-redRGB p-2.5 rounded-small" onClick={handleSignout}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 stroke-red">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                        </svg>
+                    </button>
                 </span>
             </header>
 
