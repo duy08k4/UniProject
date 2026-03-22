@@ -70,12 +70,13 @@ export const authSlice = createSlice({
                     sessionCheck: false
                 }
             }
-        }
+        },
+
     }
 })
 
 export const {
-    updateUser
+    updateUser,
 } = authSlice.actions
 
 export default authSlice.reducer

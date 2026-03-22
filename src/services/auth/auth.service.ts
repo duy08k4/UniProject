@@ -50,6 +50,7 @@ export class AuthService {
 
                 if (status >= 200 && status < 300) {
                     store.dispatch(updateUser(data.data))
+                    localStorage.setItem("hasLogin", "true");
                     toast.success("Đăng nhập thành công")
                     
                     return data.data.role === "uniadmin" ? "/super-admin/overview" : "/main"
@@ -91,6 +92,32 @@ export class AuthService {
                 401: { message: 'Đã thoát tài khoản', type: "success" },
                 403: { message: 'Đã thoát tài khoản', type: "success" }
             })
+            return false
+        } finally {
+            toast.dismiss(loading)
+        }
+    }
+
+    // Session check - Check user session when they return to the website if they haven't signed out
+    static async authUser () {
+        const loading = toast.loading('Đang kiểm tra phiên đăng nhập')
+        
+        try {
+            const { status, data } = await api.get<SignInResponse["data"]>(apiPath.auth.authUser, {
+                params: {
+                    isUserData: true
+                }
+            })
+
+            if (status >= 200 && status < 300) {
+                store.dispatch(updateUser(data))
+                toast.success("Xác thực thành công!")
+                toast.success(`Xin chào người dùng ${data.full_name}`)
+                return true
+            }
+        } catch (error) {
+            const errorStatus = (error as AxiosError).status
+            if (errorStatus === 401 && localStorage.getItem("hasLogin")) toast.info("Phiên đăng nhập hết hạn")
             return false
         } finally {
             toast.dismiss(loading)

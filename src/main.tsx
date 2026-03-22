@@ -12,7 +12,7 @@ createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <BrowserRouter>
         <App />
-        <Toaster position='top-right' theme='light' closeButton duration={5000} />
+        <Toaster position='top-right' theme='light' closeButton duration={4000} richColors visibleToasts={10}  />
       </BrowserRouter>
     </Provider>
   </StrictMode>

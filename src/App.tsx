@@ -2,7 +2,9 @@ import { Route, Routes } from "react-router-dom"
 
 // Component
 import { useTheme } from "./ui/components/ToggleTheme.comp"
+import SessionChecker from "./ui/components/SessionChecker"
 
+// Layout
 import LandingPageLayout from "./ui/layouts/Layout"
 import AuthLayout from "./ui/layouts/AuthLayout"
 import SuperAdminLayout from "./ui/layouts/SuperAdminLayout"
@@ -57,69 +59,72 @@ import LTCommittee from "./ui/pages/lecturer/LTCommittee"
 function App() {
   useTheme();
   return (
-    <Routes>
-      <Route element={<LandingPageLayout />}>
-        <Route index element={<Home />} />
-        <Route path="projects" element={<Project />} />
-        <Route path="contact" element={<Contact />} />
-      </Route>
-      <Route path="projects/:project-id" element={<ProjectDetail />} />
+    <>
+      <SessionChecker />
+      <Routes>
+        <Route element={<LandingPageLayout />}>
+          <Route index element={<Home />} />
+          <Route path="projects" element={<Project />} />
+          <Route path="contact" element={<Contact />} />
+        </Route>
+        <Route path="projects/:project-id" element={<ProjectDetail />} />
 
-      <Route path="auth" element={<AuthLayout />}>
-        <Route path="sign-in" element={<SignIn />} />
-        <Route path="sign-up" element={<SignUp />} />
-        <Route path="require-reset" element={<RequireResetPassword />} />
-        <Route path="reset-password" element={<ResetPassword />} />
-      </Route>
+        <Route path="auth" element={<AuthLayout />}>
+          <Route path="sign-in" element={<SignIn />} />
+          <Route path="sign-up" element={<SignUp />} />
+          <Route path="require-reset" element={<RequireResetPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+        </Route>
 
-      <Route path="super-admin" element={<SuperAdminLayout />} >
-        <Route path="overview" element={<Overview />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="classes" element={<ClassManagement />} />
-        <Route path="milestones" element={<Milestones />} />
-        <Route path="forms" element={<FormManagement />} />
-        <Route path="scoreboards" element={<SAScoreBoardManagement />} />
-        <Route path="submission" element={<SASubmission />} />
-        <Route path="permission" element={<SARolePermission />} />
-      </Route>
+        <Route path="super-admin" element={<SuperAdminLayout />} >
+          <Route path="overview" element={<Overview />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="classes" element={<ClassManagement />} />
+          <Route path="milestones" element={<Milestones />} />
+          <Route path="forms" element={<FormManagement />} />
+          <Route path="scoreboards" element={<SAScoreBoardManagement />} />
+          <Route path="submission" element={<SASubmission />} />
+          <Route path="permission" element={<SARolePermission />} />
+        </Route>
 
-      <Route path="main">
-        <Route index element={<Main />} />
+        <Route path="main">
+          <Route index element={<Main />} />
 
-        {/* Room admin */}
-        <Route path="admin/class/:classId" element={<RoomAdminLayout />}>
-          <Route index element={<RAOverview />} />
-          <Route path="members" element={<RAMembers />} />
-          <Route path="milestones" element={<RAMilestones />} />
-          <Route path="forms" element={<RAForms />} />
-          <Route path="scoreboards">
-            <Route index element={<RAScoreboards />} />
-            <Route path=":boardId" element={<RAScoreboardsDetail />} />
+          {/* Room admin */}
+          <Route path="admin/class/:classId" element={<RoomAdminLayout />}>
+            <Route index element={<RAOverview />} />
+            <Route path="members" element={<RAMembers />} />
+            <Route path="milestones" element={<RAMilestones />} />
+            <Route path="forms" element={<RAForms />} />
+            <Route path="scoreboards">
+              <Route index element={<RAScoreboards />} />
+              <Route path=":boardId" element={<RAScoreboardsDetail />} />
+            </Route>
+
+            <Route path="submission">
+              <Route index element={<RASubmissions />} />
+              <Route path=":formId" element={<RASubmissionDetail />} />
+            </Route>
           </Route>
 
-          <Route path="submission">
-            <Route index element={<RASubmissions />} />
-            <Route path=":formId" element={<RASubmissionDetail />} />
+          {/* Student */}
+          <Route path="student/class/:classId" element={<RoomStudentLayout />}>
+            <Route index element={<SDMilestones />} />
+            <Route path="members" element={<SDMembers />} />
+            <Route path="scoreboards" element={<SDScoreboards />} />
+            <Route path="submission" element={<SDSubmission />} />
+          </Route>
+
+          {/* Lecturer */}
+          <Route path="lecturer/class/:classId" element={<RoomLecturerLayout />}>
+            <Route index element={<SDMilestones />} />
+            <Route path="members" element={<SDMembers />} />
+            <Route path="committee" element={<LTCommittee />} />
+            <Route path="committee-scoreboards" element={<LTScoreboards />} />
           </Route>
         </Route>
-
-        {/* Student */}
-        <Route path="student/class/:classId" element={<RoomStudentLayout />}>
-          <Route index element={<SDMilestones />} />
-          <Route path="members" element={<SDMembers />} />
-          <Route path="scoreboards" element={<SDScoreboards />}/>
-          <Route path="submission" element={<SDSubmission />} />
-        </Route>
-
-        {/* Lecturer */}
-        <Route path="lecturer/class/:classId" element={<RoomLecturerLayout />}>
-          <Route index element={<SDMilestones />} />
-          <Route path="members" element={<SDMembers />} />
-          <Route path="committee" element={<LTCommittee />} />
-          <Route path="committee-scoreboards" element={<LTScoreboards />}/>
-        </Route>
-      </Route>
-    </Routes>
+      </Routes>
+    </>
   )
 }
 
