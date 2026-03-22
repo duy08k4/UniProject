@@ -1,7 +1,13 @@
 import type React from "react"
+import { useSelector } from "react-redux"
 import { NavLink, Outlet } from "react-router-dom"
+import type { RootState } from "../../redux/store"
 
 const AuthLayout: React.FC = () => {
+    const isAuth = useSelector((state: RootState) => state.auth.user.auth)
+
+    if (isAuth) return null
+
     return (
         <div className="h-full w-full bg-bgLight flex flex-col gap-15 px-twoSidePadding overflow-auto dark:bg-bgDark max-sm:px-mobile-twoSidePadding pt-10">
             <header>

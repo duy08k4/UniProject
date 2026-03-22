@@ -22,7 +22,7 @@ const Main: React.FC = () => {
 
     // Handler
     const handleSignout = async () => {
-        const result = await AuthService.signOut()
+        await AuthService.signOut()
     }
 
     return (

@@ -5,10 +5,15 @@ import { updateUser } from "../redux/reducers/authSlice.reducer"
 
 type ToastType = "error" | "success" | "warning" | "info"
 
-const errorCatch = (error: any, optionalToastMessage?: Record<number, { message: string, type: ToastType }>) => {
+const errorCatch = (error: any, optionalToastMessage?: Record<number, { message: string, type: ToastType}> , onlyToast?: { message: string, type: ToastType }) => {
     if (axios.isAxiosError(error)) {
         const status = error.response?.status
         const optionalToast = optionalToastMessage
+
+        if (onlyToast) {
+            toast[onlyToast.type](onlyToast.message)
+            return 
+        }
 
         switch (status) {
             case 400:
