@@ -8,6 +8,7 @@ import apiPath from "../path"
 import type { SignInResponse } from "./auth.type"
 import { store } from "../../redux/store"
 import { updateUser } from "../../redux/reducers/authSlice.reducer"
+import type { AxiosError } from "axios"
 
 export class AuthService {
     // Sign up
@@ -61,6 +62,35 @@ export class AuthService {
 
         } catch (error) {
             errorCatch(error)
+            return false
+        } finally {
+            toast.dismiss(loading)
+        }
+    }
+
+    // Sign out
+    static async signOut () {
+        const loading = toast.loading('Đang xử lý...')
+        try {
+            const { status } = await api.get(apiPath.auth.signOut)
+
+            if (status >= 200 && status <300) {
+                toast.success("Đã thoát tài khoản")
+                store.dispatch(updateUser(null))
+                return true
+            }
+
+        } catch (error) {
+            const errorStatus = (error as AxiosError).status
+            if (errorStatus === 401 || errorStatus === 403) {
+                store.dispatch(updateUser(null))
+                return true
+            }
+
+            errorCatch(error, {
+                401: { message: 'Đã thoát tài khoản', type: "success" },
+                403: { message: 'Đã thoát tài khoản', type: "success" }
+            })
             return false
         } finally {
             toast.dismiss(loading)
