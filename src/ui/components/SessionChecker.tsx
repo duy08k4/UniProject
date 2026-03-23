@@ -20,19 +20,25 @@ const SessionChecker = () => {
 
     useEffect(() => {
         if (!isAuthCheck) return
-        const recentPath = path.pathname
+
+        const pathName = path.pathname
 
         if (isAuth) {
-            if (recentPath === "/" || recentPath === "/projects") return
+            if (pathName === "/" || pathName === "/projects") return
 
-            if (
-                (!recentPath.includes("/main") || !recentPath.includes("/main")) ||
-                (user.role === "user" && path.pathname.includes("/super-admin"))
-            ) {
-                navigate('/main')
+            switch (user.role) {
+                case "uniadmin":
+                    if (pathName.startsWith("/super-admin")) return
+                    navigate("/super-admin")
+                    break;
+                    
+                    default:
+                    if (pathName.startsWith("/main")) return
+                    navigate("/main")
+                    break;
             }
         } else {
-            if (recentPath.includes("/main") || recentPath.includes("/super-admin")) navigate('/')
+            if (pathName.startsWith("/super-admin") || pathName.startsWith("/main")) navigate("/")
         }
 
     }, [isAuth, path.pathname, isAuthCheck])

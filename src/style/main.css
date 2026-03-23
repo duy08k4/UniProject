@@ -47,6 +47,16 @@
     input {
         outline: none !important;
     }
+
+    /* Prime React */
+    .p-confirm-dialog-accept {
+        background: #499C40 !important;
+        border: none !important;
+        
+        span {
+            color: white !important;
+        }
+    }
 }
 
 @theme {

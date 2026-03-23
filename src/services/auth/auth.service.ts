@@ -53,7 +53,7 @@ export class AuthService {
                     localStorage.setItem("hasLogin", "true");
                     toast.success("Đăng nhập thành công")
                     
-                    return data.data.role === "uniadmin" ? "/super-admin/overview" : "/main"
+                    return data.data.role === "uniadmin" ? "/super-admin" : "/main"
                 }
                 
             } else {
