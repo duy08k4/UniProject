@@ -55,6 +55,8 @@ import SDSubmission from "./ui/pages/student/SDSubmission"
 import RoomLecturerLayout from "./ui/layouts/RoomLecturerLayout"
 import LTScoreboards from "./ui/pages/lecturer/LTScoreboards"
 import LTCommittee from "./ui/pages/lecturer/LTCommittee"
+import { ConfirmDialog } from "primereact/confirmdialog"
+import { Button } from "primereact/button"
 
 function App() {
   useTheme();
@@ -77,7 +79,7 @@ function App() {
         </Route>
 
         <Route path="super-admin" element={<SuperAdminLayout />} >
-          <Route path="overview" element={<Overview />} />
+          <Route index element={<Overview />} />
           <Route path="users" element={<UserManagement />} />
           <Route path="classes" element={<ClassManagement />} />
           <Route path="milestones" element={<Milestones />} />
@@ -124,6 +126,8 @@ function App() {
           </Route>
         </Route>
       </Routes>
+
+      <ConfirmDialog />
     </>
   )
 }

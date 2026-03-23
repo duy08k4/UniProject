@@ -7,6 +7,7 @@ import UniLogo from "../../assets/UniLogo.png"
 import ToggleTheme from "../components/ToggleTheme.comp"
 import type { ReactElement } from "react"
 import { NavLink, Outlet, useLocation } from "react-router-dom"
+import { AuthService } from "../../services/auth/auth.service"
 
 type SidebarTab = { icon: ReactElement, label: string, path: string }
 
@@ -17,7 +18,7 @@ const sidebarTab: SidebarTab[] = [
         </svg>
         ,
         label: "Tổng quan",
-        path: "/super-admin/overview"
+        path: "/super-admin"
     },
     {
         icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 dark:stroke-white">
@@ -80,7 +81,11 @@ const sidebarTab: SidebarTab[] = [
 
 const SuperAdminLayout: React.FC = () => {
     const pathLocation = useLocation()
-
+    // Handler
+    const handleSignout = async () => {
+        await AuthService.signOut()
+    }
+    
     return (
         <div className="w-full h-full flex bg-bgLight dark:bg-bgDark">
             {/* Side bar */}
@@ -96,7 +101,7 @@ const SuperAdminLayout: React.FC = () => {
                 <span className="flex-1 flex flex-col gap-2.5">
                     {sidebarTab.map((tab, index) => {
                         return (
-                            <NavLink key={index} to={tab.path} className={`flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname.includes(tab.path) && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
+                            <NavLink key={index} to={tab.path} className={`flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname === tab.path && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
                                 {tab.icon}
                                 <p className="text-smallSize font-semibold dark:text-white">{tab.label}</p>
                             </NavLink>
@@ -127,6 +132,11 @@ const SuperAdminLayout: React.FC = () => {
                     <span className="flex items-center-safe gap-2.5">
                         <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium">UA</p>
                         <p className="text-nowrap font-bold dark:text-white">Uni Admin</p>
+                        <button className="hoverBtn bg-redRGB p-2.5 rounded-small" onClick={handleSignout}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 stroke-red">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                            </svg>
+                        </button>
                     </span>
                 </header>
 
