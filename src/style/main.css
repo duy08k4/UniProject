@@ -44,6 +44,15 @@
         filter: brightness(1.2);
     }
 
+    .hoverBtn:active {
+        cursor: grabbing;
+    }
+
+    .disableState:is(:disabled, [data-disabled="true"]) {
+        filter: grayscale(0.75);
+        cursor: default !important;
+    }
+
     input {
         outline: none !important;
     }
@@ -52,7 +61,7 @@
     .p-confirm-dialog-accept {
         background: #499C40 !important;
         border: none !important;
-        
+
         span {
             color: white !important;
         }
@@ -102,6 +111,8 @@
     --color-darkGray: #333333;
     --color-red: #ff0000;
     --color-redRGB: rgba(255, 0, 0, 0.25);
+    --color-oranged: #FF8C00;
+    --color-orangedRGB: rgba(255, 140, 0, 0.25);
 
     /* Light mode */
     --color-bgLight: #ffffff;

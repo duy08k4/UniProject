@@ -136,14 +136,14 @@ const Project: React.FC = () => {
                     <span className="flex items-center-safe gap-1.5">
                         <p className="font-medium mr-3.5 dark:text-white max-sm:text-mobile-smallSize">Trang 1/20</p>
 
-                        <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal">
+                        <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white max-sm:size-3.5 stroke-2">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                             </svg>
 
                         </button>
 
-                        <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal">
+                        <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white max-sm:size-3.5 stroke-2">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>

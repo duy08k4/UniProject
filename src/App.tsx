@@ -56,7 +56,7 @@ import RoomLecturerLayout from "./ui/layouts/RoomLecturerLayout"
 import LTScoreboards from "./ui/pages/lecturer/LTScoreboards"
 import LTCommittee from "./ui/pages/lecturer/LTCommittee"
 import { ConfirmDialog } from "primereact/confirmdialog"
-import { Button } from "primereact/button"
+import ClassContextProvider from "./ui/components/ClassContextProvider"
 
 function App() {
   useTheme();
@@ -93,7 +93,7 @@ function App() {
           <Route index element={<Main />} />
 
           {/* Room admin */}
-          <Route path="admin/class/:classId" element={<RoomAdminLayout />}>
+          <Route path="roomadmin/class/:classId" element={<ClassContextProvider><RoomAdminLayout /></ClassContextProvider>}>
             <Route index element={<RAOverview />} />
             <Route path="members" element={<RAMembers />} />
             <Route path="milestones" element={<RAMilestones />} />
@@ -110,7 +110,7 @@ function App() {
           </Route>
 
           {/* Student */}
-          <Route path="student/class/:classId" element={<RoomStudentLayout />}>
+          <Route path="student/class/:classId" element={<ClassContextProvider><RoomStudentLayout /></ClassContextProvider>}>
             <Route index element={<SDMilestones />} />
             <Route path="members" element={<SDMembers />} />
             <Route path="scoreboards" element={<SDScoreboards />} />
@@ -118,7 +118,7 @@ function App() {
           </Route>
 
           {/* Lecturer */}
-          <Route path="lecturer/class/:classId" element={<RoomLecturerLayout />}>
+          <Route path="lecturer/class/:classId" element={<ClassContextProvider><RoomLecturerLayout /> </ClassContextProvider>}>
             <Route index element={<SDMilestones />} />
             <Route path="members" element={<SDMembers />} />
             <Route path="committee" element={<LTCommittee />} />

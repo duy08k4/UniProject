@@ -13,10 +13,11 @@ import type { AxiosError } from "axios"
 export class AuthService {
     // Sign up
     static async signUp(dataUser: { fullName: string, gmail: string, password: string, confirmPassword: string }) {
-        const loading = toast.loading("Đang tạo tài khoản...")
+        let loading
         try {
             const { fullName, gmail, password, confirmPassword } = dataUser
 
+            loading = toast.loading("Đang tạo tài khoản...")
             if (fullName && gmail && password && confirmPassword && password === confirmPassword) {
                 const { status } = await api.post(apiPath.auth.signUp, { fullname: fullName, email: gmail, password })
 
@@ -40,11 +41,12 @@ export class AuthService {
 
     // Sign in
     static async signIn(dataUser: { email: string, password: string }) {
-        const loading = toast.loading('Đang xác thực người dùng...')
+        let loading
 
         try {
             const { email, password } = dataUser
 
+            loading = toast.loading('Đang xác thực người dùng...')
             if (email && password) {
                 const { data, status } = await api.post<SignInResponse>(apiPath.auth.signIn, { email, password })
 
@@ -71,8 +73,9 @@ export class AuthService {
 
     // Sign out
     static async signOut () {
-        const loading = toast.loading('Đang xử lý...')
+        let loading
         try {
+            loading = toast.loading('Đang xử lý...')
             const { status } = await api.get(apiPath.auth.signOut)
 
             if (status >= 200 && status <300) {
@@ -100,9 +103,10 @@ export class AuthService {
 
     // Session check - Check user session when they return to the website if they haven't signed out
     static async authUser () {
-        const loading = toast.loading('Đang kiểm tra phiên đăng nhập')
+        let loading
         
         try {
+            loading = toast.loading('Đang kiểm tra phiên đăng nhập')
             const { status, data } = await api.get<SignInResponse["data"]>(apiPath.auth.authUser, {
                 params: {
                     isUserData: true
@@ -112,7 +116,7 @@ export class AuthService {
             if (status >= 200 && status < 300) {
                 store.dispatch(updateUser(data))
                 toast.success("Xác thực thành công!")
-                toast.success(`Xin chào người dùng ${data.full_name}`)
+                toast.success(`Xin chào ${data.full_name}`)
                 return true
             }
         } catch (error) {
