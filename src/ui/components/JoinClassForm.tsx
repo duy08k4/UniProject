@@ -1,5 +1,8 @@
 import type React from "react"
 import { useState } from "react"
+import { ClassService } from "../../services/class/class.service"
+import { ScaleLoader } from "react-spinners"
+import { useNavigate } from "react-router-dom"
 
 type NewClassFormValues = {
     joinCode: string
@@ -10,15 +13,30 @@ interface JoinClassForm_Interface {
 }
 
 const JoinClassForm: React.FC<JoinClassForm_Interface> = ({ toggleForm }) => {
+    const navigate = useNavigate()
+
     const [newClassFormValues, setNewClassFormValues] = useState<NewClassFormValues>({
         joinCode: ""
     })
 
+    // State
+    const [isJoin, setIsJoin] = useState<boolean>(false)
+
+    // Handler
     const handleChange = (field: keyof NewClassFormValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setNewClassFormValues(prev => ({
             ...prev,
             [field]: e.target.value
         }))
+    }
+
+    const handleJoin = async () => {
+        setIsJoin(true)
+        const data = await ClassService.joinClass(newClassFormValues.joinCode).finally(() => {
+            setIsJoin(false)
+            setNewClassFormValues({ joinCode: "" })
+            if (data) navigate(`/main/${data.roleClass}/class/${data.id}`)
+        })
     }
 
     return (
@@ -37,15 +55,18 @@ const JoinClassForm: React.FC<JoinClassForm_Interface> = ({ toggleForm }) => {
                         type="text"
                         value={newClassFormValues.joinCode}
                         placeholder="..."
-                        className="w-full shadow-[0_0_10px_rgba(128,128,128,0.25)] text-normalSize font-light py-2.5 px-5 rounded-small max-sm:text-smallSize"
+                        className="w-full shadow-[0_0_10px_rgba(128,128,128,0.25)] text-normalSize font-light py-2.5 px-5 rounded-small max-sm:text-smallSize disableState"
                         maxLength={100}
                         onChange={handleChange("joinCode")}
+                        disabled={isJoin}
                     />
                 </span>
 
                 <span className="flex items-center-safe gap-5">
-                    <button className="flex-1 bg-lightGray hover:cursor-pointer hoverBtn py-2.5 rounded-small max-sm:text-smallSize" onClick={toggleForm}>Hủy</button>
-                    <button className="flex-2 bg-mainColor hover:cursor-pointer hoverBtn text-white py-2.5 rounded-small max-sm:text-smallSize">Tham gia</button>
+                    <button className="flex-1 bg-lightGray hoverBtn py-2.5 rounded-small max-sm:text-smallSize disableState" onClick={toggleForm} disabled={isJoin}>Hủy</button>
+                    <button className="flex-2 bg-mainColor hoverBtn text-white py-2.5 rounded-small max-sm:text-smallSize disableState" onClick={handleJoin} disabled={isJoin}>
+                        {isJoin ? <><ScaleLoader height={10} width={4} color="white" /></> : <>Tham gia</>}
+                        </button>
                 </span>
             </div>
         </div>

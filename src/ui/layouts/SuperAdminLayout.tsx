@@ -90,13 +90,13 @@ const SuperAdminLayout: React.FC = () => {
         <div className="w-full h-full flex bg-bgLight dark:bg-bgDark">
             {/* Side bar */}
             <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-gray px-[20px] py-5">
-                <span className="flex items-center-safe gap-2.5">
+                <NavLink to={"/"} className="flex items-center-safe gap-2.5">
                     <img src={UniLogo} className="h-10" loading="lazy" />
                     <span className="">
                         <h4 className="text-normalSize font-bold dark:text-white">UniProject</h4>
                         <p className="text-smallSize font-medium text-gray">UniAdmin</p>
                     </span>
-                </span>
+                </NavLink>
 
                 <span className="flex-1 flex flex-col gap-2.5">
                     {sidebarTab.map((tab, index) => {
@@ -133,7 +133,7 @@ const SuperAdminLayout: React.FC = () => {
                         <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium">UA</p>
                         <p className="text-nowrap font-bold dark:text-white">Uni Admin</p>
                         <button className="hoverBtn bg-redRGB p-2.5 rounded-small" onClick={handleSignout}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 stroke-red">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 stroke-red">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                             </svg>
                         </button>
