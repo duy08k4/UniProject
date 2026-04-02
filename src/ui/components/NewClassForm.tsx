@@ -4,6 +4,7 @@ import { toast } from "sonner"
 import { ClassService } from "../../services/class/class.service"
 import { ScaleLoader } from "react-spinners"
 import { confirmDialog } from "primereact/confirmdialog"
+import { useNavigate } from "react-router-dom"
 
 type NewClassFormValues = {
     className: string
@@ -26,6 +27,8 @@ interface NewClassForm_Interface {
 }
 
 const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
+    const navigate = useNavigate()
+    
     const [newClassFormValues, setNewClassFormValues] = useState<NewClassFormValues>({
         className: "",
         subject: "",
@@ -95,7 +98,7 @@ const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
         }
 
         setIsCreating(true)
-        await ClassService.createNewClass(
+        const newclass = await ClassService.createNewClass(
             newClassFormValues.className,
             newClassFormValues.subject,
             newClassFormValues.description
@@ -107,22 +110,27 @@ const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
                 subject: ""
             })
 
-            confirmDialog({
-                header: "Lớp học mới",
-                message: "Bạn có muốn truy cập vào lớp học không?",
+        })
+        
+        if (!newclass) {
+            toggleForm()
+            return
+        }
 
-                acceptLabel: "Truy cập",
-                rejectLabel: "Hủy",
+        confirmDialog({
+            header: "Lớp học mới",
+            message: "Bạn có muốn truy cập vào lớp học không?",
 
-                accept: () => {
-                    toast.info("Truy cập lớp học")
-                },
+            acceptLabel: "Truy cập",
+            rejectLabel: "Hủy",
 
-                reject: () => {
-                    toggleForm()
-                }
-            })
+            accept: () => {
+                navigate(`/main/${newclass.user.role}/class/${newclass.id}`)                    
+            },
 
+            reject: () => {
+                toggleForm()
+            }
         })
     }
 
@@ -148,6 +156,7 @@ const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
                             maxLength={100}
                             onChange={handleChange("className")}
                             disabled={isCreating}
+                            autoFocus
                         />
                     </span>
 

@@ -52,9 +52,7 @@ export class AuthService {
 
                 if (status >= 200 && status < 300) {
                     store.dispatch(updateUser(data.data))
-                    localStorage.setItem("hasLogin", "true");
-                    toast.success("Đăng nhập thành công")
-                    
+                    localStorage.setItem("hasLogin", "true");                    
                     return data.data.role === "uniadmin" ? "/super-admin" : "/main"
                 }
                 
@@ -115,7 +113,6 @@ export class AuthService {
 
             if (status >= 200 && status < 300) {
                 store.dispatch(updateUser(data))
-                toast.success("Xác thực thành công!")
                 toast.success(`Xin chào ${data.full_name}`)
                 return true
             }

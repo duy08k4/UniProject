@@ -5,7 +5,7 @@ import type { SignInResponse } from "../../services/auth/auth.type";
 export interface AuthSlice {
     user: {
         info: {
-            id: string | null,
+            id: string,
             supabase_id: string | null,
             full_name: string | null,
             email: string | null,

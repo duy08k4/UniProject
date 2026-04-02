@@ -11,7 +11,11 @@ export type ClassType = {
     is_banned: boolean,
     created_at: string,
     updated_at: string,
-    roleClass: string | null,
+    user: {
+        role: string,
+        is_banned: boolean,
+        roomadmin_approved: boolean
+    }
 }
 
 export type CreateNewClass = ClassType & {
@@ -21,12 +25,7 @@ export type CreateNewClass = ClassType & {
         email: string;
         role: string;
     };
-    counts: {
-        student: string;
-        lecturer: string;
-        committee: string;
-        pending: string;
-    };
+    counts: Record<"student" | "lecturer" | "committee" | "pending", string>;
     owner: {
         full_name: string;
         email: string;
@@ -34,10 +33,10 @@ export type CreateNewClass = ClassType & {
 }
 
 export type Pagination = {
-    page: string | number,
-    size: string | number,
-    total_classes: string | number,
-    totalPage: string | number
+    page: string,
+    size: string,
+    total_classes: string,
+    totalPage: string
 }
 
 export type ClassPagination = {
@@ -47,17 +46,36 @@ export type ClassPagination = {
 
 export type Members = {
     id: string,
-    role: string,
+    role: "roomadmin" | "student" | "lecturer",
     roomadmin_approved: boolean,
+    is_banned: boolean,
     is_committee_member: boolean,
     can_create_notifications: boolean,
     can_create_forms: boolean,
     can_create_score_forms: boolean,
     joined_at: string,
     updated_at: string,
+    created_at: string,
     user: {
         id: string,
         full_name: string,
         email: string
+    }
+}
+
+export type MemberData = {
+    lecturer: Members[],
+    student: Members[],
+    roomadmin: Members[],
+    pending: Members[]
+}
+
+export type MembersPagination = {
+    data: MemberData,
+    pagination: {
+        page: string,
+        size: string,
+        total_members: string,
+        totalPage: string
     }
 }

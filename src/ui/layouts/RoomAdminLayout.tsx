@@ -5,19 +5,32 @@ import UniLogo from "../../assets/UniLogo.png"
 
 // Component
 import ToggleTheme from "../components/ToggleTheme.comp"
-import { useRef, type ReactElement } from "react"
-import { NavLink, Outlet, useLocation, useParams } from "react-router-dom"
-import { useSelector } from "react-redux"
+import { useState, type ReactElement } from "react"
+import { NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../redux/store"
+import getShortName from "../../utils/getShortName"
+import RATransferRights from "../components/RATransferRights"
+import RASettingsForm from "../components/RASettingsForm"
+import { confirmDialog } from "primereact/confirmdialog"
+import { changeStateFetching } from "../../redux/reducers/global.reducer"
+import { ClassService } from "../../services/class/class.service"
 
 type SidebarTab = { icon: ReactElement, label: string, path: string }
 
 const RoomAdminLayout: React.FC = () => {
     const pathLocation = useLocation()
     const { classId } = useParams()
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
     const userData = useSelector((state: RootState) => state.auth.user.info)
     const classData = useSelector((state: RootState) => state.class.currentClass)
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
+
+    const [isLeaveClass, setIsLeaveClass] = useState<boolean>(false)
+    const [showSettings, setShowSettings] = useState<boolean>(false)
 
     const sidebarTab: SidebarTab[] = [
         {
@@ -70,83 +83,125 @@ const RoomAdminLayout: React.FC = () => {
         }
     ]
 
+    const toggleLeaveClass = () => {
+        setIsLeaveClass(!isLeaveClass)
+    }
+
+    const handleDissolve = async () => {
+        confirmDialog({
+            header: "Thông báo giải tán lớp học",
+            message: <p>Hành động giải tán lớp <b className="text-red">{classData.info.label}</b> sẽ không thể khôi phục</p>,
+
+            acceptLabel: "Tiếp tục",
+            rejectLabel: "Hủy",
+
+            accept: async () => {
+                dispatch(changeStateFetching(true))
+
+                await ClassService.removeClass(classData.info.id, userData.id).finally(() => {
+                    dispatch(changeStateFetching(false))
+                    navigate('/main')
+                })
+            }
+        })
+    }
+
     if (!userData.id || !classData.info.id) return null
 
     return (
-        <div className="w-full h-full flex bg-bgLight dark:bg-bgDark overflow-hidden">
-            {/* Side bar */}
-            <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-gray px-[20px] py-5 max-sm:fixed max-sm:z-10 max-sm:w-2/3 max-sm:bg-bgLight dark:max-sm:bg-bgDark">
-                <button className="absolute hidden top-10 left-full -translate-x-1/2 h-8 aspect-square bg-bgLight dark:max-sm:bg-bgDark border-[0.5px] rounded-full border-lightGray max-sm:flex justify-center-safe items-center-safe">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" className="dark:stroke-white size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-                    </svg>
-                </button>
-
-                <NavLink to={isFetching ? pathLocation.pathname : "/"} className="flex items-center-safe gap-2.5">
-                    <img src={UniLogo} className="h-10" loading="lazy" />
-                    <span className="">
-                        <h4 className="text-normalSize font-bold dark:text-white">UniProject</h4>
-                    </span>
-                </NavLink>
-
-                <span className="flex-1 flex flex-col gap-2.5">
-                    {sidebarTab.map((tab, index) => {
-                        return (
-                            <NavLink key={index} to={isFetching ? pathLocation.pathname : tab.path} className={`flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname === tab.path && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
-                                {tab.icon}
-                                <p className="text-smallSize max-sm:text-mobile-smallSize font-semibold dark:text-white">{tab.label}</p>
-                            </NavLink>
-                        )
-                    })}
-                </span>
-
-                <span className="w-full flex flex-col gap-2.5">
-                    <button className="hoverBtn bg-redRGB w-full flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer rounded-small disableState" disabled={isFetching}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 stroke-red">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+        <>
+            <div className="w-full h-full flex bg-bgLight dark:bg-bgDark overflow-hidden">
+                {/* Side bar */}
+                <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-gray px-[20px] py-5 max-sm:fixed max-sm:z-10 max-sm:w-2/3 max-sm:bg-bgLight dark:max-sm:bg-bgDark">
+                    <button className="absolute hidden top-10 left-full -translate-x-1/2 h-8 aspect-square bg-bgLight dark:max-sm:bg-bgDark border-[0.5px] rounded-full border-lightGray max-sm:flex justify-center-safe items-center-safe">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="dark:stroke-white size-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                         </svg>
-
-                        <p className="text-smallSize max-sm:text-mobile-smallSize font-semibold dark:text-red text-red">Rời lớp</p>
                     </button>
 
-                    <button className="hoverBtn bg-red w-full flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer rounded-small disableState" disabled={isFetching}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 stroke-white">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
-                        </svg>
-
-                        <p className="text-smallSize max-sm:text-mobile-smallSize font-semibold dark:text-white text-white">Giải tán lớp</p>
-                    </button>
-
-                    <span className="w-full flex items-center-safe justify-between">
-                        <p className="font-medium dark:text-white text-nowrap">Giao diện:</p>
-                        <ToggleTheme />
-                    </span>
-                </span>
-            </div>
-
-            {/* Body */}
-            <div className="flex-1 flex flex-col">
-                <header className="w-full border-b-[0.5px] border-lightGray dark:border-gray flex justify-between gap-10 px-mainTwoSidePadding py-5">
-                    <span className="relative w-3/5 flex items-center-safe gap-5 px-2.5 rounded-small">
-                        <h1 className="text-largeSize font-bold dark:text-white line-clamp-1">{classData.info.label}</h1>
-                    </span>
-
-                    <span className="flex items-center-safe gap-2.5">
-                        <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium">
-                            {userData.full_name && userData.full_name?.split(" ")[0].split("")[0] + userData.full_name?.split(" ")[userData.full_name.split(" ").length - 1].split("")[0]}
-                        </p>
+                    <NavLink to={isFetching ? pathLocation.pathname : "/"} className="flex items-center-safe gap-2.5">
+                        <img src={UniLogo} className="h-10" loading="lazy" />
                         <span className="">
-                            <p className="text-nowrap font-bold dark:text-white">{userData.full_name}</p>
-                            <p className="text-smallSize text-gray text-nowrap font-medium dark:text-white">{userData.email}</p>
+                            <h4 className="text-normalSize font-bold dark:text-white">UniProject</h4>
+                        </span>
+                    </NavLink>
+
+                    <span className="flex-1 flex flex-col gap-2.5">
+                        {sidebarTab.map((tab, index) => {
+                            return (
+                                <NavLink key={index} to={isFetching ? pathLocation.pathname : tab.path} className={`relative flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname === tab.path && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
+                                    {tab.icon}
+                                    <p className="text-smallSize max-sm:text-mobile-smallSize font-semibold dark:text-white">{tab.label}</p>
+                                    {tab.path.includes("members") && Number(classData.info.counts.pending) > 0 && <div className="absolute top-0 left-full translate-y-1/2 -translate-x-[calc(100%+20px)] bg-red text-white h-7 aspect-square rounded-full flex items-center-safe justify-center-safe ">{classData.info.counts.pending}</div>}
+                                </NavLink>
+                            )
+                        })}
+                    </span>
+
+                    <span className="w-full flex flex-col gap-2.5">
+                        <button className="hoverBtn bg-redRGB w-full flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer rounded-small disableState" disabled={isFetching} onClick={toggleLeaveClass}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 stroke-red">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                            </svg>
+
+                            <p className="text-smallSize max-sm:text-mobile-smallSize font-semibold dark:text-red text-red" onClick={toggleLeaveClass}>Rời lớp</p>
+                        </button>
+
+                        <button className="hoverBtn bg-red w-full flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer rounded-small disableState" disabled={isFetching} onClick={handleDissolve}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 stroke-white">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+                            </svg>
+
+                            <p className="text-smallSize max-sm:text-mobile-smallSize font-semibold dark:text-white text-white">Giải tán lớp</p>
+                        </button>
+
+                        <span className="w-full flex items-center-safe justify-between">
+                            <p className="font-medium dark:text-white text-nowrap">Giao diện:</p>
+                            <ToggleTheme />
                         </span>
                     </span>
-                </header>
+                </div>
 
-                <div className="flex-1 px-mainTwoSidePadding overflow-auto">
-                    <Outlet />
+                {/* Body */}
+                <div className="flex-1 flex flex-col">
+                    <header className="w-full border-b-[0.5px] border-lightGray dark:border-gray flex justify-between gap-10 px-mainTwoSidePadding py-5">
+                        <span className="relative w-3/5 flex items-center-safe gap-5 px-2.5 rounded-small">
+                            {pathLocation.pathname !== `/main/roomadmin/class/${classId}` && <h1 className="text-largeSize font-bold dark:text-white line-clamp-1">{classData.info.label}</h1>}
+                        </span>
+
+                        <span className="flex items-center-safe gap-5">
+                            <span className="flex items-center-safe gap-2.5">
+                                <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium p-2.5">
+                                    {getShortName(userData.full_name)}
+                                </p>
+                                <span className="">
+                                    <p className="text-nowrap font-bold dark:text-white">{userData.full_name}</p>
+                                    <p className="text-smallSize text-gray text-nowrap font-medium dark:text-white">{userData.email}</p>
+                                </span>
+                            </span>
+
+                            <button
+                                className="p-2.5 rounded-full hover:bg-gray/10 dark:hover:bg-white/10 transition-all group"
+                                title="Cài đặt lớp học"
+                                onClick={() => setShowSettings(true)}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 text-gray group-hover:text-mainColor transition-colors">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 0 1 0 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.127c-.332.183-.582.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.127.332-.183.582-.495.644-.869l.214-1.281Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                            </button>
+                        </span>
+                    </header>
+
+                    <div className="flex-1 px-mainTwoSidePadding overflow-auto">
+                        <Outlet />
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {isLeaveClass && <RATransferRights togglePopup={toggleLeaveClass} />}
+            {showSettings && <RASettingsForm toggleForm={() => setShowSettings(false)} />}
+        </>
     )
 }
 
