@@ -12,12 +12,15 @@ import JoinClassForm from "../components/JoinClassForm"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../redux/store"
 import { AuthService } from "../../services/auth/auth.service"
-import { ClassService, sizePage } from "../../services/class/class.service"
+import { ClassService } from "../../services/class/class.service"
 import formatVNTime from "../../utils/formatVNTime"
 import { useDebounce } from "../../hooks/Debounce"
 import { ScaleLoader } from "react-spinners"
 import type { CreateNewClass } from "../../services/class/class.type"
 import { currentClass_ResetInfo } from "../../redux/reducers/classSlice.reducer"
+import { toast } from "sonner"
+import { clasSizePage } from "../../config/pageSize"
+import { changeStateFetching } from "../../redux/reducers/global.reducer"
 
 const Main: React.FC = () => {
     const [isNewClassForm, setIsNewClassForm] = useState<boolean>(false)
@@ -29,21 +32,20 @@ const Main: React.FC = () => {
     const dispatch = useDispatch()
 
     // State
-    const [isSearching, setIsSearching] = useState<boolean>(false)
-
+    const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
     // Redux
     const userData = useSelector((state: RootState) => state.auth.user)
     const classList = useSelector((state: RootState) => state.class.classList)
     const classListPagination = useSelector((state: RootState) => state.class.pagination)
     const [page, setPage] = useState<number>(1)
 
-
     useEffect(() => {
         if (!userData.info.id) return
         (async () => {
-            setIsSearching(true)
-            await ClassService.getAllClasses(page, sizePage, searchDebounce || undefined).finally(() => {
-                setIsSearching(false)
+            dispatch(changeStateFetching(true))
+
+            await ClassService.getAllClasses(page, clasSizePage, searchDebounce || undefined).finally(() => {
+                dispatch(changeStateFetching(false))
                 dispatch(currentClass_ResetInfo())
             })
         })()
@@ -66,8 +68,24 @@ const Main: React.FC = () => {
         }
     }
 
+    const refresh = async () => {
+        dispatch(changeStateFetching(true))
+        await ClassService.getAllClasses(page, clasSizePage, searchDebounce || undefined).finally(() => {
+            dispatch(changeStateFetching(false))
+        })
+    }
+
     const accessClass = (classData: CreateNewClass) => {
-        navigate(`/main/${classData.roleClass}/class/${classData.id}`)
+        if (!classData.user.roomadmin_approved) {
+            toast.error("Bạn chưa được phép vào lớp")
+            return
+        }
+
+        if (classData.user.is_banned) {
+            toast.error("Tạm thời bạn không thể vào lớp")
+            return
+        }
+        navigate(`/main/${classData.user.role}/class/${classData.id}`)
     }
 
     return (
@@ -99,6 +117,12 @@ const Main: React.FC = () => {
             <div className="h-full flex-1 flex flex-col gap-2.5 px-[300px] max-sm:px-mobile-twoSidePadding overflow-auto pb-5">
                 <div className="sticky top-0 left-0 w-full bg-bgLight dark:bg-bgDark py-5 z-10">
                     <span className="w-full flex max-sm:flex-col items-center-safe gap-5 max-sm:gap-2.5">
+                        <button className="h-full aspect-square p-1.5 border-[0.5px] border-lightGray rounded-full hoverBtn disableState" disabled={isFetching} onClick={refresh}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4 dark:stroke-white max-sm:size-3.5 stroke-2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
+                        </button>
+
                         <span className="relative w-full flex items-center-safe px-2.5 rounded-small shadow-[0_0_10px_rgba(128,128,128,0.25)] dark:bg-black">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-6 dark:stroke-white">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -109,16 +133,16 @@ const Main: React.FC = () => {
                                 className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white disableState"
                                 placeholder="Tìm kiếm tên lớp hoặc gmail chủ phòng..."
                                 onChange={(e) => { setSearch(e.target.value) }}
-                                disabled={isSearching}
+                                disabled={isFetching}
                             />
                             <span id="underlineInput" className="absolute bottom-0 left-0 bg-mainColor dark:bg-white w-0 h-px"></span>
                         </span>
 
-                        {isSearching && (<ScaleLoader height={10} width={4} color="#499c40" />)}
+                        {isFetching && (<ScaleLoader height={10} width={4} color="#499c40" />)}
 
                         <span className="flex max-sm:w-full gap-1.5 items-center-safe">
-                            <button className="flex-1 border-[0.5px] border-lightGray dark:border-gray dark:text-white px-5 py-2 rounded-small text-nowrap max-sm:text-mobile-normalSize hoverBtn disableState" disabled={isSearching} onClick={() => { setIsJoinClassForm(!isJoinClassForm) }}>Tham gia lớp</button>
-                            <button className="flex-1 bg-mainColor text-white font-medium px-5 py-2 rounded-small text-nowrap max-sm:text-mobile-normalSize hoverBtn disableState" disabled={isSearching} onClick={() => { setIsNewClassForm(!isNewClassForm) }}>Tạo lớp</button>
+                            <button className="flex-1 border-[0.5px] border-lightGray dark:border-gray dark:text-white px-5 py-2 rounded-small text-nowrap max-sm:text-mobile-normalSize hoverBtn disableState" disabled={isFetching} onClick={() => { setIsJoinClassForm(!isJoinClassForm) }}>Tham gia lớp</button>
+                            <button className="flex-1 bg-mainColor text-white font-medium px-5 py-2 rounded-small text-nowrap max-sm:text-mobile-normalSize hoverBtn disableState" disabled={isFetching} onClick={() => { setIsNewClassForm(!isNewClassForm) }}>Tạo lớp</button>
                         </span>
                     </span>
 
@@ -130,13 +154,13 @@ const Main: React.FC = () => {
                                 <p className="font-medium mr-3.5 dark:text-white max-sm:text-mobile-smallSize">Trang {classListPagination.page}/{classListPagination.totalPage}</p>
                             )}
 
-                            <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState" disabled={isSearching || page <= 0} onClick={() => handleChangePage("prev")}>
+                            <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState" disabled={isFetching || page <= 1} onClick={() => handleChangePage("prev")}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white max-sm:size-3.5 stroke-2">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                                 </svg>
                             </button>
 
-                            <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState" disabled={isSearching || Number.parseInt(String(classListPagination.totalPage)) < page} onClick={() => handleChangePage("next")}>
+                            <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState" disabled={isFetching || page >= Number.parseInt(String(classListPagination.totalPage))} onClick={() => handleChangePage("next")}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white max-sm:size-3.5 stroke-2">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                                 </svg>
@@ -150,17 +174,31 @@ const Main: React.FC = () => {
                         return (
                             <span
                                 key={classData.id}
-                                className={`flex flex-col h-full gap-3.5 shadow-[0_0_20px_rgba(128,128,128,0.25)] px-5 py-5 rounded-small border-t-4 border-mainColor hoverBtn hover:shadow-[0_0_10px_2px_rgba(128,128,128,0.75)]`}
+                                className={`flex flex-col h-full gap-3.5 shadow-[0_0_20px_rgba(128,128,128,0.25)] px-5 py-5 rounded-small border-t-4 ${classData.user.roomadmin_approved ? "border-mainColor" : "border-oranged"} hoverBtn hover:shadow-[0_0_10px_2px_rgba(128,128,128,0.75)]`}
                                 onClick={() => { accessClass(classData) }}
                             >
                                 <span className="flex flex-col gap-1.5">
                                     <h4 className="text-mediumSize max-sm:text-mobile-mediumSize font-bold line-clamp-1 dark:text-white">{classData.label}</h4>
-                                    <p className="text flex items-center-safe gap-2 dark:text-mainColor font-black">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-4 dark:fill-mainColor">
-                                            <path fillRule="evenodd" d="M5.25 2.25a3 3 0 0 0-3 3v4.318a3 3 0 0 0 .879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 0 0 5.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 0 0-2.122-.879H5.25ZM6.375 7.5a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" clipRule="evenodd" />
-                                        </svg>
-                                        {classData.owner && userData.info.email === classData.owner.email ? "Chủ phòng" : "Thành viên"}
-                                    </p>
+
+                                    <div className="flex items-center-safe gap-3.5">
+                                        <p className={`text flex shrink-0 items-center-safe text-gray gap-2 ${classData.user.roomadmin_approved ? "dark:text-mainColor" : "dark:text-oranged"} font-black`}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`size-4 fill-gray ${classData.user.roomadmin_approved ? "dark:fill-mainColor" : "dark:fill-oranged"}`}>
+                                                <path fillRule="evenodd" d="M5.25 2.25a3 3 0 0 0-3 3v4.318a3 3 0 0 0 .879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 0 0 5.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 0 0-2.122-.879H5.25ZM6.375 7.5a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" clipRule="evenodd" />
+                                            </svg>
+                                            {classData.owner && userData.info.email === classData.owner.email ? "Chủ phòng" : "Thành viên"}
+                                        </p>
+
+                                        <span className="flex items-center-safe gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`size-4 fill-gray ${classData.user.roomadmin_approved ? "dark:fill-mainColor" : "dark:fill-oranged"}`}>
+                                                <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z" />
+                                            </svg>
+
+                                            <p className={`w-fit h-fit text line-clamp-1 text-gray ${classData.user.roomadmin_approved ? "dark:text-mainColor" : "dark:text-oranged"} font-black`}>
+                                                {classData.subject}
+                                            </p>
+                                        </span>
+
+                                    </div>
                                 </span>
 
                                 <span className="flex-1">
@@ -188,24 +226,33 @@ const Main: React.FC = () => {
                                 <span className="border-t border-lightGray flex justify-between pt-2.5">
                                     <span>
                                         <span className="flex items-center-safe gap-1.5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="size-4 stroke-mainColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className={`size-4 ${classData.user.roomadmin_approved ? "stroke-mainColor" : "stroke-oranged"}`}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                                             </svg>
 
-                                            <p className="font-medium text-smallSize text-mainColor line-clamp-1">{classData.owner && classData.owner.email}</p>
+                                            <p className={`font-medium text-smallSize ${classData.user.roomadmin_approved ? "text-mainColor" : "text-oranged"} line-clamp-1`}>{classData.owner && classData.owner.email}</p>
                                         </span>
 
                                         <span className="flex items-center-safe gap-1.5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-4 fill-mainColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`size-4  ${classData.user.roomadmin_approved ? "fill-mainColor" : "fill-oranged"}`}>
                                                 <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clipRule="evenodd" />
                                             </svg>
 
-                                            <p className="font-medium text-smallSize text-mainColor">{formatVNTime(classData.created_at)}</p>
+                                            <p className={`font-medium text-smallSize ${classData.user.roomadmin_approved ? "text-mainColor" : "text-oranged"}`}>{formatVNTime(classData.created_at)}</p>
                                         </span>
                                     </span>
 
                                     <span className="h-full flex items-center-safe">
-                                        <button className="h-fit w-fit bg-mainColor text-white px-3.5 py-1.5 rounded-small hoverBtn disableState" disabled={isSearching}>Vào lớp</button>
+                                        {classData.user.roomadmin_approved ?
+                                            (classData.user.is_banned ?
+                                                <button className="h-fit w-fit bg-redRGB text-red px-3.5 py-1.5 rounded-small hoverBtn disableState" disabled={isFetching}>Đình chỉ</button>
+                                                :
+                                                <button className="h-fit w-fit bg-mainColor text-white px-3.5 py-1.5 rounded-small hoverBtn disableState" disabled={isFetching}>Vào lớp</button>
+                                            )
+
+                                            :
+                                            <p className="h-fit w-fit bg-orangedRGB text-oranged px-3.5 py-1.5 rounded-small">Chờ duyệt</p>
+                                        }
                                     </span>
                                 </span>
                             </span>

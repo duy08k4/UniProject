@@ -9,6 +9,7 @@ import { Provider } from 'react-redux'
 import { store } from './redux/store.ts'
 import { PrimeReactProvider } from 'primereact/api';
 
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
@@ -16,7 +17,6 @@ createRoot(document.getElementById('root')!).render(
         <PrimeReactProvider>
           <App />
         </PrimeReactProvider>
-        
         <Toaster position='top-right' theme='light' closeButton duration={4000} richColors visibleToasts={10} offset={{ bottom: 50 }} />
       </BrowserRouter>
     </Provider>

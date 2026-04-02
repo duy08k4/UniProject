@@ -1,12 +1,45 @@
 import type React from "react"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store"
+import formatVNTime from "../../../utils/formatVNTime"
 
 const RAOverview: React.FC = () => {
     const classInfo = useSelector((state: RootState) => state.class.currentClass.info)
 
     return (
         <div className="w-full h-fit flex flex-col gap-10 pt-topPadding">
+            {/* Class info card */}
+            <div className="flex flex-col gap-5 p-7 shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-normal dark:bg-lightDark">
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-hugeSize font-bold dark:text-white uppercase">{classInfo.label}</h2>
+                    <p className="text-gray font-medium dark:text-gray/80">{classInfo.subject}</p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-5 max-md:grid-cols-1 border-t border-gray/10 pt-5">
+                    <div className="flex flex-col gap-1">
+                        <p className="text-smallSize text-gray dark:text-gray/60 italic font-medium">Mã tham gia:</p>
+                        <p className="text-bigSize font-bold text-mainColor tracking-wider">{classInfo.join_code}</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <p className="text-smallSize text-gray dark:text-gray/60 italic font-medium">Người phụ trách:</p>
+                        <p className="text-normalSize font-semibold dark:text-white">{classInfo.owner?.full_name || classInfo.createdBy.full_name}</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <p className="text-smallSize text-gray dark:text-gray/60 italic font-medium">Ngày khởi tạo:</p>
+                        <p className="text-normalSize font-semibold dark:text-white">{classInfo.created_at ? formatVNTime(classInfo.created_at).split(',')[0] : "N/A"}</p>
+                    </div>
+                </div>
+
+                {classInfo.description && (
+                    <div className="flex flex-col gap-1 border-t border-gray/10 pt-5">
+                        <p className="text-smallSize text-gray dark:text-gray/60 italic font-medium">Mô tả lớp học:</p>
+                        <p className="text-normalSize dark:text-white leading-relaxed">{classInfo.description}</p>
+                    </div>
+                )}
+            </div>
+
             {/* Stats Cards */}
             <div className="grid grid-cols-4 gap-5 max-sm:grid-cols-1">
                 <div className="flex flex-col gap-2.5 px-7 py-5 shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-normal dark:bg-lightDark">
@@ -16,8 +49,8 @@ const RAOverview: React.FC = () => {
                     </div>
                     <div className="flex items-center-safe gap-5">
                         <span className="flex items-center-safe gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" className="size-6 dark:stroke-gray">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-6 dark:stroke-gray">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                             </svg>
                             <p className="text-[32px] font-bold dark:text-white">{Number(classInfo.counts.student) < 10 ? `0${classInfo.counts.student}` : classInfo.counts.student}</p>
                         </span>

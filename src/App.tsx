@@ -1,4 +1,7 @@
 import { Route, Routes } from "react-router-dom"
+import { ConfirmDialog } from "primereact/confirmdialog"
+import ClassContextProvider from "./ui/components/ClassContextProvider"
+import SocketSubcriber from "./ui/components/SocketSubcribe"
 
 // Component
 import { useTheme } from "./ui/components/ToggleTheme.comp"
@@ -55,14 +58,13 @@ import SDSubmission from "./ui/pages/student/SDSubmission"
 import RoomLecturerLayout from "./ui/layouts/RoomLecturerLayout"
 import LTScoreboards from "./ui/pages/lecturer/LTScoreboards"
 import LTCommittee from "./ui/pages/lecturer/LTCommittee"
-import { ConfirmDialog } from "primereact/confirmdialog"
-import ClassContextProvider from "./ui/components/ClassContextProvider"
 
 function App() {
   useTheme();
   return (
     <>
       <SessionChecker />
+      <SocketSubcriber />
       <Routes>
         <Route element={<LandingPageLayout />}>
           <Route index element={<Home />} />
