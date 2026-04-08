@@ -28,6 +28,7 @@ import ResetPassword from "./ui/pages/ResetPassword"
 import Overview from "./ui/pages/superadmin/SAOverview"
 import UserManagement from "./ui/pages/superadmin/SAUserManagement"
 import ClassManagement from "./ui/pages/superadmin/SAClassManagement"
+import SAClassDetail from "./ui/pages/superadmin/SAClassDetail"
 import Milestones from "./ui/pages/superadmin/SAMilestones"
 import FormManagement from "./ui/pages/superadmin/SAFormManagement"
 import SAScoreBoardManagement from "./ui/pages/superadmin/SAScoreBoardManagement"
@@ -83,7 +84,10 @@ function App() {
         <Route path="super-admin" element={<SuperAdminLayout />} >
           <Route index element={<Overview />} />
           <Route path="users" element={<UserManagement />} />
+
           <Route path="classes" element={<ClassManagement />} />
+          <Route path="class/:classId" element={<SAClassDetail />} />
+
           <Route path="milestones" element={<Milestones />} />
           <Route path="forms" element={<FormManagement />} />
           <Route path="scoreboards" element={<SAScoreBoardManagement />} />

@@ -8,6 +8,9 @@ import ToggleTheme from "../components/ToggleTheme.comp"
 import type { ReactElement } from "react"
 import { NavLink, Outlet, useLocation } from "react-router-dom"
 import { AuthService } from "../../services/auth/auth.service"
+import { useSelector } from "react-redux"
+import type { RootState } from "../../redux/store"
+import getShortName from "../../utils/getShortName"
 
 type SidebarTab = { icon: ReactElement, label: string, path: string }
 
@@ -81,16 +84,19 @@ const sidebarTab: SidebarTab[] = [
 
 const SuperAdminLayout: React.FC = () => {
     const pathLocation = useLocation()
+    const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
+    const userData = useSelector((state: RootState) => state.auth.user.info)
+
     // Handler
     const handleSignout = async () => {
         await AuthService.signOut()
     }
-    
+
     return (
         <div className="w-full h-full flex bg-bgLight dark:bg-bgDark">
             {/* Side bar */}
             <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-gray px-[20px] py-5">
-                <NavLink to={"/"} className="flex items-center-safe gap-2.5">
+                <NavLink to={"/super-admin"} className="flex items-center-safe gap-2.5">
                     <img src={UniLogo} className="h-10" loading="lazy" />
                     <span className="">
                         <h4 className="text-normalSize font-bold dark:text-white">UniProject</h4>
@@ -101,7 +107,7 @@ const SuperAdminLayout: React.FC = () => {
                 <span className="flex-1 flex flex-col gap-2.5">
                     {sidebarTab.map((tab, index) => {
                         return (
-                            <NavLink key={index} to={tab.path} className={`flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname === tab.path && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
+                            <NavLink key={index} to={isFetching ? pathLocation.pathname : tab.path} className={`flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname === tab.path && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
                                 {tab.icon}
                                 <p className="text-smallSize font-semibold dark:text-white">{tab.label}</p>
                             </NavLink>
@@ -120,19 +126,18 @@ const SuperAdminLayout: React.FC = () => {
             {/* Body */}
             <div className="flex-1 flex flex-col">
                 <header className="w-full border-b-[0.5px] border-lightGray dark:border-gray flex justify-end-safe gap-10 px-mainTwoSidePadding py-5">
-                    <span className="relative w-1/4 flex items-center-safe px-2.5 rounded-small bg-[#e0e0e0] dark:bg-black">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 dark:stroke-white">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg>
-
-                        <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white" placeholder="Tìm kiếm..." />
-                        <span id="underlineInput" className="absolute bottom-0 left-0 bg-mainColor dark:bg-white w-0 h-px"></span>
-                    </span>
-
                     <span className="flex items-center-safe gap-2.5">
-                        <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium">UA</p>
-                        <p className="text-nowrap font-bold dark:text-white">Uni Admin</p>
-                        <button className="hoverBtn bg-redRGB p-2.5 rounded-small" onClick={handleSignout}>
+                        <span className="flex items-center-safe gap-2.5">
+                            <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium p-2.5">
+                                {getShortName(userData.full_name)}
+                            </p>
+                            <span className="">
+                                <p className="text-nowrap font-bold dark:text-white">{userData.full_name}</p>
+                                <p className="text-smallSize text-gray text-nowrap font-medium dark:text-white">{userData.email}</p>
+                            </span>
+                        </span>
+
+                        <button className="hoverBtn bg-redRGB p-2.5 rounded-small disableState" disabled={isFetching} onClick={handleSignout}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 stroke-red">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                             </svg>

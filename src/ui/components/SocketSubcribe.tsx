@@ -13,19 +13,27 @@ const SocketSubcriber = () => {
 
         GlobalGateway.OnApproveMember()
         GlobalGateway.OnNewMember()
+        GlobalGateway.OnCreateNewClass()
+        GlobalGateway.OnUpdateClassStatus()
 
         ClassGateway.OnSuspendMemberFromClass()
         ClassGateway.OnLeaveTheClass()
         ClassGateway.OnDissolveClass()
+        ClassGateway.OnUpdateMemberData()
+        ClassGateway.OnRemoveClass()
 
 
         return () => {
             GlobalGateway.off(globalSocketEventName.OnApproveMember)
             GlobalGateway.off(globalSocketEventName.OnNewMember)
+            GlobalGateway.off(globalSocketEventName.OnCreateNewClass)
+            GlobalGateway.off(globalSocketEventName.OnUpdateClassStatus)
 
             ClassGateway.off(classSocketEventName.OnSuspendMemberFromClass)
             ClassGateway.off(classSocketEventName.OnLeaveTheClass)
             ClassGateway.off(classSocketEventName.OnDissolveClass)
+            ClassGateway.off(classSocketEventName.OnUpdateMemberData)
+            ClassGateway.off(classSocketEventName.OnRemoveClass)
         }
     }, [userData.id])
 

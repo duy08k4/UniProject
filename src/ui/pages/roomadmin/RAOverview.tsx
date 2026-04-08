@@ -2,9 +2,11 @@ import type React from "react"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store"
 import formatVNTime from "../../../utils/formatVNTime"
+import { NavLink, useParams } from "react-router-dom"
 
 const RAOverview: React.FC = () => {
     const classInfo = useSelector((state: RootState) => state.class.currentClass.info)
+    const { classId } = useParams()
 
     return (
         <div className="w-full h-fit flex flex-col gap-10 pt-topPadding">
@@ -45,7 +47,7 @@ const RAOverview: React.FC = () => {
                 <div className="flex flex-col gap-2.5 px-7 py-5 shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-normal dark:bg-lightDark">
                     <div className="flex justify-between items-center-safe">
                         <h4 className="text-gray font-medium dark:text-white">Thành viên</h4>
-                        <a href="#" className="text-mainColor text-smallSize underline italic">Chi tiết</a>
+                        <NavLink to={`/main/roomadmin/class/${classId}/members`} className="text-mainColor text-smallSize underline italic">Chi tiết</NavLink>
                     </div>
                     <div className="flex items-center-safe gap-5">
                         <span className="flex items-center-safe gap-2">
@@ -67,7 +69,7 @@ const RAOverview: React.FC = () => {
                 <div className="flex flex-col gap-2.5 px-7 py-5 shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-normal dark:bg-lightDark">
                     <div className="flex justify-between items-center-safe">
                         <h4 className="text-gray font-medium dark:text-white">Biểu mẫu</h4>
-                        <a href="#" className="text-mainColor text-smallSize underline italic">Chi tiết</a>
+                        <NavLink to={"#"} className="text-mainColor text-smallSize underline italic">Chi tiết</NavLink>
                     </div>
                     <div className="flex items-center-safe gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-6 dark:stroke-gray">
@@ -93,7 +95,7 @@ const RAOverview: React.FC = () => {
                 <div className="flex flex-col gap-2.5 px-7 py-5 shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-normal dark:bg-lightDark">
                     <div className="flex justify-between items-center-safe">
                         <h4 className="text-gray font-medium dark:text-white">Yêu cầu chờ xử lý</h4>
-                        <a href="#" className="text-mainColor text-smallSize underline italic">Chi tiết</a>
+                        <NavLink to={`/main/roomadmin/class/${classId}/members`} className="text-mainColor text-smallSize underline italic">Chi tiết</NavLink>
                     </div>
                     <div className="flex items-center-safe gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-6 dark:stroke-gray">

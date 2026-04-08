@@ -1,5 +1,4 @@
 import type React from "react"
-import UserDetailPopup from "../../components/UserDetailPopup"
 import { useState } from "react"
 
 const UserManagement: React.FC = () => {
@@ -117,9 +116,6 @@ const UserManagement: React.FC = () => {
 
                 </div>
             </div>
-
-            {isOpenPopup && <UserDetailPopup togglePopup={() => setIsOpenPopup(false)} />}
-
         </div>
     )
 }

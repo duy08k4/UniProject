@@ -30,13 +30,13 @@ const MemberPendingCard: React.FC<MemberCard> = ({ memberData }) => {
     const handleApprove = async () => {
         dispatch(changeStateFetching(true))
 
-        const userUpodate = await ClassService.updateMember(classData.id, memberData.user.id, {
+        const userUpdate = await ClassService.updateMember(classData.id, memberData.user.id, {
             roomadmin_approved: true
         }).finally(() => {
             dispatch(changeStateFetching(false))
         })
 
-        if (userUpodate) dispatch(currentClass_UpdateMember(userUpodate))
+        if (userUpdate) dispatch(currentClass_UpdateMember(userUpdate))
     }
 
     const handleApproveLecturer = async () => {
@@ -50,14 +50,14 @@ const MemberPendingCard: React.FC<MemberCard> = ({ memberData }) => {
             accept: async () => {
                 dispatch(changeStateFetching(true))
 
-                const userUpodate = await ClassService.updateMember(classData.id, memberData.user.id, {
+                const userUpdate = await ClassService.updateMember(classData.id, memberData.user.id, {
                     roomadmin_approved: true,
                     role: "lecturer"
                 }).finally(() => {
                     dispatch(changeStateFetching(false))
                 })
 
-                if (userUpodate) dispatch(currentClass_UpdateMember(userUpodate))
+                if (userUpdate) dispatch(currentClass_UpdateMember(userUpdate))
             }
         })
     }
@@ -116,13 +116,13 @@ const MemberCard: React.FC<MemberCard> = ({ memberData, onDoubleClick }) => {
             accept: async () => {
                 dispatch(changeStateFetching(true))
 
-                const userUpodate = await ClassService.updateMember(classData.id, memberData.user.id, {
+                const userUpdate = await ClassService.updateMember(classData.id, memberData.user.id, {
                     is_banned: banned,
                 }).finally(() => {
                     dispatch(changeStateFetching(false))
                 })
 
-                if (userUpodate) dispatch(currentClass_UpdateMember(userUpodate))
+                if (userUpdate) dispatch(currentClass_UpdateMember(userUpdate))
             }
         })
     }
@@ -138,11 +138,11 @@ const MemberCard: React.FC<MemberCard> = ({ memberData, onDoubleClick }) => {
             accept: async () => {
                 dispatch(changeStateFetching(true))
 
-                const userUpodate = await ClassService.removeMember(memberData.user.id, classData.id).finally(() => {
+                const userUpdate = await ClassService.removeMember(memberData.user.id, classData.id).finally(() => {
                     dispatch(changeStateFetching(false))
                 })
 
-                if (userUpodate) dispatch(currentClass_UpdateMember(userUpodate))
+                if (userUpdate) dispatch(currentClass_UpdateMember(userUpdate))
             }
         })
     }
@@ -231,7 +231,8 @@ const RAMembers: React.FC = () => {
 
     const updateMember = (member: Members) => (e: React.MouseEvent) => {
         e.preventDefault()
-        console.log("asdasd")
+
+        if (member.is_banned) return
         setPermissionUpdateMember(member)
         toggleUpdateMember()
     }
@@ -248,7 +249,8 @@ const RAMembers: React.FC = () => {
     }
 
     const changePage = (pagination: "prev" | "next") => {
-        if (Number(paginationMembers.totalPage) < page && pagination === "next") {
+        alert()
+        if (page < Number(paginationMembers.totalPage) && pagination === "next") {
             setPage((prev) => prev + 1)
         }
 
@@ -324,11 +326,21 @@ const RAMembers: React.FC = () => {
                             </svg>
                         </button>
 
-                        <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState" disabled={isFetching || Number(paginationMembers.totalPage) >= page} onClick={() => { changePage("next") }}>
+                        <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState" disabled={isFetching || page >= Number(paginationMembers.totalPage)} onClick={() => { changePage("next") }}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white max-sm:size-3.5 stroke-2">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>
                         </button>
+                    </span>
+                </div>
+
+                <div className="px-2.5">
+                    <span className="w-fit bg-mainColorRGB flex items-center-safe gap-2.5 px-2.5 py-1.5 rounded-small">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" className="size-6 stroke-mainColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                        </svg>
+
+                        <p className="text-mainColor"><b className="text-mainColor">Gợi ý:</b> Double click vào thành viên để cập nhật thông tin của họ</p>
                     </span>
                 </div>
 
