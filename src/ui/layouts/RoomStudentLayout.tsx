@@ -6,13 +6,25 @@ import UniLogo from "../../assets/UniLogo.png"
 // Component
 import ToggleTheme from "../components/ToggleTheme.comp"
 import { useRef, type ReactElement } from "react"
-import { NavLink, Outlet, useLocation, useParams } from "react-router-dom"
+import { NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "../../redux/store"
+import getShortName from "../../utils/getShortName"
+import { confirmDialog } from "primereact/confirmdialog"
+import { ClassService } from "../../services/class/class.service"
+import { changeStateFetching } from "../../redux/reducers/global.reducer"
+import { currentClass_RemoveMember } from "../../redux/reducers/classSlice.reducer"
 
 type SidebarTab = { icon: ReactElement, label: string, path: string }
 
 const RoomStudentLayout: React.FC = () => {
     const pathLocation = useLocation()
     const { classId } = useParams()
+    const dispatch = useDispatch()
+
+    const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
+    const userData = useSelector((state: RootState) => state.auth.user.info)
+    const classData = useSelector((state: RootState) => state.class.currentClass)
 
     const sidebarTab = useRef<SidebarTab[]>([
         {
@@ -49,21 +61,45 @@ const RoomStudentLayout: React.FC = () => {
         }
     ])
 
+    // Handler
+    const handleLeaveClass = async () => {
+        confirmDialog({
+            header: "Thông báo",
+            message: <p>Xác nhận rời lớp <b className="text-red">{classData.info.label}</b></p>,
+
+            acceptLabel: "Rời lớp",
+            rejectLabel: "Hủy",
+
+            accept: async () => {
+                dispatch(changeStateFetching(true))
+
+                const userUpodate = await ClassService.removeMember(userData.id, classData.info.id)
+                .finally(() => {
+                    dispatch(changeStateFetching(false))
+                })
+
+                if (userUpodate) dispatch(currentClass_RemoveMember(userUpodate))
+            }
+        })
+    }
+
+    if (!userData.id || !classData.info.id) return null
+
     return (
         <div className="w-full h-full flex bg-bgLight dark:bg-bgDark">
             {/* Side bar */}
             <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-gray px-[20px] py-5">
-                <span className="flex items-center-safe gap-2.5">
+                <NavLink to={isFetching ? pathLocation.pathname : "/main"} className="flex items-center-safe gap-2.5">
                     <img src={UniLogo} className="h-10" loading="lazy" />
                     <span className="">
                         <h4 className="text-normalSize font-bold dark:text-white">UniProject</h4>
                     </span>
-                </span>
+                </NavLink>
 
                 <span className="flex-1 flex flex-col gap-2.5">
                     {sidebarTab.current.map((tab, index) => {
                         return (
-                            <NavLink key={index} to={tab.path} className={`flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname === tab.path && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
+                            <NavLink key={index} to={isFetching ? pathLocation.pathname : tab.path} className={`disableState flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname === tab.path && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
                                 {tab.icon}
                                 <p className="text-smallSize font-semibold dark:text-white">{tab.label}</p>
                             </NavLink>
@@ -72,7 +108,7 @@ const RoomStudentLayout: React.FC = () => {
                 </span>
 
                 <span className="w-full flex flex-col gap-2.5">
-                    <button className="hoverBtn bg-redRGB w-full flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer rounded-small">
+                    <button className="hoverBtn bg-redRGB w-full flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer rounded-small disableState" disabled={isFetching} onClick={handleLeaveClass}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 stroke-red">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                         </svg>
@@ -90,20 +126,11 @@ const RoomStudentLayout: React.FC = () => {
             {/* Body */}
             <div className="flex-1 flex flex-col">
                 <header className="w-full border-b-[0.5px] border-lightGray dark:border-gray flex justify-end-safe gap-10 px-mainTwoSidePadding py-5">
-                    <span className="relative w-1/4 flex items-center-safe px-2.5 rounded-small bg-[#e0e0e0] dark:bg-black">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 dark:stroke-white">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg>
-
-                        <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white" placeholder="Tìm kiếm..." />
-                        <span id="underlineInput" className="absolute bottom-0 left-0 bg-mainColor dark:bg-white w-0 h-px"></span>
-                    </span>
-
                     <span className="flex items-center-safe gap-2.5">
-                        <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium">QT</p>
+                        <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium">{getShortName(userData.full_name)}</p>
                         <span className="">
-                            <p className="text-nowrap font-bold dark:text-white">Sinh viên</p>
-                            <p className="text-smallSize text-gray text-nowrap font-medium dark:text-white">duytran.290804@gmail.com</p>
+                            <p className="text-nowrap font-bold dark:text-white">{userData.full_name}</p>
+                            <p className="text-smallSize text-gray text-nowrap font-medium dark:text-white">{userData.email}</p>
                         </span>
                     </span>
                 </header>

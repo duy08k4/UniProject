@@ -230,48 +230,38 @@ export const classSlice = createSlice({
         },
 
         currentClass_UpdateMember: (state, action: PayloadAction<Members>) => {
-            const memberUpdate = action.payload
+            const member = action.payload;
+            const { data } = state.currentClass.members;
+            const { counts } = state.currentClass.info;
 
-            // Check pending state
-            const isUserPending = state.currentClass.members.data.pending.filter(m => m.id === memberUpdate.id)
+            let oldRole: keyof typeof data | null = null;
 
-            if (isUserPending) {
-                state.currentClass.members.data.pending = [
-                    ...state.currentClass.members.data[memberUpdate.role].filter(m => m.id !== memberUpdate.id && m.user.id !== memberUpdate.user.id),
-                ]
-            }
+            // Remove member in all roles
+            (Object.keys(data) as Array<keyof typeof data>).forEach(key => {
+                const i = data[key].findIndex(m => m.user.id === member.user.id);
+                if (i !== -1) { (oldRole = key), data[key].splice(i, 1); }
+            });
 
-            state.currentClass.members.data[memberUpdate.role] = [
-                ...state.currentClass.members.data[memberUpdate.role].filter(m => m.id !== memberUpdate.id && m.user.id !== memberUpdate.user.id),
-                memberUpdate
-            ]
+            // 2. Add the member to role
+            data[member.role].push(member);
 
-            classSlice.caseReducers.currentClass_UpdatePagination(state)
-
-            if (memberUpdate.role === "roomadmin") return
-
-            state.currentClass = {
-                ...state.currentClass,
-                info: {
-                    ...state.currentClass.info,
-                    counts: {
-                        ...state.currentClass.info.counts,
-                        [memberUpdate.role]: (Number(state.currentClass.info.counts[memberUpdate.role]) + 1).toString(),
-                        pending: isUserPending ? (Number(state.currentClass.info.counts.pending) - 1).toString() : state.currentClass.info.counts.pending
-                    }
+            // 3. update count when role change
+            if (oldRole !== member.role) {
+                if (oldRole && oldRole in counts) {
+                    counts[oldRole as keyof typeof counts] = Math.max(0, Number(counts[oldRole as keyof typeof counts]) - 1).toString();
+                }
+                if (member.role in counts) {
+                    counts[member.role as keyof typeof counts] = (Number(counts[member.role as keyof typeof counts]) + 1).toString();
                 }
             }
-        },
 
-        currentClass_RemoveMember: (state, action: PayloadAction<{ memberRemoved: Members | undefined; newAdminId?: string }>) => {
+            classSlice.caseReducers.currentClass_UpdatePagination(state);
+        },
+        
+        currentClass_RemoveMember: (state, action: PayloadAction<{ memberRemoved: Members; newAdminId?: string }>) => {
             const { memberRemoved, newAdminId } = action.payload;
             const data = state.currentClass.members.data;
             const info = state.currentClass.info;
-
-            if (!memberRemoved) {
-                window.location.reload();
-                return;
-            }
 
             if (!memberRemoved.roomadmin_approved) {
                 const pendingList = state.currentClass.members.data.pending
@@ -297,13 +287,11 @@ export const classSlice = createSlice({
             }
 
             if (removedRole === 'roomadmin') {
-                if (!newAdminId) {
-                    window.location.reload();
-                    return;
-                }
 
                 const allMembers = Object.values(data).flat();
                 const newAdminData = allMembers.find(m => m.user.id === newAdminId);
+
+                console.log(newAdminData)
 
                 if (newAdminData) {
                     const oldRole = newAdminData.role;

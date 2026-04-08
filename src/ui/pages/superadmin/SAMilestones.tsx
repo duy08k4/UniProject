@@ -113,9 +113,6 @@ const Milestones: React.FC = () => {
 
                 </div>
             </div>
-
-            {/* {isOpenPopup && <UserDetailPopup togglePopup={() => setIsOpenPopup(false)} />} */}
-
         </div>
     )
 }

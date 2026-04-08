@@ -113,7 +113,6 @@ export class AuthService {
 
             if (status >= 200 && status < 300) {
                 store.dispatch(updateUser(data))
-                toast.success(`Xin chào ${data.full_name}`)
                 return true
             }
         } catch (error) {

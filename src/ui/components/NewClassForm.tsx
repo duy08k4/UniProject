@@ -117,21 +117,7 @@ const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
             return
         }
 
-        confirmDialog({
-            header: "Lớp học mới",
-            message: "Bạn có muốn truy cập vào lớp học không?",
-
-            acceptLabel: "Truy cập",
-            rejectLabel: "Hủy",
-
-            accept: () => {
-                navigate(`/main/${newclass.user.role}/class/${newclass.id}`)                    
-            },
-
-            reject: () => {
-                toggleForm()
-            }
-        })
+        toast.success("Yêu cầu tạo lớp học của bạn đã được gửi")
     }
 
     return (

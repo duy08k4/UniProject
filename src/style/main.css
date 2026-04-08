@@ -48,8 +48,8 @@
         cursor: grabbing;
     }
 
-    .disableState:is(:disabled, [data-disabled="true"]) {
-        filter: grayscale(0.75);
+    .disableState:disabled {
+        opacity: 0.5 !important;
         cursor: default !important;
     }
 
@@ -108,6 +108,7 @@
     --color-lightDark: #262626;
     --color-gray: #808080;
     --color-lightGray: #d3d3d3;
+    --color-lighterGray: #f2f2f2;
     --color-darkGray: #333333;
     --color-red: #ff0000;
     --color-redRGB: rgba(255, 0, 0, 0.25);

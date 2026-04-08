@@ -1,8 +1,9 @@
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../redux/store"
 import { useEffect, useState } from "react"
 import { AuthService } from "../../services/auth/auth.service"
 import { useLocation, useNavigate } from "react-router-dom"
+import { changeStateFetching } from "../../redux/reducers/global.reducer"
 
 const SessionChecker = () => {
     // Redux
@@ -11,10 +12,15 @@ const SessionChecker = () => {
     const [isAuthCheck, setIsAuthCheck] = useState<boolean>(false)
     const navigate = useNavigate()
     const path = useLocation()
+    const dispatch = useDispatch()
 
     useEffect(() => {
         (async () => {
-            await AuthService.authUser().finally(() => { setIsAuthCheck(true) })
+            dispatch(changeStateFetching(true))
+            await AuthService.authUser().finally(() => {
+                setIsAuthCheck(true)
+                dispatch(changeStateFetching(false))
+            })
         })()
     }, [])
 
@@ -31,8 +37,8 @@ const SessionChecker = () => {
                     if (pathName.startsWith("/super-admin")) return
                     navigate("/super-admin")
                     break;
-                    
-                    default:
+
+                default:
                     if (pathName.startsWith("/main")) return
                     navigate("/main")
                     break;

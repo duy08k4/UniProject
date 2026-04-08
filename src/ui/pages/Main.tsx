@@ -76,6 +76,16 @@ const Main: React.FC = () => {
     }
 
     const accessClass = (classData: CreateNewClass) => {
+        if (!classData.created_approval) {
+            toast.error("Lớp học chưa được duyệt")
+            return
+        }
+
+        if (classData.is_banned) {
+            toast.error("Lớp học đã bị đóng")
+            return
+        }
+        
         if (!classData.user.roomadmin_approved) {
             toast.error("Bạn chưa được phép vào lớp")
             return
@@ -131,7 +141,7 @@ const Main: React.FC = () => {
                             <input
                                 type="text"
                                 className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white disableState"
-                                placeholder="Tìm kiếm tên lớp hoặc gmail chủ phòng..."
+                                placeholder="Tìm kiếm tên lớp, môn học, email chủ phòng, tên chủ phòng..."
                                 onChange={(e) => { setSearch(e.target.value) }}
                                 disabled={isFetching}
                             />
@@ -174,7 +184,7 @@ const Main: React.FC = () => {
                         return (
                             <span
                                 key={classData.id}
-                                className={`flex flex-col h-full gap-3.5 shadow-[0_0_20px_rgba(128,128,128,0.25)] px-5 py-5 rounded-small border-t-4 ${classData.user.roomadmin_approved ? "border-mainColor" : "border-oranged"} hoverBtn hover:shadow-[0_0_10px_2px_rgba(128,128,128,0.75)]`}
+                                className={`flex flex-col h-full gap-3.5 shadow-[0_0_20px_rgba(128,128,128,0.25)] px-5 py-5 rounded-small border-t-4 ${!classData.created_approval || classData.is_banned ? "select-none grayscale-75" : "hoverBtn hover:shadow-[0_0_10px_2px_rgba(128,128,128,0.75)]"} ${classData.user.roomadmin_approved ? "border-mainColor" : "border-oranged"}`}
                                 onClick={() => { accessClass(classData) }}
                             >
                                 <span className="flex flex-col gap-1.5">
@@ -247,7 +257,11 @@ const Main: React.FC = () => {
                                             (classData.user.is_banned ?
                                                 <button className="h-fit w-fit bg-redRGB text-red px-3.5 py-1.5 rounded-small hoverBtn disableState" disabled={isFetching}>Đình chỉ</button>
                                                 :
-                                                <button className="h-fit w-fit bg-mainColor text-white px-3.5 py-1.5 rounded-small hoverBtn disableState" disabled={isFetching}>Vào lớp</button>
+                                                <button className="h-fit w-fit bg-mainColor text-white px-3.5 py-1.5 rounded-small hoverBtn disableState" disabled={isFetching}>
+                                                    {classData.created_approval ? (
+                                                        classData.is_banned ? "Đã đóng" : "Vào lớp"
+                                                    ) :  "Chờ duyệt"}
+                                                </button>
                                             )
 
                                             :

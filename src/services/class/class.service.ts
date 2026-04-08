@@ -193,7 +193,7 @@ export class ClassService {
         }
     }
     // Update class's info
-    static async updateClass(classId: string, optionChange?: { label?: string, description?: string, subject?: string, required_approval?: boolean, required_join_form?: boolean }) {
+    static async updateClass(classId: string, optionChange?: { label?: string, description?: string, subject?: string, created_approval?: boolean, is_banned?: boolean, required_approval?: boolean, required_join_form?: boolean }) {
         if (!optionChange) return false
         let loading
 
@@ -201,43 +201,44 @@ export class ClassService {
             const state = store.getState()
             const userId = state.auth.user.info.id
 
-            const { label, description, subject, required_approval, required_join_form } = optionChange
+            const { label, description, subject, required_approval, required_join_form, created_approval, is_banned } = optionChange
             if (!classId || !userId) {
                 toast.error("Không thể cập nhật thông tin lớp học")
                 return false
             }
 
-            const currentClassData = store.getState().class.currentClass.info
-
-            if (!currentClassData) {
-                toast.error("Không thể cập nhật thông tin lớp học")
-                return
-            }
-
             let dataUpdate = {}
 
-            if (label && currentClassData.label != label) {
+            if (label) {
                 dataUpdate = { ...dataUpdate, label }
             }
 
-            if (description && currentClassData.description != description) {
+            if (description) {
                 dataUpdate = { ...dataUpdate, description }
             }
 
-            if (subject && currentClassData.subject != subject) {
+            if (subject) {
                 dataUpdate = { ...dataUpdate, subject }
             }
 
-            if (typeof required_approval === "boolean" && currentClassData.required_approval != required_approval) {
+            if (typeof required_approval === "boolean") {
                 dataUpdate = { ...dataUpdate, required_approval }
             }
 
-            if (typeof required_join_form === "boolean" && currentClassData.required_join_form != required_join_form) {
+            if (typeof required_join_form === "boolean") {
                 dataUpdate = { ...dataUpdate, required_join_form }
             }
 
+            if (typeof is_banned === "boolean") {
+                dataUpdate = { ...dataUpdate, is_banned }
+            }
+
+            if (typeof created_approval === "boolean") {
+                dataUpdate = { ...dataUpdate, created_approval }
+            }
+
             if (Object.values(dataUpdate).length === 0) {
-                toast.error("Vui lòng chỉnh sửa thông tin trước khi cập nhật")
+                toast.error("Thông tin không thay đổi. Không thể cập nhật")
                 return false
             }
 
@@ -277,7 +278,6 @@ export class ClassService {
 
 
             if (status >= 200 && status < 300) {
-                toast.success("Đã tạo lớp học mới")
                 store.dispatch(addClass(data))
                 return data
             }
@@ -341,12 +341,6 @@ export class ClassService {
                 classId
             }
 
-
-            if (clientId === userId && !newAdminId) {
-                toast.error("Vui lòng chỉ định chủ phòng mới")
-                return false
-            }
-
             if (clientId === userId && newAdminId) {
                 params.newOwnerId = newAdminId
             }
@@ -358,7 +352,7 @@ export class ClassService {
             if (status >= 200 && status < 300) {
                 toast.success("Thành công")
                 const memberRemoved = Object.values(store.getState().class.currentClass.members.data).flat().find(m => m.user.id === userId)
-                store.dispatch(currentClass_RemoveMember({ memberRemoved, newAdminId }))
+                if (memberRemoved) store.dispatch(currentClass_RemoveMember({ memberRemoved, newAdminId }))
                 return data
             }
         } catch (error) {

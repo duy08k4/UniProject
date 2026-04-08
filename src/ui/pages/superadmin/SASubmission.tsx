@@ -103,9 +103,6 @@ const SASubmission: React.FC = () => {
 
                 </div>
             </div>
-
-            {/* {isOpenPopup && <UserDetailPopup togglePopup={() => setIsOpenPopup(false)} />} */}
-
         </div>
     )
 }

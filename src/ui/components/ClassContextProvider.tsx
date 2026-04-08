@@ -24,14 +24,17 @@ const ClassContextProvider = ({ children }: { children: React.ReactNode }) => {
         (async () => {
             const result = await ClassService.getClass(classId)
             if (!result) navigate("/main")
+
             if (result) {
                 const memberInClass = result.user
 
-                if (!memberInClass.role) navigate("/main")
+                if (!memberInClass.role || !result.created_approval || result.is_banned || result.is_deleted) {
+                    navigate("/main")
+                }
             }
         })()
 
-    }, [classId, userData.id])
+    }, [classId, userData.id, currentClass.info.id])
 
     return <>{children}</>
 }
