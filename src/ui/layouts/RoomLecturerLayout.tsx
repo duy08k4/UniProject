@@ -34,7 +34,7 @@ const RoomLecturerLayout: React.FC = () => {
             </svg>
 
             ,
-            label: "Tiến trình",
+            label: "Quy trình",
             path: `/main/lecturer/class/${classId}`
         },
         {

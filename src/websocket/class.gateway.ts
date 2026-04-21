@@ -2,7 +2,7 @@ import { confirmDialog } from "primereact/confirmdialog"
 import { io } from "socket.io-client"
 import { store } from "../redux/store"
 import { currentClass_RemoveMember, currentClass_UpdateMember, removeClassInList, updateClassInList } from "../redux/reducers/classSlice.reducer"
-import { Role, RoomRole, type RoleType, type RoomRoleType } from "../config/role"
+import { Role, RoomRole, type RoleType, type RoomRoleType } from "../config/enum"
 import { toast } from "sonner"
 import { changeStateFetching } from "../redux/reducers/global.reducer"
 

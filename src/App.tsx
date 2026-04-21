@@ -34,6 +34,7 @@ import FormManagement from "./ui/pages/superadmin/SAFormManagement"
 import SAScoreBoardManagement from "./ui/pages/superadmin/SAScoreBoardManagement"
 import SASubmission from "./ui/pages/superadmin/SASubmission"
 import SARolePermission from "./ui/pages/superadmin/SARolePermission"
+import SAProgressDetail from "./ui/components/SAProgressDetail"
 
 // Main
 import Main from "./ui/pages/Main"
@@ -43,6 +44,7 @@ import RAOverview from "./ui/pages/roomadmin/RAOverview"
 import RAMembers from "./ui/pages/roomadmin/RAMembers"
 import RAMilestones from "./ui/pages/roomadmin/RAMilestones"
 import RAForms from "./ui/pages/roomadmin/RAForms"
+import RADetailForms from "./ui/components/RADetailForms"
 import RAScoreboards from "./ui/pages/roomadmin/RAScoreboards"
 import RAScoreboardsDetail from "./ui/pages/roomadmin/RAScoreboardsDetail"
 import RASubmissions from "./ui/pages/roomadmin/RASubmissions"
@@ -88,7 +90,10 @@ function App() {
           <Route path="classes" element={<ClassManagement />} />
           <Route path="class/:classId" element={<SAClassDetail />} />
 
-          <Route path="milestones" element={<Milestones />} />
+          <Route path="progresses">
+            <Route index element={<Milestones />} />
+            <Route path=":classId/:progressId" element={<SAProgressDetail />} />
+          </Route>
           <Route path="forms" element={<FormManagement />} />
           <Route path="scoreboards" element={<SAScoreBoardManagement />} />
           <Route path="submission" element={<SASubmission />} />
@@ -102,8 +107,12 @@ function App() {
           <Route path="roomadmin/class/:classId" element={<ClassContextProvider><RoomAdminLayout /></ClassContextProvider>}>
             <Route index element={<RAOverview />} />
             <Route path="members" element={<RAMembers />} />
-            <Route path="milestones" element={<RAMilestones />} />
-            <Route path="forms" element={<RAForms />} />
+            <Route path="progresses" element={<RAMilestones />} />
+            <Route path="forms">
+              <Route index element={<RAForms />} />
+              <Route path="new" element={<RADetailForms />} />
+              <Route path=":formId" element={<RADetailForms />} />
+            </Route>
             <Route path="scoreboards">
               <Route index element={<RAScoreboards />} />
               <Route path=":boardId" element={<RAScoreboardsDetail />} />

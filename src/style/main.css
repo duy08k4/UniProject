@@ -57,6 +57,10 @@
         outline: none !important;
     }
 
+    .dialogHide {
+        display: none;
+    }
+
     /* Prime React */
     .p-confirm-dialog-accept {
         background: #499C40 !important;
@@ -114,6 +118,8 @@
     --color-redRGB: rgba(255, 0, 0, 0.25);
     --color-oranged: #FF8C00;
     --color-orangedRGB: rgba(255, 140, 0, 0.25);
+    --color-lightOrange: #FFE0B2;
+    --color-lightOrangeRGB: rgba(255, 224, 178, 0.25);
 
     /* Light mode */
     --color-bgLight: #ffffff;

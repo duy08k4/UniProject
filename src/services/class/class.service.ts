@@ -49,7 +49,7 @@ export class ClassService {
             }
 
             loading = toast.loading("Đang lấy thông tin lớp học...")
-            const { status, data } = await api.get<CreateNewClass>(apiPath.class.getOneClasses, {
+            const { status, data } = await api.get<CreateNewClass>(apiPath.class.getOneClass, {
                 params: { classId }
             })
 
@@ -162,10 +162,7 @@ export class ClassService {
                 return false
             }
             const { role, can_create_forms, can_create_notifications, can_create_score_forms, is_banned, roomadmin_approved } = option
-            const dataUpdate: any = {
-                classId,
-                memberId
-            }
+            const dataUpdate: any = {}
 
             if (role !== undefined) dataUpdate.role = role
             if (can_create_forms !== undefined) dataUpdate.can_create_forms = can_create_forms
@@ -177,6 +174,9 @@ export class ClassService {
             if (Object.values(dataUpdate).length === 0) {
                 toast.error("Không có dữ liệu cần cập nhật")
                 return false
+            } else {   
+                dataUpdate.classId = classId
+                dataUpdate.memberId = memberId
             }
 
             loading = toast.loading("Đang cập nhật dữ liệu...")

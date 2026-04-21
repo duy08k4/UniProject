@@ -4,7 +4,7 @@ import { currentClass_AddPending, currentClass_UpdateMember, updateClass, update
 import { ClassService } from "../services/class/class.service"
 import { toast } from "sonner"
 import { memberSizePage } from "../config/pageSize"
-import { Role, type RoomRoleType } from "../config/role"
+import { Role, type RoomRoleType } from "../config/enum"
 import { confirmDialog } from "primereact/confirmdialog"
 
 const socket = io(`${import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL_LOCAL}`)

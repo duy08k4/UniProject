@@ -30,3 +30,28 @@ export const RoomRole = {
 } as const
 
 export type RoomRoleType = typeof RoomRole[keyof typeof RoomRole];
+
+export const Field_Type = {
+  STRING: "string",
+  NUMBER: "number",
+  FILE: "file",
+  CHECKBOX: "checkbox",
+}
+
+export type Field_TypeType = typeof Field_Type[keyof typeof Field_Type]
+
+export const Unit = {
+  FILE:"file",
+  UNIT: "unit",
+  CHARACTER: "character"
+}
+
+export type UnitType = typeof Unit[keyof typeof Unit]
+
+export const ScoreForm_Type = {
+  OTHERS: "others",
+  THESIS: "thesis",
+  INTERNSHIP: "internship",
+} as const
+
+export type ScoreForm_TypeType = typeof ScoreForm_Type[keyof typeof ScoreForm_Type]
