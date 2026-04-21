@@ -11,7 +11,7 @@ import { changeStateFetching } from "../../redux/reducers/global.reducer";
 import { useDebounce } from "../../hooks/Debounce";
 import { ScaleLoader } from "react-spinners";
 import { confirmDialog } from "primereact/confirmdialog";
-import { RoomRole } from "../../config/role";
+import { RoomRole } from "../../config/enum";
 
 interface RATransferRights_Interface {
     togglePopup: () => void;

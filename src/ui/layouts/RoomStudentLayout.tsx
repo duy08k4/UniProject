@@ -33,7 +33,7 @@ const RoomStudentLayout: React.FC = () => {
             </svg>
 
             ,
-            label: "Tiến trình",
+            label: "Quy trình",
             path: `/main/student/class/${classId}`
         },
         {

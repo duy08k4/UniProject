@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 import { changeStateFetching } from "../../redux/reducers/global.reducer";
 import { currentClass_UpdateMember } from "../../redux/reducers/classSlice.reducer";
-import { RoomRole } from "../../config/role";
+import { RoomRole } from "../../config/enum";
 
 interface RAUpdateUserForm_Interface {
     toggleForm: () => void;
