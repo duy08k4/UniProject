@@ -127,3 +127,13 @@
     /* Darkmode */
     --color-bgDark: #171717;
 }
+
+/* Tiptap dark mode */
+.dark .ProseMirror { color: white; }
+.dark .ProseMirror p,
+.dark .ProseMirror h1,
+.dark .ProseMirror h2,
+.dark .ProseMirror h3,
+.dark .ProseMirror li,
+.dark .ProseMirror blockquote { color: white; }
+.ProseMirror:focus { outline: none; }

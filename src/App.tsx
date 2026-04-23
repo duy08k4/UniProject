@@ -56,11 +56,15 @@ import SDMilestones from "./ui/pages/student/SDMilestones"
 import SDMembers from "./ui/pages/student/SDMembers"
 import SDScoreboards from "./ui/pages/student/SDScoreboards"
 import SDSubmission from "./ui/pages/student/SDSubmission"
+import SDTopics from "./ui/pages/student/SDTopics"
+import SDNewsfeed from "./ui/pages/student/SDNewsfeed"
 
 // Lecturer
 import RoomLecturerLayout from "./ui/layouts/RoomLecturerLayout"
 import LTScoreboards from "./ui/pages/lecturer/LTScoreboards"
 import LTCommittee from "./ui/pages/lecturer/LTCommittee"
+import LTTopics from "./ui/pages/lecturer/LTTopics"
+import RANewsfeed from "./ui/pages/roomadmin/RANewsfeed"
 
 function App() {
   useTheme();
@@ -108,6 +112,7 @@ function App() {
             <Route index element={<RAOverview />} />
             <Route path="members" element={<RAMembers />} />
             <Route path="progresses" element={<RAMilestones />} />
+            <Route path="newsfeed" element={<RANewsfeed />} />
             <Route path="forms">
               <Route index element={<RAForms />} />
               <Route path="new" element={<RADetailForms />} />
@@ -126,18 +131,22 @@ function App() {
 
           {/* Student */}
           <Route path="student/class/:classId" element={<ClassContextProvider><RoomStudentLayout /></ClassContextProvider>}>
-            <Route index element={<SDMilestones />} />
+            <Route index element={<SDNewsfeed />} />
             <Route path="members" element={<SDMembers />} />
             <Route path="scoreboards" element={<SDScoreboards />} />
             <Route path="submission" element={<SDSubmission />} />
+            <Route path="topics" element={<SDTopics />} />
+            <Route path="milestones" element={<SDMilestones />} />
           </Route>
 
           {/* Lecturer */}
           <Route path="lecturer/class/:classId" element={<ClassContextProvider><RoomLecturerLayout /> </ClassContextProvider>}>
-            <Route index element={<SDMilestones />} />
+            <Route index element={<SDNewsfeed />} />
             <Route path="members" element={<SDMembers />} />
             <Route path="committee" element={<LTCommittee />} />
             <Route path="committee-scoreboards" element={<LTScoreboards />} />
+            <Route path="topics" element={<LTTopics />} />
+            <Route path="milestones" element={<SDMilestones />} />
           </Route>
         </Route>
       </Routes>

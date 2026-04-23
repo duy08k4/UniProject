@@ -2,7 +2,8 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store"
-import type { MilestoneDataForPagination, MilestoneShortDetail } from "../../../services/progress/progress.type"
+import { store } from "../../../redux/store"
+import type { MilestoneShortDetail } from "../../../services/progress/progress.type"
 import RANewProgress from "../../components/RANewProgress"
 import Loading from "../../components/Loading"
 import ProgressService from "../../../services/progress/progress.service"
@@ -11,6 +12,9 @@ import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import formatVNTime from "../../../utils/formatVNTime"
 import { confirmDialog } from "primereact/confirmdialog"
 import { toast } from "sonner"
+import TopicsService from "../../../services/topics/topics.service"
+import type { TopicDetail } from "../../../services/topics/topics.type"
+import { VNThesisType, VNTopicStatus } from "../../../config/enum"
 
 const RAMilestones: React.FC = () => {
     const userData = useSelector((state: RootState) => state.auth.user.info)
@@ -22,9 +26,12 @@ const RAMilestones: React.FC = () => {
 
     const [milestones, setMilestones] = useState<(MilestoneShortDetail & { isNew?: boolean, markedDeleted?: boolean, tempId?: string })[]>([])
     const [isAdding, setIsAdding] = useState(false)
-    const [backup, setBackup] = useState<(MilestoneDataForPagination & { isNew?: boolean, markedDeleted?: boolean, tempId?: string })[]>([])
+    const [backup, setBackup] = useState<(MilestoneShortDetail & { isNew?: boolean, markedDeleted?: boolean, tempId?: string })[]>([])
 
     const [milestoneErrorTempID, setMilestoneErrorTempID] = useState<string[]>([])
+
+    // Topics for registration milestone
+    const [registrationTopics, setRegistrationTopics] = useState<TopicDetail[]>([])
 
     // States for editing process info (label & description)
     const [isEditingInfo, setIsEditingInfo] = useState(false)
@@ -48,6 +55,16 @@ const RAMilestones: React.FC = () => {
             setMilestones(progress.milestones)
         }
     }, [progress, isAdding])
+
+    // Fetch topics cho registration milestone
+    useEffect(() => {
+        if (!classId || !progress) return
+        const regMilestone = progress.milestones?.find((m: any) => m.is_registration_milestone)
+        if (!regMilestone) return
+        TopicsService.getTopics(classId, regMilestone.id).then(data => {
+            if (data) setRegistrationTopics(data)
+        })
+    }, [classId, progress])
 
     const refreshProgress = async () => {
         if (!classId || !userData.id) return
@@ -151,6 +168,7 @@ const RAMilestones: React.FC = () => {
             description: "",
             is_deleted: false,
             is_stopped: false,
+            is_registration_milestone: false,
             updated_at: "-",
             created_at: new Date().toLocaleDateString("vi-VN"),
             isNew: true
@@ -160,7 +178,7 @@ const RAMilestones: React.FC = () => {
         setMilestones(reIndex(newList))
     }
 
-    const updateMilestone = (index: number, data: Partial<MilestoneDataForPagination>) => {
+    const updateMilestone = (index: number, data: Partial<MilestoneShortDetail>) => {
         const newList = [...milestones]
         newList[index] = { ...newList[index], ...data }
         setMilestones(newList)
@@ -234,6 +252,16 @@ const RAMilestones: React.FC = () => {
         setIsAdding(false)
     }
 
+    const handleCreateRegistrationMilestone = async () => {
+        if (!classId) return
+        dispatch(changeStateFetching(true))
+        await ProgressService.createRegistrationMilestone(classId)
+        await ProgressService.getProgressDetail(classId)
+        const updatedProgress = store.getState().progress.currentProgress
+        if (updatedProgress) setMilestones(updatedProgress.milestones)
+        dispatch(changeStateFetching(false))
+    }
+
     const handleCancel = () => {
         if (isMilestoneDataChanged()) {
             confirmDialog({
@@ -303,9 +331,12 @@ const RAMilestones: React.FC = () => {
                         {!isEditingInfo ? (
                             <>
                                 <button onClick={startEditingInfo} className="dark:text-white border border-lightGray dark:border-gray px-2.5 py-2.5 rounded-normal hoverBtn disableState" disabled={isFetching || isAdding}>Chỉnh sửa thông tin</button>
-                                <button className={`${progress.is_submitted ? "bg-redRGB text-red" : "bg-mainColor text-white"} px-2.5 py-2.5 rounded-normal hoverBtn disableState`} disabled={isFetching || isAdding} onClick={toggleRequireApproval}>
-                                    {progress.is_submitted ? "Thu hồi yêu cầu duyệt" : "Yêu cầu duyệt"}
-                                </button>
+
+                                {!progress.created_approval && (
+                                    <button className={`${progress.is_submitted ? "bg-redRGB text-red" : "bg-mainColor text-white"} px-2.5 py-2.5 rounded-normal hoverBtn disableState`} disabled={isFetching || isAdding} onClick={toggleRequireApproval}>
+                                        {progress.is_submitted ? "Thu hồi yêu cầu duyệt" : "Yêu cầu duyệt"}
+                                    </button>
+                                )}
                             </>
                         ) : (
                             <>
@@ -378,6 +409,12 @@ const RAMilestones: React.FC = () => {
                     </span>
                 ) : (
                     <div className="flex-1 flex justify-end items-center gap-2">
+                        {!milestones.some((m: any) => m.is_registration_milestone) && (
+                            <button onClick={handleCreateRegistrationMilestone} disabled={isFetching}
+                                className="bg-blue-500/10 text-blue-500 font-medium px-3.5 py-2 rounded-normal hoverBtn disableState text-smallSize">
+                                + Tạo lại cột đăng ký đề tài
+                            </button>
+                        )}
                         <button onClick={handleSave} className="bg-mainColor text-white font-medium px-6 py-2 rounded-normal hoverBtn disableState" disabled={isFetching || !isMilestoneDataChanged()}>Lưu</button>
                         <button onClick={handleCancel} className="bg-gray/10 text-gray font-medium px-6 py-2 rounded-normal hoverBtn disableState" disabled={isFetching}>Hủy</button>
                     </div>
@@ -474,26 +511,67 @@ const RAMilestones: React.FC = () => {
                                         {milestone.label}
                                     </h3>
 
-                                    <span className={`flex items-center px-4 py-1.5 rounded-normal text-smallSize font-bold uppercase ${milestone.is_stopped ? "bg-redRGB text-red" : "bg-mainColorRGB text-mainColor"}`}>
-                                        {milestone.is_stopped ? "Đã dừng" : "Hoạt động"}
+                                    <span className={`flex items-center px-4 py-1.5 rounded-normal text-smallSize font-bold uppercase ${(milestone as any).is_registration_milestone ? "bg-blue-500/10 text-blue-500" : milestone.is_stopped ? "bg-redRGB text-red" : "bg-mainColorRGB text-mainColor"}`}>
+                                        {(milestone as any).is_registration_milestone ? "Đăng ký đề tài" : milestone.is_stopped ? "Đã dừng" : "Hoạt động"}
                                     </span>
                                 </div>
 
-                                <p className="text-normalSize text-gray dark:text-white/60 leading-relaxed italic max-w-4xl">
-                                    "{milestone.description}"
-                                </p>
-
-                                <div className="flex flex-wrap gap-x-10 gap-y-3 pt-5 mt-2 border-t border-lightGray/10 dark:border-white/5">
-                                    <div className="flex flex-col">
-                                        <span className="text-tinySize text-gray dark:text-gray uppercase font-bold tracking-tighter">Ngày khởi tạo</span>
-                                        <span className="text-smallSize font-semibold dark:text-white">{milestone.created_at}</span>
+                                {/* Registration milestone: hiển thị bảng đề tài */}
+                                {(milestone as any).is_registration_milestone ? (
+                                    <div className="flex flex-col gap-3">
+                                        <p className="text-smallSize text-gray italic">{registrationTopics.length} đề tài đã đăng ký</p>
+                                        {registrationTopics.length === 0 ? (
+                                            <p className="text-gray italic text-smallSize">Chưa có sinh viên nào đăng ký đề tài.</p>
+                                        ) : (
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-smallSize">
+                                                    <thead>
+                                                        <tr className="border-b border-gray/10 text-gray">
+                                                            <th className="text-left py-2 pr-4 font-medium">Sinh viên</th>
+                                                            <th className="text-left py-2 pr-4 font-medium">Tên đề tài</th>
+                                                            <th className="text-left py-2 pr-4 font-medium">Loại</th>
+                                                            <th className="text-left py-2 pr-4 font-medium">GVHD</th>
+                                                            <th className="text-left py-2 font-medium">Trạng thái</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {registrationTopics.map(topic => (
+                                                            <tr key={topic.id} className="border-b border-gray/5 hover:bg-gray/5 transition-colors">
+                                                                <td className="py-2.5 pr-4 dark:text-white font-medium">{topic.student.full_name}</td>
+                                                                <td className="py-2.5 pr-4 dark:text-white max-w-[200px] truncate">{topic.title}</td>
+                                                                <td className="py-2.5 pr-4 text-gray">{VNThesisType[topic.thesis_type]?.split(" ")[0]}</td>
+                                                                <td className="py-2.5 pr-4 text-gray">{topic.supervisor?.full_name ?? "—"}</td>
+                                                                <td className="py-2.5">
+                                                                    <span className={`font-semibold ${VNTopicStatus[topic.status]?.color}`}>
+                                                                        {VNTopicStatus[topic.status]?.label}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
                                     </div>
+                                ) : (
+                                    <>
+                                        <p className="text-normalSize text-gray dark:text-white/60 leading-relaxed italic max-w-4xl">
+                                            "{milestone.description}"
+                                        </p>
 
-                                    <div className="flex flex-col">
-                                        <span className="text-tinySize text-gray dark:text-gray uppercase font-bold tracking-tighter">Cập nhật cuối</span>
-                                        <span className="text-smallSize font-semibold dark:text-white">{milestone.updated_at}</span>
-                                    </div>
-                                </div>
+                                        <div className="flex flex-wrap gap-x-10 gap-y-3 pt-5 mt-2 border-t border-lightGray/10 dark:border-white/5">
+                                            <div className="flex flex-col">
+                                                <span className="text-tinySize text-gray dark:text-gray uppercase font-bold tracking-tighter">Ngày khởi tạo</span>
+                                                <span className="text-smallSize font-semibold dark:text-white">{milestone.created_at}</span>
+                                            </div>
+
+                                            <div className="flex flex-col">
+                                                <span className="text-tinySize text-gray dark:text-gray uppercase font-bold tracking-tighter">Cập nhật cuối</span>
+                                                <span className="text-smallSize font-semibold dark:text-white">{milestone.updated_at}</span>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>

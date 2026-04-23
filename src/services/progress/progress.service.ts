@@ -59,7 +59,7 @@ export default class ProgressService {
 
             if (status >= 200 && status < 300) {
                 store.dispatch(setCurrentProgress(data))
-                return true
+                return data
             }
 
         } catch (error) {
@@ -154,7 +154,7 @@ export default class ProgressService {
 
             if (status >= 200 && status < 300) {
                 store.dispatch(setCurrentProgress(data))
-                return true
+                return data
             }
 
         } catch (error) {
@@ -227,6 +227,24 @@ export default class ProgressService {
 
             if (status >= 200 && status < 300) {
                 store.dispatch(updateMilestone(data))
+                return true
+            }
+        } catch (error) {
+            errorCatch(error)
+            return false
+        } finally {
+            toast.dismiss(loading)
+        }
+    }
+
+    static async createRegistrationMilestone(classId: string) {
+        let loading
+        try {
+            loading = toast.loading("Đang tạo cột đăng ký đề tài...")
+            const { status, data } = await api.post<ProgressDeatil>(apiPath.progress.createRegistrationMilestone, {}, { params: { classId } })
+            if (status >= 200 && status < 300) {
+                store.dispatch(setCurrentProgress(data))
+                toast.success("Đã tạo lại cột đăng ký đề tài")
                 return true
             }
         } catch (error) {
