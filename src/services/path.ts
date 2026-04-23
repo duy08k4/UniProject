@@ -27,6 +27,7 @@ const apiPath = {
 
         updateMilestone: "/progress/milestone",
         removeMilestone: "/progress/milestone/remove",
+        createRegistrationMilestone: "/progress/milestone/registration",
     },
 
     form: {
@@ -52,6 +53,23 @@ const apiPath = {
         removeUsecase: "/admin/usecase/remove",
         getPermission: "/admin/permission",
         updatePermission: "/admin/permission/update"
+    },
+
+    topics: {
+        getTopics: "/topics",
+        getOneTopic: "/topics",
+        createTopic: "/topics",
+        inviteSupervisor: "/topics",   // PATCH /topics/:id/invite
+        supervisorResponse: "/topics", // PATCH /topics/:id/supervisor-response
+        submitOutline: "/topics",      // PATCH /topics/:id/submit-outline
+        reviewTopic: "/topics",        // PATCH /topics/:id/review
+    },
+
+    notifications: {
+        getPagination: "/notifications",        // GET /notifications?...
+        getOne: "/notifications",               // GET /notifications/:id
+        upsert: "/notifications/update",        // POST /notifications/update
+        remove: "/notifications",               // DELETE /notifications/:id
     }
 }
 

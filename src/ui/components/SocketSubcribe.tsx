@@ -3,6 +3,8 @@ import { useSelector } from "react-redux"
 import type { RootState } from "../../redux/store"
 import { GlobalGateway, globalSocketEventName } from "../../websocket/global.gateway"
 import { ClassGateway, classSocketEventName } from "../../websocket/class.gateway"
+import { NotificationGateway, notificationSocketEventName } from "../../websocket/notification.gateway"
+import { ProgressGateway, progressSocketEventName } from "../../websocket/progress.gateway"
 
 const SocketSubcriber = () => {
     const userData = useSelector((state: RootState) => state.auth.user.info)
@@ -22,6 +24,12 @@ const SocketSubcriber = () => {
         ClassGateway.OnUpdateMemberData()
         ClassGateway.OnRemoveClass()
 
+        ProgressGateway.OnUpdateProgress()
+
+        NotificationGateway.OnUpdateNotification()
+        NotificationGateway.OnRemoveNotification()
+
+
 
         return () => {
             GlobalGateway.off(globalSocketEventName.OnApproveMember)
@@ -34,6 +42,12 @@ const SocketSubcriber = () => {
             ClassGateway.off(classSocketEventName.OnDissolveClass)
             ClassGateway.off(classSocketEventName.OnUpdateMemberData)
             ClassGateway.off(classSocketEventName.OnRemoveClass)
+
+            ProgressGateway.off(progressSocketEventName.OnUpdateProgress)
+
+            NotificationGateway.off(notificationSocketEventName.OnUpdateNotification)
+            NotificationGateway.off(notificationSocketEventName.OnRemoveNotification)
+
         }
     }, [userData.id])
 

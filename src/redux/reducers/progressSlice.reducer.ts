@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { ProgressDeatil, ProgressPagination, UpdateMilestone } from "../../services/progress/progress.type";
+import type { ProgressDeatil, ProgressDeatilPagination, ProgressPagination, UpdateMilestone } from "../../services/progress/progress.type";
 
 // Reducer
 export interface ProgressSlice {
@@ -23,6 +23,19 @@ export const progressSlice = createSlice({
         // Progress
         setProgressPaginationData: (state, action: PayloadAction<ProgressPagination | null>) => {
             state.progressPagination = action.payload
+        },
+
+        updateProgressInPagination: (state, action: PayloadAction<ProgressDeatilPagination>) => {
+
+            const progressPagination = state.progressPagination
+            if (!progressPagination) return
+
+            const progressUpdate = action.payload
+            const progressIndex = progressPagination.data.findIndex(p => p.id === progressUpdate.id)
+
+            if (progressIndex >= 0) {
+                progressPagination.data[progressIndex] = progressUpdate
+            }
         },
 
         setCurrentProgress: (state, action: PayloadAction<ProgressDeatil | null>) => {
@@ -55,6 +68,7 @@ export const {
 
     // Progress
     setProgressPaginationData,
+    updateProgressInPagination,
     setCurrentProgress,
 
     // Milestone

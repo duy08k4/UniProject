@@ -6,12 +6,16 @@ import type { RootState } from "../../../redux/store"
 import { ClassService } from "../../../services/class/class.service"
 import formatVNTime from "../../../utils/formatVNTime"
 import getShortName from "../../../utils/getShortName"
-import { RoomRole, VNRoleName, type RoomRoleType } from "../../../config/enum"
+import { RoomRole, VNRoleName, VNThesisType, VNTopicStatus, type RoomRoleType } from "../../../config/enum"
 import { useDebounce } from "../../../hooks/Debounce"
 import { currentClass_SetMembers } from "../../../redux/reducers/classSlice.reducer"
 import { memberSizePage } from "../../../config/pageSize"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import { confirmDialog } from "primereact/confirmdialog"
+import TopicsService from "../../../services/topics/topics.service"
+import type { TopicDetail } from "../../../services/topics/topics.type"
+import ProgressService from "../../../services/progress/progress.service"
+import OutlineReviewPanel from "../../components/OutlineReviewPanel"
 
 const SAClassDetail: React.FC = () => {
     const { classId } = useParams()
@@ -29,11 +33,24 @@ const SAClassDetail: React.FC = () => {
     const [roleSearch, setRoleSearch] = useState<string>("")
     const roleSearchDebounce = useDebounce(roleSearch, 1500)
 
+    // Topics pending review
+    const [pendingTopics, setPendingTopics] = useState<TopicDetail[]>([])
+    const [rejectNotes, setRejectNotes] = useState<Record<string, string>>({})
+    const [showOutlinePanel, setShowOutlinePanel] = useState(false)
+
     // Get class data
     useEffect(() => {
         if (!classId || !userData.id) return
         ClassService.getClass(classId)
     }, [userData.id, classId])
+
+    // Fetch pending topics (outline_pending)
+    useEffect(() => {
+        if (!classId || !userData.id) return
+        TopicsService.getTopics(classId).then(data => {
+            if (data) setPendingTopics(data.filter(t => t.status === "outline_pending"))
+        })
+    }, [classId, userData.id])
 
     // Get members
     useEffect(() => {
@@ -72,6 +89,16 @@ const SAClassDetail: React.FC = () => {
         }).finally(() => {
             dispatch(changeStateFetching(false))
         })
+    }
+
+    const handleReviewTopic = async (topicId: string, approve: boolean) => {
+        if (!classId) return
+        const result = await TopicsService.reviewTopic(topicId, classId, approve, rejectNotes[topicId])
+        if (result) {
+            const updated = pendingTopics.filter(t => t.id !== topicId)
+            setPendingTopics(updated)
+            if (updated.length === 0) setShowOutlinePanel(false)
+        }
     }
 
     // Handler
@@ -147,6 +174,15 @@ const SAClassDetail: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2.5">
+                    {pendingTopics.length > 0 && (
+                        <button onClick={() => setShowOutlinePanel(true)} disabled={isFetching}
+                            className="px-5 py-2 bg-mainColorRGB text-mainColor rounded-normal font-semibold disableState animate-bounce hoverBtn flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-4 stroke-mainColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                            </svg>
+                            Đề cương chờ duyệt ({pendingTopics.length})
+                        </button>
+                    )}
                     {!info.created_approval && (
                         <button className="px-5 py-2 bg-mainColor text-white rounded-normal font-semibold disableState hoverBtn" disabled={isFetching} onClick={handleApprove}>Duyệt lớp</button>
                     )}
@@ -307,7 +343,7 @@ const SAClassDetail: React.FC = () => {
 
                             <div className="flex">
                                 <span className="flex gap-1.5 items-center-safe">
-                                    <p className="font-bold dark:text-white">Số lượng:</p>
+                                    <p className="font-bold dark:text-white">Số lượng: {Object.values(members.data).flat().length}</p>
                                     <p className="dark:text-white">thành viên</p>
                                 </span>
 
@@ -392,6 +428,18 @@ const SAClassDetail: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Panel duyệt đề cương */}
+            {showOutlinePanel && (
+                <OutlineReviewPanel
+                    topics={pendingTopics}
+                    isFetching={isFetching}
+                    rejectNotes={rejectNotes}
+                    onRejectNoteChange={(id, note) => setRejectNotes(prev => ({ ...prev, [id]: note }))}
+                    onReview={handleReviewTopic}
+                    onClose={() => setShowOutlinePanel(false)}
+                />
+            )}
         </div>
     )
 }

@@ -30,12 +30,18 @@ const RoomLecturerLayout: React.FC = () => {
     const sidebarTab = useRef<SidebarTab[]>([
         {
             icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+            </svg>,
+            label: "Bảng tin",
+            path: `/main/lecturer/class/${classId}`
+        },
+        {
+            icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
             </svg>
-
             ,
             label: "Quy trình",
-            path: `/main/lecturer/class/${classId}`
+            path: `/main/lecturer/class/${classId}/milestones`
         },
         {
             icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
@@ -43,6 +49,13 @@ const RoomLecturerLayout: React.FC = () => {
             </svg>,
             label: "Thành viên",
             path: `/main/lecturer/class/${classId}/members`
+        },
+        {
+            icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+            </svg>,
+            label: "Đề tài",
+            path: `/main/lecturer/class/${classId}/topics`
         }
     ])
 
@@ -62,30 +75,30 @@ const RoomLecturerLayout: React.FC = () => {
             ,
             label: "Bảng điểm",
             path: `/main/lecturer/class/${classId}/committee-scoreboards`
-        },
+        }
     ])
 
     // Handler
-        const handleLeaveClass = async () => {
-            confirmDialog({
-                header: "Thông báo",
-                message: <p>Xác nhận rời lớp <b className="text-red">{classData.info.label}</b></p>,
-    
-                acceptLabel: "Rời lớp",
-                rejectLabel: "Hủy",
-    
-                accept: async () => {
-                    dispatch(changeStateFetching(true))
-    
-                    const userUpodate = await ClassService.removeMember(userData.id, classData.info.id)
+    const handleLeaveClass = async () => {
+        confirmDialog({
+            header: "Thông báo",
+            message: <p>Xác nhận rời lớp <b className="text-red">{classData.info.label}</b></p>,
+
+            acceptLabel: "Rời lớp",
+            rejectLabel: "Hủy",
+
+            accept: async () => {
+                dispatch(changeStateFetching(true))
+
+                const userUpodate = await ClassService.removeMember(userData.id, classData.info.id)
                     .finally(() => {
                         dispatch(changeStateFetching(false))
                     })
-    
-                    if (userUpodate) dispatch(currentClass_RemoveMember(userUpodate))
-                }
-            })
-        }
+
+                if (userUpodate) dispatch(currentClass_RemoveMember(userUpodate))
+            }
+        })
+    }
 
     if (!userData.id || !classData.info.id) return null
 

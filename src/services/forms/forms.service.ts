@@ -40,7 +40,7 @@ export class FormsService {
 
             if (status >= 200 && status < 300) {
                 store.dispatch(setFormPagination(data))
-                return true
+                return data
             }
 
         } catch (error) {

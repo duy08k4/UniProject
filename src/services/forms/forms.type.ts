@@ -111,9 +111,10 @@ export type DetailForm = {
         id: string,
         label: string
     },
-    notification: null | {
-        id: string
-    },
+    notification: {
+        id: string,
+        title: string
+    }[],
     createdBy: {
         id: string,
         full_name: string,
