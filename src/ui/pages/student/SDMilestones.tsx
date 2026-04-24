@@ -1,7 +1,7 @@
 import type React from "react"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 import ProgressService from "../../../services/progress/progress.service"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
@@ -17,6 +17,7 @@ const SDMilestones: React.FC = () => {
 
 
     const { classId } = useParams()
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (!classId || !userData.id) return
@@ -95,8 +96,7 @@ const SDMilestones: React.FC = () => {
                     <div className="absolute left-[-26px] top-0 bottom-0 w-0.5 bg-mainColor/20 dark:bg-white/10 rounded-full"></div>
 
                     {progress.milestones.map((milestone) => (
-                        <div key={milestone.id} className="relative mb-12 last:mb-0 group" onClick={() => { alert("Nhớ thêm chức năng xem chi tiết cột mốc. Chưa duyệt là không cho mở chi tiết") }} >
-                            <div className={`absolute left-[-42px] top-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shadow-md z-10 transition-all bg-mainColor`}>
+                        <div key={milestone.id} className="relative mb-12 last:mb-0 group" onClick={() => navigate(milestone.id)}>                            <div className={`absolute left-[-42px] top-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shadow-md z-10 transition-all bg-mainColor`}>
                                 {milestone.index > 0 ? milestone.index : "X"}
                             </div>
 

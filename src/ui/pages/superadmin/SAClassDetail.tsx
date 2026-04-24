@@ -6,7 +6,7 @@ import type { RootState } from "../../../redux/store"
 import { ClassService } from "../../../services/class/class.service"
 import formatVNTime from "../../../utils/formatVNTime"
 import getShortName from "../../../utils/getShortName"
-import { RoomRole, VNRoleName, VNThesisType, VNTopicStatus, type RoomRoleType } from "../../../config/enum"
+import { VNRoleName } from "../../../config/enum"
 import { useDebounce } from "../../../hooks/Debounce"
 import { currentClass_SetMembers } from "../../../redux/reducers/classSlice.reducer"
 import { memberSizePage } from "../../../config/pageSize"
@@ -14,7 +14,6 @@ import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import { confirmDialog } from "primereact/confirmdialog"
 import TopicsService from "../../../services/topics/topics.service"
 import type { TopicDetail } from "../../../services/topics/topics.type"
-import ProgressService from "../../../services/progress/progress.service"
 import OutlineReviewPanel from "../../components/OutlineReviewPanel"
 
 const SAClassDetail: React.FC = () => {
@@ -148,7 +147,6 @@ const SAClassDetail: React.FC = () => {
             }
 
         })
-
     }
 
     return (

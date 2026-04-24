@@ -57,7 +57,7 @@ const TiptapEditor: React.FC<Props> = ({ content, onChange, readonly = false }) 
             )}
 
             <EditorContent editor={editor}
-                className={`px-4 py-3 focus:outline-none min-h-[120px] dark:text-white [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror_p]:dark:text-white [&_.ProseMirror_h2]:dark:text-white [&_.ProseMirror_li]:dark:text-white [&_.ProseMirror]:dark:text-white [&_.ProseMirror_strong]:dark:text-white [&_.ProseMirror_em]:dark:text-white [&_.ProseMirror_u]:dark:text-white ${readonly ? "cursor-default" : ""}`} />
+                className={`px-4 py-3 focus:outline-none min-h-[120px] [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror_*]:text-[#3e3f46] [&_.ProseMirror_*]:dark:text-white ${readonly ? "cursor-default" : ""}`} />
 
             {!readonly && (
                 <div className={`px-3 py-1 text-tinySize text-right border-t border-gray/10 ${charCount > MAX_CHARS * 0.9 ? "text-red" : "text-gray"}`}>

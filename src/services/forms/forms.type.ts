@@ -10,8 +10,9 @@ export type FormInfoType = {
     field_count: string
     is_auto_open: boolean
     is_auto_close: boolean
-    open_at: null
-    close_at: null
+    is_join_form: boolean
+    open_at: string | null
+    close_at: string | null
     update_at?: string, // Khi tạo mới hoặc update form thì field này không tồn tại
     created_at?: string, // Khi tạo mới hoặc update form thì field này không tồn tại
 }
@@ -38,17 +39,17 @@ export type UpdateFormsType = FormInfoType & {
         {
             checkboxFieldId?: string // Trường này chỉ tồn tại khi update
             index: string
-            label: string
+            title: string
             description: string
             input_type: Field_TypeType
             choice_count: string
             is_deleted: boolean
             is_required: boolean
             is_multiple: boolean
-            update_at?: string, // Khi tạo mới hoặc update form thì field này không tồn tại
-            created_at?: string, // Khi tạo mới hoặc update form thì field này không tồn tại
+            update_at?: string,
+            created_at?: string,
             checkbox_field_choices: {
-                choiceId?: string // Trường này chỉ tồn tại khi update
+                choiceId?: string
                 index: string
                 body: string
             }[]
@@ -148,7 +149,7 @@ export type DetailForm = {
         {
             id?: string
             index: string
-            label: string
+            title: string
             description: string
             input_type: Field_TypeType
             choice_count: string
