@@ -25,6 +25,8 @@ const apiPath = {
         updateProgressInfo: "/progress/update",
         removeProgress: "/progress/remove",
 
+        milestonePagination: "/progress/milestone/pagination",
+        getOneMilestone: "/progress/milestone",
         updateMilestone: "/progress/milestone",
         removeMilestone: "/progress/milestone/remove",
         createRegistrationMilestone: "/progress/milestone/registration",
@@ -34,6 +36,7 @@ const apiPath = {
         formPagination: "/form/pagination",
         getOneForm: "/form",
         updateForm: "/form",
+        toggleStop: "/form/toggle-stop",
         getSubmission: "/form/submission",
         removeForms: "/form/remove",
         removeFields: "/form/field/remove",

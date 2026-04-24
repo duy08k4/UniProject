@@ -2,7 +2,7 @@ import { toast } from "sonner"
 import errorCatch from "../../config/errorCatch"
 import api from "../../config/gateway"
 import apiPath from "../path"
-import type { ProgressDeatil, ProgressPagination, UpdateMilestone } from "./progress.type"
+import type { MilestoneDetail, MilestonePagination, ProgressDeatil, ProgressPagination, UpdateMilestone } from "./progress.type"
 import { store } from "../../redux/store"
 import { removeMilestone, setCurrentProgress, setProgressPaginationData, updateMilestone } from "../../redux/reducers/progressSlice.reducer"
 import { Role } from "../../config/enum"
@@ -193,6 +193,12 @@ export default class ProgressService {
 
             if (status >= 200 && status < 300) {
                 store.dispatch(setCurrentProgress(null))
+                const { soft_deleted, hard_deleted } = data
+                if (soft_deleted?.length && !hard_deleted?.length) {
+                    toast.info("Quy trình đã được lưu trữ do có dữ liệu quan trọng")
+                } else {
+                    toast.success("Đã xóa quy trình")
+                }
                 return data
             }
 
@@ -205,7 +211,58 @@ export default class ProgressService {
     }
 
     /* ------------------------------------------------------------------------------ MILESTONE ---------------------------------------------------------------------------------------------- */
-    // Get milestone
+    // Get milestone (pagination)
+    static async getMilestones(classId: string, progressId: string, page: string, size: string, search?: string, is_deleted?: boolean, is_stopped?: boolean) {
+        try {
+            if (!classId || !progressId) return false
+
+            const params: any = { classId, progressId, page, size }
+            if (search) params.search = search
+            if (typeof is_deleted === "boolean") params.is_deleted = is_deleted
+            if (typeof is_stopped === "boolean") params.is_stopped = is_stopped
+
+            const { status, data } = await api.get<MilestonePagination>(apiPath.progress.milestonePagination, { params })
+            if (status >= 200 && status < 300) return data
+            return false
+        } catch (error) {
+            errorCatch(error)
+            return false
+        }
+    }
+
+    // Get milestone (detail)
+    static async getOneMilestone(milestoneId: string, classId: string) {
+        let loading
+
+        try {
+            if (!milestoneId) {
+                toast.error("Không tìm thấy cột mốc")
+                return false
+            }
+
+            if (!classId) {
+                toast.error("Không tìm thấy lớp học")
+                return false
+            }
+
+            loading = toast.loading("Đang tải dữ liệu cột mốc...")
+
+            const { status, data } = await api.get<MilestoneDetail>(apiPath.progress.getOneMilestone, {
+                params: { milestoneId, classId }
+            })
+
+            if (status >= 200 && status < 300) {
+                return data
+                // store.dispatch(updateMilestone(data))
+                return true
+            }
+        } catch (error) {
+            errorCatch(error)
+            return false
+        } finally {
+            toast.dismiss(loading)
+        }
+    }
 
     // Update milestone (create new and)
     static async updateMilestone(classId: string, progressId: string, milestone: { id?: string, index: string | number, label: string, description: string, is_stopped: boolean }[]) {
@@ -263,7 +320,7 @@ export default class ProgressService {
             if (milestoneIds.length === 0) return false
 
             loading = toast.loading("Đang xóa cột mốc...")
-            const { status } = await api.delete(apiPath.progress.removeMilestone, {
+            const { status, data } = await api.delete(apiPath.progress.removeMilestone, {
                 params: {
                     ids: milestoneIds
                 },
@@ -274,6 +331,12 @@ export default class ProgressService {
 
             if (status >= 200 && status < 300) {
                 store.dispatch(removeMilestone({ ids: milestoneIds }))
+                const { soft_deleted, hard_deleted } = data
+                if (soft_deleted?.length && !hard_deleted?.length) {
+                    toast.info("Cột mốc đã được lưu trữ do có dữ liệu quan trọng")
+                } else {
+                    toast.success("Đã xóa cột mốc")
+                }
                 return true
             }
         } catch (error) {

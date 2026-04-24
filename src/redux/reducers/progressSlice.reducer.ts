@@ -1,15 +1,17 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { ProgressDeatil, ProgressDeatilPagination, ProgressPagination, UpdateMilestone } from "../../services/progress/progress.type";
+import type { MilestoneDetail, ProgressDeatil, ProgressDeatilPagination, ProgressPagination, UpdateMilestone } from "../../services/progress/progress.type";
 
 // Reducer
 export interface ProgressSlice {
     progressPagination: ProgressPagination | null,
-    currentProgress: ProgressDeatil | null
+    currentProgress: ProgressDeatil | null,
+    currentMilestone: MilestoneDetail | null
 }
 
 const initialState: ProgressSlice = {
     progressPagination: null,
     currentProgress: null,
+    currentMilestone: null
 }
 
 export const progressSlice = createSlice({
@@ -43,6 +45,10 @@ export const progressSlice = createSlice({
         },
 
         // Milestone
+        setCurrentMilestone: (state, action: PayloadAction<MilestoneDetail | null>) => {
+            state.currentMilestone = action.payload
+        },
+
         updateMilestone: (state, action: PayloadAction<UpdateMilestone>) => {
             if (state.currentProgress) {
                 const dataUpdate = action.payload
@@ -59,6 +65,43 @@ export const progressSlice = createSlice({
 
                 state.currentProgress.milestones = newMilestoneList
             }
+        },
+
+        // Forms in Milestone
+        addFormToCurrentMilestone: (state, action: PayloadAction<MilestoneDetail['forms'][0]>) => {
+            if (state.currentMilestone) {
+                state.currentMilestone.forms.push(action.payload)
+            }
+        },
+
+        updateFormInCurrentMilestone: (state, action: PayloadAction<MilestoneDetail['forms'][0]>) => {
+            if (state.currentMilestone) {
+                const idx = state.currentMilestone.forms.findIndex(f => f.id === action.payload.id)
+                if (idx >= 0) state.currentMilestone.forms[idx] = action.payload
+            }
+        },
+
+        removeFormsFromCurrentMilestone: (state, action: PayloadAction<string[]>) => {
+            if (state.currentMilestone) {
+                state.currentMilestone.forms = state.currentMilestone.forms.filter(f => !action.payload.includes(f.id))
+            }
+        },
+
+        // Notifications in Milestone
+        updateNotificationInCurrentMilestone: (state, action: PayloadAction<MilestoneDetail['notifications'][0]>) => {
+            if (!state.currentMilestone) return
+            const idx = state.currentMilestone.notifications.findIndex(n => n.id === action.payload.id)
+            if (idx >= 0) {
+                state.currentMilestone.notifications[idx] = action.payload
+            } else {
+                state.currentMilestone.notifications.unshift(action.payload)
+            }
+        },
+
+        removeNotificationFromCurrentMilestone: (state, action: PayloadAction<string>) => {
+            if (state.currentMilestone) {
+                state.currentMilestone.notifications = state.currentMilestone.notifications.filter(n => n.id !== action.payload)
+            }
         }
     }
 })
@@ -72,8 +115,18 @@ export const {
     setCurrentProgress,
 
     // Milestone
+    setCurrentMilestone,
     updateMilestone,
-    removeMilestone
+    removeMilestone,
+
+    // Forms in Milestone
+    addFormToCurrentMilestone,
+    updateFormInCurrentMilestone,
+    removeFormsFromCurrentMilestone,
+
+    // Notifications in Milestone
+    updateNotificationInCurrentMilestone,
+    removeNotificationFromCurrentMilestone
 } = progressSlice.actions
 
 export default progressSlice.reducer

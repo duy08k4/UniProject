@@ -5,6 +5,7 @@ import { GlobalGateway, globalSocketEventName } from "../../websocket/global.gat
 import { ClassGateway, classSocketEventName } from "../../websocket/class.gateway"
 import { NotificationGateway, notificationSocketEventName } from "../../websocket/notification.gateway"
 import { ProgressGateway, progressSocketEventName } from "../../websocket/progress.gateway"
+import { FormsGateway, formsSocketEventName } from "../../websocket/forms.gateway"
 
 const SocketSubcriber = () => {
     const userData = useSelector((state: RootState) => state.auth.user.info)
@@ -29,7 +30,9 @@ const SocketSubcriber = () => {
         NotificationGateway.OnUpdateNotification()
         NotificationGateway.OnRemoveNotification()
 
-
+        FormsGateway.OnToggleStop()
+        FormsGateway.OnFormSaved()
+        FormsGateway.OnFormDeleted()
 
         return () => {
             GlobalGateway.off(globalSocketEventName.OnApproveMember)
@@ -48,6 +51,9 @@ const SocketSubcriber = () => {
             NotificationGateway.off(notificationSocketEventName.OnUpdateNotification)
             NotificationGateway.off(notificationSocketEventName.OnRemoveNotification)
 
+            FormsGateway.off(formsSocketEventName.OnToggleStop)
+            FormsGateway.off(formsSocketEventName.OnFormSaved)
+            FormsGateway.off(formsSocketEventName.OnFormDeleted)
         }
     }, [userData.id])
 

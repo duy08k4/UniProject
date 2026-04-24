@@ -7,7 +7,7 @@ import type { MilestoneShortDetail } from "../../../services/progress/progress.t
 import RANewProgress from "../../components/RANewProgress"
 import Loading from "../../components/Loading"
 import ProgressService from "../../../services/progress/progress.service"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import formatVNTime from "../../../utils/formatVNTime"
 import { confirmDialog } from "primereact/confirmdialog"
@@ -23,6 +23,7 @@ const RAMilestones: React.FC = () => {
 
     const { classId } = useParams()
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [milestones, setMilestones] = useState<(MilestoneShortDetail & { isNew?: boolean, markedDeleted?: boolean, tempId?: string })[]>([])
     const [isAdding, setIsAdding] = useState(false)
@@ -236,8 +237,9 @@ const RAMilestones: React.FC = () => {
             dispatch(changeStateFetching(true))
             removeResult = await ProgressService.removeMilestone([...deletedList]).finally(() => {
                 dispatch(changeStateFetching(false))
+                removeResult = true
             })
-        }
+        } else removeResult = true
 
 
         // Create and Update
@@ -292,6 +294,11 @@ const RAMilestones: React.FC = () => {
         newItems[target] = temp
 
         setMilestones(reIndex(newItems))
+    }
+
+    const viewDetailMilestone = (id: string) => {
+        if (!id) return
+        navigate(`/main/roomadmin/class/${classId}/progresses/${id}`)
     }
 
     if (!classId || !progress || !progress.id) {
@@ -505,7 +512,7 @@ const RAMilestones: React.FC = () => {
                             </div>
                         ) : (
                             // INFO CARD
-                            <div className="bg-white dark:bg-lightDark rounded-normal p-6 shadow-[0_2px_15px_rgba(0,0,0,0.05)] border border-lightGray/20 dark:border-white/5 flex flex-col gap-4">
+                            <div className="bg-white dark:bg-lightDark rounded-normal p-6 shadow-[0_2px_15px_rgba(0,0,0,0.05)] border border-lightGray/20 dark:border-white/5 flex flex-col gap-4" onClick={() => viewDetailMilestone(milestone.id)}>
                                 <div className="flex justify-between items-center-safe gap-4">
                                     <h3 className="text-largeSize font-bold dark:text-white tracking-tight capitalize">
                                         {milestone.label}
@@ -515,6 +522,10 @@ const RAMilestones: React.FC = () => {
                                         {(milestone as any).is_registration_milestone ? "Đăng ký đề tài" : milestone.is_stopped ? "Đã dừng" : "Hoạt động"}
                                     </span>
                                 </div>
+
+                                <p className="text-normalSize text-gray dark:text-white/60 leading-relaxed italic max-w-4xl">
+                                    "{milestone.description}"
+                                </p>
 
                                 {/* Registration milestone: hiển thị bảng đề tài */}
                                 {(milestone as any).is_registration_milestone ? (
@@ -534,8 +545,9 @@ const RAMilestones: React.FC = () => {
                                                             <th className="text-left py-2 font-medium">Trạng thái</th>
                                                         </tr>
                                                     </thead>
+
                                                     <tbody>
-                                                        {registrationTopics.map(topic => (
+                                                        {registrationTopics.slice(0, 5).map(topic => (
                                                             <tr key={topic.id} className="border-b border-gray/5 hover:bg-gray/5 transition-colors">
                                                                 <td className="py-2.5 pr-4 dark:text-white font-medium">{topic.student.full_name}</td>
                                                                 <td className="py-2.5 pr-4 dark:text-white max-w-[200px] truncate">{topic.title}</td>
@@ -555,10 +567,6 @@ const RAMilestones: React.FC = () => {
                                     </div>
                                 ) : (
                                     <>
-                                        <p className="text-normalSize text-gray dark:text-white/60 leading-relaxed italic max-w-4xl">
-                                            "{milestone.description}"
-                                        </p>
-
                                         <div className="flex flex-wrap gap-x-10 gap-y-3 pt-5 mt-2 border-t border-lightGray/10 dark:border-white/5">
                                             <div className="flex flex-col">
                                                 <span className="text-tinySize text-gray dark:text-gray uppercase font-bold tracking-tighter">Ngày khởi tạo</span>

@@ -1,13 +1,17 @@
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useParams, useNavigate } from "react-router-dom"
 import { useDebounce } from "../../../hooks/Debounce"
 import { FormsService } from "../../../services/forms/forms.service"
+import { confirmDialog } from "primereact/confirmdialog"
 import type { RootState } from "../../../redux/store"
 import formatVNTime from "../../../utils/formatVNTime"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
+import { removeFormFromPagination } from "../../../redux/reducers/formSlice.reducer"
 import { ScaleLoader } from "react-spinners"
+import FormViewer from "../../components/FormViewer"
+import type { DetailForm } from "../../../services/forms/forms.type"
 
 const RAForms: React.FC = () => {
     const { classId } = useParams<{ classId: string }>()
@@ -18,10 +22,12 @@ const RAForms: React.FC = () => {
     const [page, setPage] = useState(1)
     const [isStopped, setIsStopped] = useState<string>("") // "" (Tất cả), "false" (Hoạt động), "true" (Đã đóng)
     const [isDeleted, setIsDeleted] = useState<boolean>(false)
+    const [previewForm, setPreviewForm] = useState<DetailForm | null>(null)
     
     const searchDebounce = useDebounce(search, 1500)
 
     const formPagination = useSelector((state: RootState) => state.form.formPagination)
+    const currentForm = useSelector((state: RootState) => state.form.currentForm)
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
 
     const pageSize = 12
@@ -47,6 +53,29 @@ const RAForms: React.FC = () => {
         setPage(1)
     }
 
+    const handleDelete = (formId: string) => {
+        confirmDialog({
+            header: "Xóa biểu mẫu",
+            message: "Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa?",
+            acceptLabel: "Xóa",
+            rejectLabel: "Hủy",
+            accept: async () => {
+                dispatch(changeStateFetching(true));
+                const result = await FormsService.removeForms([formId]).finally(() => dispatch(changeStateFetching(false)));
+                if (result) dispatch(removeFormFromPagination(formId));
+            }
+        });
+    };
+
+    const currentFormRef = useRef(currentForm)
+    useEffect(() => { currentFormRef.current = currentForm }, [currentForm])
+
+    const handlePreview = async (formId: string) => {
+        if (!classId) return
+        const result = await FormsService.getFormDetail(classId, formId)
+        if (result) setPreviewForm(currentFormRef.current)
+    }
+
     const changePage = (pagination: "prev" | "next") => {
         if (!formPagination) return
         if (page < formPagination.pagination.totalPages && pagination === "next") {
@@ -59,6 +88,7 @@ const RAForms: React.FC = () => {
 
     return (
         <div className="w-full flex flex-col gap-5 py-mainTwoSidePadding">
+            {previewForm && <FormViewer form={previewForm} onClose={() => setPreviewForm(null)} readonly />}
             {/* Header */}
             <div className="w-full flex justify-between items-center-safe">
                 <h1 className="text-largeSize font-bold dark:text-white">Quản lý biểu mẫu</h1>
@@ -190,8 +220,20 @@ const RAForms: React.FC = () => {
                             <button 
                                 className="flex-1 bg-mainColorRGB text-mainColor px-2.5 py-1.5 rounded-small hoverBtn disableState font-bold text-smallSize"
                                 disabled={isFetching}
+                                onClick={() => navigate(`/main/roomadmin/class/${classId}/forms/${form.id}`)}
                             >
                                 Xem chi tiết
+                            </button>
+                            <button
+                                className="bg-gray/5 text-gray px-3 py-1.5 rounded-small hoverBtn disableState dark:bg-white/5 dark:text-white"
+                                disabled={isFetching}
+                                onClick={() => handlePreview(form.id)}
+                                title="Xem trước"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 stroke-gray dark:stroke-white">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
                             </button>
                             <button 
                                 className="bg-gray/5 text-gray px-3 py-1.5 rounded-small hoverBtn disableState dark:bg-white/5 dark:text-white"
@@ -199,8 +241,18 @@ const RAForms: React.FC = () => {
                                 onClick={() => navigate(`/main/roomadmin/class/${classId}/submission/${form.id}`)}
                                 title="Xem phản hồi"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 stroke-gray dark:stroke-white">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                                </svg>
+                            </button>
+                            <button
+                                className="bg-red/5 text-red px-3 py-1.5 rounded-small hoverBtn disableState dark:bg-red/10"
+                                disabled={isFetching}
+                                onClick={() => handleDelete(form.id)}
+                                title="Xóa"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 stroke-red">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                 </svg>
                             </button>
                         </div>

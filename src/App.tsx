@@ -65,6 +65,7 @@ import LTScoreboards from "./ui/pages/lecturer/LTScoreboards"
 import LTCommittee from "./ui/pages/lecturer/LTCommittee"
 import LTTopics from "./ui/pages/lecturer/LTTopics"
 import RANewsfeed from "./ui/pages/roomadmin/RANewsfeed"
+import RAMilestoneDetail from "./ui/pages/roomadmin/RAMilestoneDetail"
 
 function App() {
   useTheme();
@@ -112,6 +113,7 @@ function App() {
             <Route index element={<RAOverview />} />
             <Route path="members" element={<RAMembers />} />
             <Route path="progresses" element={<RAMilestones />} />
+            <Route path="progresses/:milestoneId" element={<RAMilestoneDetail />} />
             <Route path="newsfeed" element={<RANewsfeed />} />
             <Route path="forms">
               <Route index element={<RAForms />} />
@@ -137,6 +139,7 @@ function App() {
             <Route path="submission" element={<SDSubmission />} />
             <Route path="topics" element={<SDTopics />} />
             <Route path="milestones" element={<SDMilestones />} />
+            <Route path="milestones/:milestoneId" element={<RAMilestoneDetail />} />
           </Route>
 
           {/* Lecturer */}
@@ -147,6 +150,7 @@ function App() {
             <Route path="committee-scoreboards" element={<LTScoreboards />} />
             <Route path="topics" element={<LTTopics />} />
             <Route path="milestones" element={<SDMilestones />} />
+            <Route path="milestones/:milestoneId" element={<RAMilestoneDetail />} />
           </Route>
         </Route>
       </Routes>
