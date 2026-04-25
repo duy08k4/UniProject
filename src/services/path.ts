@@ -45,9 +45,11 @@ const apiPath = {
     scoreform: {
         scoreFormPagination: "/scoreforms",
         getScoreFormDetail: "/scoreforms/detail",
+        getScoreFormRows: "/scoreforms/rows",
         updateScoreForm: "/scoreforms",
         softDeleteScoreForms: "/scoreforms/soft",
         hardDeleteScoreForms: "/scoreforms/hard",
+        updateCell: "/scoreforms/cell",
     },
 
     admin: {
@@ -73,6 +75,11 @@ const apiPath = {
         getOne: "/notifications",               // GET /notifications/:id
         upsert: "/notifications/update",        // POST /notifications/update
         remove: "/notifications",               // DELETE /notifications/:id
+    },
+
+    committee: {
+        upsert: "/committees",
+        getByClassId: (classId: string) => `/committees/${classId}`,
     }
 }
 

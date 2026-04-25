@@ -8,6 +8,7 @@ import globalReducer from './reducers/global.reducer'
 import progressReducer from './reducers/progressSlice.reducer'
 import formReducer from './reducers/formSlice.reducer'
 import notificationReducer from './reducers/notification.reducer'
+import scoreFormReducer from './reducers/scoreformSlice.reducer'
 
 export const store = configureStore({
   reducer: {
@@ -17,7 +18,8 @@ export const store = configureStore({
     progress: progressReducer,
     notification: notificationReducer,
     form: formReducer,
-    stateGlobal: globalReducer
+    stateGlobal: globalReducer,
+    scoreForm: scoreFormReducer,
   },
 })
 

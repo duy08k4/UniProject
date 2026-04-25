@@ -4,7 +4,14 @@ import api from "../../config/gateway"
 import apiPath from "../path"
 import { store } from "../../redux/store"
 import { Role } from "../../config/enum"
-import type { DetailScoreForm, ScoreFormPaginationType, UpdateScoreFormType } from "./scoreforms.type"
+import type { DetailScoreForm, ScoreFormPaginationType, ScoreFormRow, UpdateScoreFormType } from "./scoreforms.type"
+import {
+    removeScoreFormFromPagination,
+    setCurrentScoreForm,
+    setScoreFormPagination,
+    setScoreFormRows,
+    updateCell,
+} from "../../redux/reducers/scoreformSlice.reducer"
 
 export default class ScoreFormsService {
     // Score form (pagination)
@@ -33,7 +40,10 @@ export default class ScoreFormsService {
 
             const { status, data } = await api.get<ScoreFormPaginationType>(apiPath.scoreform.scoreFormPagination, { params })
 
-            if (status >= 200 && status < 300) return data
+            if (status >= 200 && status < 300) {
+                store.dispatch(setScoreFormPagination(data))
+                return true
+            }
 
         } catch (error) {
             errorCatch(error)
@@ -56,7 +66,10 @@ export default class ScoreFormsService {
 
             const { status, data } = await api.get<DetailScoreForm>(apiPath.scoreform.getScoreFormDetail, { params: { id } })
 
-            if (status >= 200 && status < 300) return data
+            if (status >= 200 && status < 300) {
+                store.dispatch(setCurrentScoreForm(data))
+                return true
+            }
 
         } catch (error) {
             errorCatch(error)
@@ -66,7 +79,21 @@ export default class ScoreFormsService {
         }
     }
 
-    // Update score form
+    // Get rows + cells
+    static async getScoreFormRows(scoreFormId: string) {
+        try {
+            const { status, data } = await api.get<ScoreFormRow[]>(apiPath.scoreform.getScoreFormRows, { params: { scoreFormId } })
+            if (status >= 200 && status < 300) {
+                store.dispatch(setScoreFormRows(data))
+                return true
+            }
+        } catch (error) {
+            errorCatch(error)
+            return false
+        }
+    }
+
+    // Update score form (create / update columns)
     static async updateScoreForm(dataUpdate: UpdateScoreFormType) {
         let loading
         try {
@@ -90,7 +117,14 @@ export default class ScoreFormsService {
             })
 
             if (status >= 200 && status < 300) {
-                toast.success("Lưu bảng điểm thành công")
+                toast.success("Bảng điểm đã cập nhật")
+                if (dataUpdate.id) {
+                    // Merge response (có columns mới) với detail hiện tại (có class, milestone, ...)
+                    const current = store.getState().scoreForm.currentScoreForm
+                    if (current) {
+                        store.dispatch(setCurrentScoreForm({ ...current, ...data, class: current.class, milestone: current.milestone }))
+                    }
+                }
                 return data
             }
 
@@ -99,6 +133,22 @@ export default class ScoreFormsService {
             return false
         } finally {
             toast.dismiss(loading)
+        }
+    }
+
+    // Update cell
+    static async updateCell(scoreFormId: string, rowId: string, columnId: string, value: number) {
+        try {
+            const { status, data } = await api.post(apiPath.scoreform.updateCell, { scoreFormId, rowId, columnId, value })
+            if (status >= 200 && status < 300) {
+                store.dispatch(updateCell({ cellId: data.id, value: value.toString() }))
+                // Reload rows để lấy giá trị formula cells đã được recalculate
+                await ScoreFormsService.getScoreFormRows(scoreFormId)
+                return true
+            }
+        } catch (error) {
+            errorCatch(error)
+            return false
         }
     }
 
@@ -117,6 +167,7 @@ export default class ScoreFormsService {
 
             if (status >= 200 && status < 300) {
                 toast.success("Xóa bảng điểm thành công")
+                store.dispatch(removeScoreFormFromPagination(ids))
                 return true
             }
 
@@ -143,6 +194,7 @@ export default class ScoreFormsService {
 
             if (status >= 200 && status < 300) {
                 toast.success("Xóa vĩnh viễn bảng điểm thành công")
+                store.dispatch(removeScoreFormFromPagination(ids))
                 return true
             }
 

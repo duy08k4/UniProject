@@ -55,9 +55,12 @@ export const VNUnit: Record<string, string> = {
 }
 
 export const ScoreForm_Type = {
-  OTHERS: "others",
-  THESIS: "thesis",
-  INTERNSHIP: "internship",
+  SUPERVISOR_SCORE: "supervisor_score",
+  REVIEWER_SCORE: "reviewer_score",
+  COMMITTEE_SCORE: "committee_score",
+  ATTENDANCE_CHECK: "attendance_check",
+  BONUS_SCORE: "bonus_score",
+  OTHERS: "others"
 } as const
 
 export type ScoreForm_TypeType = typeof ScoreForm_Type[keyof typeof ScoreForm_Type]
@@ -95,17 +98,6 @@ export const VNTopicStatus: Record<string, { label: string, color: string }> = {
   outline_rejected:    { label: "Đề cương bị từ chối",    color: "text-red" },
   approved:            { label: "Đã duyệt",               color: "text-mainColor" },
 }
-
-export const ScoreFormTag = {
-  SUPERVISOR_SCORE: "supervisor_score", //Điểm giảng viên hướng dẫn
-  REVIEWER_SCORE: "reviewer_score", // Điểm giảng viên phản biện
-  COMMITTEE_SCORE: "committee_score", // Điểm hội đồng
-  ATTENDANCE_CHECK: "attendance_check", // Điểm chuyên cần / tiến độ
-  BONUS_SCORE: "bonus_score", // Điểm cộng
-  OTHERS: "others" // Khác
-}
-
-export type ScoreFormTagType = typeof ScoreFormTag[keyof typeof ScoreFormTag]
 
 export const ScoreFormStatus = {
   PENDING: "pending",
@@ -158,3 +150,58 @@ export const VNFieldLabel: Record<string, string> = {
   supervisor_review_file: "Phiếu nhận xét GVHD",
   revision_file: "Giải trình chỉnh sửa",
 }
+
+export const CommitteeRole = {
+  CHAIRMAN: 'chairman',
+  REVIEWER: 'reviewer',
+  MEMBER: 'member',
+  SECRETARY: 'secretary',
+} as const
+
+export type CommitteeRoleType = typeof CommitteeRole[keyof typeof CommitteeRole]
+
+export const VNCommitteeRole: Record<string, string> = {
+  chairman: "Chủ tịch",
+  reviewer: "Ủy viên phản biện",
+  member: "Ủy viên",
+  secretary: "Thư ký",
+}
+
+export const ColumnAllowedRole = {
+  ROOMADMIN: 'roomadmin',
+  LECTURER: 'lecturer',
+  CHAIRMAN: 'chairman',
+  REVIEWER: 'reviewer',
+  MEMBER: 'member',
+} as const
+
+export type ColumnAllowedRoleType = typeof ColumnAllowedRole[keyof typeof ColumnAllowedRole]
+
+export const VNColumnAllowedRole: Record<string, string> = {
+  roomadmin: "Quản lý lớp",
+  lecturer: "Giảng viên",
+  chairman: "Chủ tịch HĐ",
+  reviewer: "Ủy viên phản biện",
+  member: "Ủy viên HĐ",
+}
+
+export const ColumnType = {
+  NORMAL: 'normal',
+  COMPONENT: 'component',
+  SUMMARY: 'summary',
+} as const
+
+export type ColumnTypeType = typeof ColumnType[keyof typeof ColumnType]
+
+export const VNColumnType: Record<string, string> = {
+  normal: "Cột thông thường",
+  component: "Điểm thành phần",
+  summary: "Điểm tổng kết",
+}
+
+export const ColumnLabel = {
+  LAST_NAME: 'last_name',
+  FIRST_NAME: 'first_name',
+} as const
+
+export type ColumnLabelType = typeof ColumnLabel[keyof typeof ColumnLabel]
