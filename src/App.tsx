@@ -49,12 +49,14 @@ import RAScoreboards from "./ui/pages/roomadmin/RAScoreboards"
 import RAScoreboardsDetail from "./ui/pages/roomadmin/RAScoreboardsDetail"
 import RASubmissions from "./ui/pages/roomadmin/RASubmissions"
 import RASubmissionDetail from "./ui/pages/roomadmin/RASubmissionDetail"
+import RACommittee from "./ui/pages/roomadmin/RACommittee"
 
 // Student
 import RoomStudentLayout from "./ui/layouts/RoomStudentLayout"
 import SDMilestones from "./ui/pages/student/SDMilestones"
 import SDMembers from "./ui/pages/student/SDMembers"
 import SDScoreboards from "./ui/pages/student/SDScoreboards"
+import SDScoreboardsDetail from "./ui/pages/student/SDScoreboardsDetail"
 import SDSubmission from "./ui/pages/student/SDSubmission"
 import SDTopics from "./ui/pages/student/SDTopics"
 import SDNewsfeed from "./ui/pages/student/SDNewsfeed"
@@ -62,6 +64,7 @@ import SDNewsfeed from "./ui/pages/student/SDNewsfeed"
 // Lecturer
 import RoomLecturerLayout from "./ui/layouts/RoomLecturerLayout"
 import LTScoreboards from "./ui/pages/lecturer/LTScoreboards"
+import LTScoreboardsDetail from "./ui/pages/lecturer/LTScoreboardsDetail"
 import LTCommittee from "./ui/pages/lecturer/LTCommittee"
 import LTTopics from "./ui/pages/lecturer/LTTopics"
 import RANewsfeed from "./ui/pages/roomadmin/RANewsfeed"
@@ -125,6 +128,8 @@ function App() {
               <Route path=":boardId" element={<RAScoreboardsDetail />} />
             </Route>
 
+            <Route path="committee" element={<RACommittee />} />
+
             <Route path="submission">
               <Route index element={<RASubmissions />} />
               <Route path=":formId" element={<RASubmissionDetail />} />
@@ -135,7 +140,10 @@ function App() {
           <Route path="student/class/:classId" element={<ClassContextProvider><RoomStudentLayout /></ClassContextProvider>}>
             <Route index element={<SDNewsfeed />} />
             <Route path="members" element={<SDMembers />} />
-            <Route path="scoreboards" element={<SDScoreboards />} />
+            <Route path="scoreboards">
+              <Route index element={<SDScoreboards />} />
+              <Route path=":boardId" element={<SDScoreboardsDetail />} />
+            </Route>
             <Route path="submission" element={<SDSubmission />} />
             <Route path="topics" element={<SDTopics />} />
             <Route path="milestones" element={<SDMilestones />} />
@@ -147,7 +155,10 @@ function App() {
             <Route index element={<SDNewsfeed />} />
             <Route path="members" element={<SDMembers />} />
             <Route path="committee" element={<LTCommittee />} />
-            <Route path="committee-scoreboards" element={<LTScoreboards />} />
+            <Route path="committee-scoreboards">
+              <Route index element={<LTScoreboards />} />
+              <Route path=":boardId" element={<LTScoreboardsDetail />} />
+            </Route>
             <Route path="topics" element={<LTTopics />} />
             <Route path="milestones" element={<SDMilestones />} />
             <Route path="milestones/:milestoneId" element={<RAMilestoneDetail />} />

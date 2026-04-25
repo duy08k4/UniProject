@@ -1,10 +1,29 @@
-import type { ScoreForm_TypeType } from "../../config/enum"
+import type { ColumnAllowedRoleType, ColumnLabelType, ColumnTypeType, ScoreForm_TypeType, ScoreFormStatusType } from "../../config/enum"
 
 export type ScoreFormColumn = {
     id?: string
     label: string
-    formula_content?: string
+    formula_content?: string | null
+    allowed_role?: ColumnAllowedRoleType | null
+    column_type?: ColumnTypeType
+    column_label?: ColumnLabelType | null
     index?: string
+}
+
+export type ScoreFormCell = {
+    id: string
+    value: string | null
+    updated_at: string
+    column: { id: string }
+    updatedBy: { id: string; full_name: string } | null
+}
+
+export type ScoreFormRow = {
+    id: string
+    index: number
+    updated_at: string
+    student: { id: string; full_name: string; email: string }
+    cells: ScoreFormCell[]
 }
 
 export type UpdateScoreFormType = {
@@ -26,6 +45,7 @@ export type UpdateScoreFormType = {
 export type ScoreFormDataForPagination = {
     id: string
     score_form_type: ScoreForm_TypeType
+    status: ScoreFormStatusType
     label: string
     description: string | null
     field_count: number
@@ -61,6 +81,7 @@ export type ScoreFormPaginationType = {
 export type DetailScoreForm = {
     id: string
     score_form_type: ScoreForm_TypeType
+    status: ScoreFormStatusType
     label: string
     description: string | null
     field_count: number
@@ -90,6 +111,9 @@ export type DetailScoreForm = {
         id: string
         label: string
         formula_content: string | null
+        allowed_role: ColumnAllowedRoleType | null
+        column_type: ColumnTypeType
+        column_label: ColumnLabelType | null
         index: number
     }[]
 }

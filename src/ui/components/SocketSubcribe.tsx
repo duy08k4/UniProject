@@ -6,6 +6,7 @@ import { ClassGateway, classSocketEventName } from "../../websocket/class.gatewa
 import { NotificationGateway, notificationSocketEventName } from "../../websocket/notification.gateway"
 import { ProgressGateway, progressSocketEventName } from "../../websocket/progress.gateway"
 import { FormsGateway, formsSocketEventName } from "../../websocket/forms.gateway"
+import { ScoreFormsGateway, scoreFormsSocketEventName } from "../../websocket/scoreforms.gateway"
 
 const SocketSubcriber = () => {
     const userData = useSelector((state: RootState) => state.auth.user.info)
@@ -34,6 +35,11 @@ const SocketSubcriber = () => {
         FormsGateway.OnFormSaved()
         FormsGateway.OnFormDeleted()
 
+        ScoreFormsGateway.OnToggleStop()
+        ScoreFormsGateway.OnScoreFormSaved()
+        ScoreFormsGateway.OnScoreFormDeleted()
+        ScoreFormsGateway.OnCellUpdated()
+
         return () => {
             GlobalGateway.off(globalSocketEventName.OnApproveMember)
             GlobalGateway.off(globalSocketEventName.OnNewMember)
@@ -54,6 +60,11 @@ const SocketSubcriber = () => {
             FormsGateway.off(formsSocketEventName.OnToggleStop)
             FormsGateway.off(formsSocketEventName.OnFormSaved)
             FormsGateway.off(formsSocketEventName.OnFormDeleted)
+
+            ScoreFormsGateway.off(scoreFormsSocketEventName.OnToggleStop)
+            ScoreFormsGateway.off(scoreFormsSocketEventName.OnScoreFormSaved)
+            ScoreFormsGateway.off(scoreFormsSocketEventName.OnScoreFormDeleted)
+            ScoreFormsGateway.off(scoreFormsSocketEventName.OnCellUpdated)
         }
     }, [userData.id])
 
