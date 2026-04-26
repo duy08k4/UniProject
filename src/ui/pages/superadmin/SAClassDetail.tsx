@@ -6,7 +6,7 @@ import type { RootState } from "../../../redux/store"
 import { ClassService } from "../../../services/class/class.service"
 import formatVNTime from "../../../utils/formatVNTime"
 import getShortName from "../../../utils/getShortName"
-import { VNRoleName } from "../../../config/enum"
+import { VNRoleName, VNThesisType, VNTopicStatus } from "../../../config/enum"
 import { useDebounce } from "../../../hooks/Debounce"
 import { currentClass_SetMembers } from "../../../redux/reducers/classSlice.reducer"
 import { memberSizePage } from "../../../config/pageSize"
@@ -14,7 +14,6 @@ import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import { confirmDialog } from "primereact/confirmdialog"
 import TopicsService from "../../../services/topics/topics.service"
 import type { TopicDetail } from "../../../services/topics/topics.type"
-import OutlineReviewPanel from "../../components/OutlineReviewPanel"
 
 const SAClassDetail: React.FC = () => {
     const { classId } = useParams()
@@ -32,10 +31,11 @@ const SAClassDetail: React.FC = () => {
     const [roleSearch, setRoleSearch] = useState<string>("")
     const roleSearchDebounce = useDebounce(roleSearch, 1500)
 
-    // Topics pending review
-    const [pendingTopics, setPendingTopics] = useState<TopicDetail[]>([])
-    const [rejectNotes, setRejectNotes] = useState<Record<string, string>>({})
-    const [showOutlinePanel, setShowOutlinePanel] = useState(false)
+    // Tab
+    const [activeTab, setActiveTab] = useState<"members" | "topics">("members")
+
+    // Topics (read-only)
+    const [topics, setTopics] = useState<TopicDetail[]>([])
 
     // Get class data
     useEffect(() => {
@@ -43,11 +43,11 @@ const SAClassDetail: React.FC = () => {
         ClassService.getClass(classId)
     }, [userData.id, classId])
 
-    // Fetch pending topics (outline_pending)
+    // Fetch all topics
     useEffect(() => {
         if (!classId || !userData.id) return
         TopicsService.getTopics(classId).then(data => {
-            if (data) setPendingTopics(data.filter(t => t.status === "outline_pending"))
+            if (data) setTopics(data)
         })
     }, [classId, userData.id])
 
@@ -88,16 +88,6 @@ const SAClassDetail: React.FC = () => {
         }).finally(() => {
             dispatch(changeStateFetching(false))
         })
-    }
-
-    const handleReviewTopic = async (topicId: string, approve: boolean) => {
-        if (!classId) return
-        const result = await TopicsService.reviewTopic(topicId, classId, approve, rejectNotes[topicId])
-        if (result) {
-            const updated = pendingTopics.filter(t => t.id !== topicId)
-            setPendingTopics(updated)
-            if (updated.length === 0) setShowOutlinePanel(false)
-        }
     }
 
     // Handler
@@ -172,15 +162,6 @@ const SAClassDetail: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2.5">
-                    {pendingTopics.length > 0 && (
-                        <button onClick={() => setShowOutlinePanel(true)} disabled={isFetching}
-                            className="px-5 py-2 bg-mainColorRGB text-mainColor rounded-normal font-semibold disableState animate-bounce hoverBtn flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-4 stroke-mainColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                            </svg>
-                            Đề cương chờ duyệt ({pendingTopics.length})
-                        </button>
-                    )}
                     {!info.created_approval && (
                         <button className="px-5 py-2 bg-mainColor text-white rounded-normal font-semibold disableState hoverBtn" disabled={isFetching} onClick={handleApprove}>Duyệt lớp</button>
                     )}
@@ -296,9 +277,25 @@ const SAClassDetail: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Right: Members List */}
+                {/* Right: Tab content */}
                 <div className="flex-1 flex flex-col gap-2.5">
+                    {/* Tab switcher */}
+                    <div className="flex gap-1 border-b border-lightGray dark:border-gray">
+                        <button
+                            onClick={() => setActiveTab("members")}
+                            className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === "members" ? "border-mainColor text-mainColor" : "border-transparent text-gray hover:text-black dark:hover:text-white"}`}
+                        >
+                            Thành viên
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("topics")}
+                            className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === "topics" ? "border-mainColor text-mainColor" : "border-transparent text-gray hover:text-black dark:hover:text-white"}`}
+                        >
+                            Đề tài {topics.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-lighterGray dark:bg-white/10 rounded text-xs">{topics.length}</span>}
+                        </button>
+                    </div>
 
+                    {activeTab === "members" ? (
                     <div className="flex-1 flex flex-col gap-2.5">
                         <div className="sticky top-0 z-10 left-0 w-full bg-bgLight dark:bg-bgDark flex flex-col gap-5 py-5">
                             <div className="flex items-center-safe gap-5">
@@ -424,20 +421,51 @@ const SAClassDetail: React.FC = () => {
                             </table>
                         </div>
                     </div>
+                    ) : (
+                    /* Tab Đề tài — read-only */
+                    <div className="border-[0.5px] border-lightGray dark:border-gray rounded-normal overflow-hidden">
+                        <table className="w-full bg-transparent">
+                            <colgroup>
+                                <col className="w-[22%]" />
+                                <col className="w-[30%]" />
+                                <col className="w-[10%]" />
+                                <col className="w-[20%]" />
+                                <col className="w-[18%]" />
+                            </colgroup>
+                            <thead className="bg-lightGray/50 dark:bg-white/5">
+                                <tr>
+                                    <th className="text-left px-5 py-3 dark:text-white text-sm uppercase tracking-wider">Sinh viên</th>
+                                    <th className="text-left dark:text-white text-sm uppercase tracking-wider">Tên đề tài</th>
+                                    <th className="text-left dark:text-white text-sm uppercase tracking-wider">Loại</th>
+                                    <th className="text-left dark:text-white text-sm uppercase tracking-wider">GVHD</th>
+                                    <th className="text-left dark:text-white text-sm uppercase tracking-wider">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {topics.map((topic) => (
+                                    <tr key={topic.id} className="border-t-[0.5px] border-lightGray dark:border-lightGray hover:bg-lighterGray dark:hover:bg-white/5">
+                                        <td className="px-5 py-3 dark:text-white text-sm">{topic.student.full_name}</td>
+                                        <td className="px-5 py-3 dark:text-white text-sm max-w-[200px] truncate">{topic.title}</td>
+                                        <td className="px-5 py-3 text-gray text-sm">{VNThesisType[topic.thesis_type]?.split(" ")[0]}</td>
+                                        <td className="px-5 py-3 text-gray text-sm">{topic.supervisor?.full_name ?? "—"}</td>
+                                        <td className="px-5 py-3 text-sm">
+                                            <span className={`font-semibold ${VNTopicStatus[topic.status]?.color}`}>
+                                                {VNTopicStatus[topic.status]?.label}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {topics.length === 0 && (
+                                    <tr>
+                                        <td colSpan={5} className="py-20 text-center text-gray italic">Chưa có đề tài nào trong lớp này</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                    )}
                 </div>
             </div>
-
-            {/* Panel duyệt đề cương */}
-            {showOutlinePanel && (
-                <OutlineReviewPanel
-                    topics={pendingTopics}
-                    isFetching={isFetching}
-                    rejectNotes={rejectNotes}
-                    onRejectNoteChange={(id, note) => setRejectNotes(prev => ({ ...prev, [id]: note }))}
-                    onReview={handleReviewTopic}
-                    onClose={() => setShowOutlinePanel(false)}
-                />
-            )}
         </div>
     )
 }
