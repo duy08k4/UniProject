@@ -50,6 +50,7 @@ import RAScoreboardsDetail from "./ui/pages/roomadmin/RAScoreboardsDetail"
 import RASubmissions from "./ui/pages/roomadmin/RASubmissions"
 import RASubmissionDetail from "./ui/pages/roomadmin/RASubmissionDetail"
 import RACommittee from "./ui/pages/roomadmin/RACommittee"
+import RATopics from "./ui/pages/roomadmin/RATopics"
 
 // Student
 import RoomStudentLayout from "./ui/layouts/RoomStudentLayout"
@@ -129,6 +130,7 @@ function App() {
             </Route>
 
             <Route path="committee" element={<RACommittee />} />
+            <Route path="topics" element={<RATopics />} />
 
             <Route path="submission">
               <Route index element={<RASubmissions />} />
