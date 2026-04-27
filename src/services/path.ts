@@ -53,11 +53,7 @@ const apiPath = {
     },
 
     admin: {
-        getUsecase: "/admin/usecase",
-        addUsecase: "/admin/usecase/add",
-        removeUsecase: "/admin/usecase/remove",
-        getPermission: "/admin/permission",
-        updatePermission: "/admin/permission/update"
+       
     },
 
     topics: {
