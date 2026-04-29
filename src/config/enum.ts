@@ -115,6 +115,8 @@ export const SubmissionStatus = {
   REJECT: "reject"
 }
 
+export type SubmissionStatusType = typeof SubmissionStatus[keyof typeof SubmissionStatus]
+
 export const VNScoreFormTag: Record<string, string> = {
   supervisor_score: "Điểm GVHD",
   reviewer_score: "Điểm phản biện",

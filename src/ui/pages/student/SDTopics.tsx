@@ -97,6 +97,7 @@ const SDTopics: React.FC = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                         </svg>
                     </div>
+
                     <div className="flex flex-col items-center text-center gap-2">
                         <h2 className="text-hugeSize font-bold text-gray dark:text-white uppercase tracking-wider">Chưa mở đăng ký đề tài</h2>
                         <p className="text-normalSize text-gray dark:text-gray/70 italic max-w-md">
@@ -200,6 +201,7 @@ const SDTopics: React.FC = () => {
                                     <p className="text-smallSize text-gray italic font-medium">
                                         {topic.status === TopicStatus.OUTLINE_REJECTED ? "Nộp lại file đề cương (PDF)" : "Nộp file đề cương (PDF)"}
                                     </p>
+                                    
                                     <input type="file" accept=".pdf" disabled={isFetching}
                                         onChange={async (e) => {
                                             const file = e.target.files?.[0]

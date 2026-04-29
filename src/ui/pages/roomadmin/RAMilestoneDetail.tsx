@@ -56,15 +56,9 @@ const RAMilestoneDetail: React.FC = () => {
     if (isFetching && !milestone) return <Loading />
     if (!milestone) return null
 
-    if (viewingForm) {
-        console.log(viewingForm.is_stopped || (!!viewingForm.close_at && new Date(viewingForm.close_at) < new Date()))
-
-    }
-
-
     return (
         <div className="w-full h-fit flex flex-col gap-6 pt-topPadding pb-20">
-            {viewingForm && <FormViewer form={viewingForm} onClose={() => setViewingForm(null)} />}
+            {viewingForm && <FormViewer formId={viewingForm.id} onClose={() => setViewingForm(null)} />}
 
             {/* Header + Info Card */}
             <div className="flex flex-col gap-4 p-6 rounded-normal bg-white dark:bg-lightDark shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-lightGray/20 dark:border-white/5">

@@ -9,6 +9,30 @@ import RANewProgress from "../../components/RANewProgress"
 import Loading from "../../components/Loading"
 import formatVNTime from "../../../utils/formatVNTime"
 
+const NonProgress: React.FC = () => {
+    return (
+        <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-6 p-10 bg-white dark:bg-lightDark rounded-normal shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-lightGray/10 mt-5">
+            {/* Icon Lock với hiệu ứng Ping nhẹ để tạo sự chú ý */}
+            <div className="relative">
+                <div className="absolute inset-0 bg-red/10 rounded-full animate-ping"></div>
+                <div className="relative bg-redRGB/10 p-6 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-16 stroke-red">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                </div>
+            </div>
+
+            {/* Nội dung thông báo */}
+            <div className="flex flex-col items-center text-center gap-2">
+                <h2 className="text-hugeSize font-bold text-gray dark:text-white uppercase tracking-wider">Quy trình đang đợi duyệt</h2>
+                <p className="text-normalSize text-gray dark:text-gray/70 italic max-w-md">
+                    Hiện tại quy trình thực hiện đồ án của lớp học chưa được phê duyệt. Bạn sẽ có thể xem chi tiết các cột mốc ngay sau khi trạng thái chuyển thành 'Đã duyệt'.
+                </p>
+            </div>
+        </div>
+    )
+}
+
 const SDMilestones: React.FC = () => {
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
     const userData = useSelector((state: RootState) => state.auth.user.info)
@@ -44,7 +68,7 @@ const SDMilestones: React.FC = () => {
     if (!classId || !progress || !progress.id) {
         if (isFetching) return <Loading />
 
-        return <RANewProgress />
+        return <NonProgress />
     }
 
     if (progress.created_approval) {
@@ -97,8 +121,8 @@ const SDMilestones: React.FC = () => {
 
                     {progress.milestones.map((milestone) => (
                         <div key={milestone.id} className="relative mb-12 last:mb-0 group" onClick={() => navigate(milestone.id)}>                            <div className={`absolute left-[-42px] top-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shadow-md z-10 transition-all bg-mainColor`}>
-                                {milestone.index > 0 ? milestone.index : "X"}
-                            </div>
+                            {milestone.index > 0 ? milestone.index : "X"}
+                        </div>
 
                             <div className="bg-white dark:bg-lightDark rounded-normal p-6 shadow-[0_2px_15px_rgba(0,0,0,0.05)] border border-lightGray/20 dark:border-white/5 flex flex-col gap-4">
                                 <div className="flex justify-between items-center-safe gap-4">
@@ -133,27 +157,7 @@ const SDMilestones: React.FC = () => {
             </div>
         )
     } else {
-        return (
-            <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-6 p-10 bg-white dark:bg-lightDark rounded-normal shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-lightGray/10 mt-5">
-                {/* Icon Lock với hiệu ứng Ping nhẹ để tạo sự chú ý */}
-                <div className="relative">
-                    <div className="absolute inset-0 bg-red/10 rounded-full animate-ping"></div>
-                    <div className="relative bg-redRGB/10 p-6 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-16 stroke-red">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                        </svg>
-                    </div>
-                </div>
-
-                {/* Nội dung thông báo */}
-                <div className="flex flex-col items-center text-center gap-2">
-                    <h2 className="text-hugeSize font-bold text-gray dark:text-white uppercase tracking-wider">Quy trình đang đợi duyệt</h2>
-                    <p className="text-normalSize text-gray dark:text-gray/70 italic max-w-md">
-                        Hiện tại quy trình thực hiện đồ án của lớp học chưa được phê duyệt. Bạn sẽ có thể xem chi tiết các cột mốc ngay sau khi trạng thái chuyển thành 'Đã duyệt'.
-                    </p>
-                </div>
-            </div>
-        )
+        return <NonProgress />
     }
 }
 

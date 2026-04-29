@@ -8,6 +8,7 @@ import progressReducer from './reducers/progressSlice.reducer'
 import formReducer from './reducers/formSlice.reducer'
 import notificationReducer from './reducers/notification.reducer'
 import scoreFormReducer from './reducers/scoreformSlice.reducer'
+import submissionReducer from './reducers/submissionSlice.reducer'
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     progress: progressReducer,
     notification: notificationReducer,
     form: formReducer,
+    submission: submissionReducer,
     stateGlobal: globalReducer,
     scoreForm: scoreFormReducer,
   },

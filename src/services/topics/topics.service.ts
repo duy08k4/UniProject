@@ -2,7 +2,8 @@ import { toast } from "sonner"
 import api from "../../config/gateway"
 import apiPath from "../path"
 import errorCatch from "../../config/errorCatch"
-import type { ThesisTypeType, TopicDetail } from "./topics.type"
+import type { TopicDetail } from "./topics.type"
+import type { ThesisTypeType } from "../../config/enum"
 
 export default class TopicsService {
     static async getTopics(classId: string, milestoneId?: string) {
