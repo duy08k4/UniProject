@@ -147,7 +147,7 @@ export type DetailForm = {
     ],
     checkboxFields: [
         {
-            id?: string
+            id: string
             index: string
             title: string
             description: string

@@ -303,7 +303,7 @@ const RADetailForms: React.FC = () => {
 
     return (
         <div className="w-full flex flex-col gap-6 py-mainTwoSidePadding min-h-screen">
-            {showPreview && currentForm && <FormViewer form={currentForm} onClose={() => setShowPreview(false)} readonly />}
+            {showPreview && currentForm && <FormViewer formId={currentForm.id} onClose={() => setShowPreview(false)} readonly />}
 
             <div className="w-full flex justify-between items-center bg-white dark:bg-lightDark p-4 rounded-normal shadow-[0_0_20px_rgba(128,128,128,0.1)] sticky top-0 z-30 border-[0.5px] border-lightGray/20">
                 <div className="flex flex-col">

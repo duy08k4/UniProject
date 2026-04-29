@@ -52,6 +52,14 @@ const apiPath = {
         updateCell: "/scoreforms/cell",
     },
 
+    submission: {
+        uploadFile: "/submission/upload-file",
+        removeFile: "/submission/remove-file",
+        getSubmissionPagination: "/submission/pagination",
+        getOneSubmission: "/submission",
+        updateSubmission: "/submission"
+    },
+
     admin: {
        
     },

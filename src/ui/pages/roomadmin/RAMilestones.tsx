@@ -501,7 +501,7 @@ const RAMilestones: React.FC = () => {
                                     <label className="flex items-center gap-2 cursor-pointer select-none">
                                         <input
                                             type="checkbox"
-                                            checked={milestone.isNew ? true : milestone.is_stopped}
+                                            checked={milestone.is_stopped}
                                             onChange={(e) => updateMilestone(index, { is_stopped: e.target.checked })}
                                             disabled={isFetching}
                                             className="size-4 accent-mainColor disableState"
