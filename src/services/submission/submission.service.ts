@@ -1,10 +1,10 @@
 import { toast } from "sonner"
 import errorCatch from "../../config/errorCatch"
 import api from "../../config/gateway"
-import type { UpdateSubmission, UpdateSubmissionResponse } from "./submission.type"
+import type { SubmissionPaginationType, UpdateSubmission, UpdateSubmissionResponse } from "./submission.type"
 import { store } from "../../redux/store"
 import apiPath from "../path"
-import { setCurrentSubmission } from "../../redux/reducers/submissionSlice.reducer"
+import { setCurrentSubmission, setSubmissionPagination } from "../../redux/reducers/submissionSlice.reducer"
 
 export default class SubmissionService {
     // Upload file
@@ -47,24 +47,17 @@ export default class SubmissionService {
     }
 
     // Get submission (pagination)
-    static async getSubmissionPagination(pagination: { page: string, size: string, search?: string, status?: string, classId?: string, formId?: string }) {
-        let loading
-
+    static async getSubmissionPagination(params: { page: string, size: string, search?: string, status?: string, classId?: string, formId?: string }) {
         try {
-            const { page, size, search, status, classId, formId } = pagination
-
-            if (!page || !size) {
-                toast.error(`Không thể tải trang ${page}`)
-                return false
+            const { status, data } = await api.get<SubmissionPaginationType>(apiPath.submission.getSubmissionPagination, { params })
+            if (status >= 200 && status < 300) {
+                store.dispatch(setSubmissionPagination(data))
+                return true
             }
-
-            // const { } = await api.get
-
+            return false
         } catch (error) {
             errorCatch(error)
             return false
-        } finally {
-            toast.dismiss(loading)
         }
     }
     // Get submission (detail)

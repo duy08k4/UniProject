@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { ScaleLoader } from "react-spinners"
 import type { RootState } from "../../../redux/store"
 import { store } from "../../../redux/store"
 import ScoreFormsService from "../../../services/scoreforms/scoreforms.service"
-import { setCurrentScoreForm, setScoreFormRows } from "../../../redux/reducers/scoreformSlice.reducer"
-import { changeStateFetching } from "../../../redux/reducers/global.reducer"
+import { setCurrentScoreForm, setScoreFormRows, updateCellByRowCol } from "../../../redux/reducers/scoreformSlice.reducer"
 import { ColumnAllowedRole, ColumnLabel, VNColumnAllowedRole } from "../../../config/enum"
+import { confirmDialog } from "primereact/confirmdialog"
 import CommitteeService from "../../../services/committee/committee.service"
 import type { CommitteeMemberDetail } from "../../../services/committee/committee.type"
 import formatVNTime from "../../../utils/formatVNTime"
+import { computeFormulaValue } from "../../../utils/computeFormulaValue"
+import FormulaPreview from "../../components/FormulaPreview"
 
 const LTScoreboardsDetail: React.FC = () => {
     const { boardId } = useParams<{ boardId: string }>()
@@ -28,6 +30,8 @@ const LTScoreboardsDetail: React.FC = () => {
     const [cellInput, setCellInput] = useState("")
     const [myCommitteeMember, setMyCommitteeMember] = useState<CommitteeMemberDetail | null>(null)
     const [isRoomAdmin, setIsRoomAdmin] = useState(false)
+    const abortControllers = useRef<Map<string, AbortController>>(new Map())
+    const originalCellVal = useRef("")
 
     useEffect(() => {
         if (!boardId || !classInfo.id) return
@@ -49,6 +53,10 @@ const LTScoreboardsDetail: React.FC = () => {
             })
         ]).finally(() => setLoading(false))
     }, [boardId, classInfo.id])
+
+    useEffect(() => {
+        if (detail?.is_stopped && editingCell) setEditingCell(null)
+    }, [detail?.is_stopped])
 
     const canEditColumn = React.useMemo(() => (col: any) => {
         if (col.formula_content) return false
@@ -88,21 +96,54 @@ const LTScoreboardsDetail: React.FC = () => {
         return getVal(a).localeCompare(getVal(b), 'vi')
     })
 
-    const getCellValue = (rowId: string, colId: string) =>
+    const getRawCellValue = (rowId: string, colId: string) =>
         rows.find(r => r.id === rowId)?.cells.find(c => c.column.id === colId)?.value ?? ""
 
-    const commitCell = async () => {
-        if (!editingCell || !boardId) return
-        const originalVal = getCellValue(editingCell.rowId, editingCell.colId)
-        if (cellInput !== originalVal) {
-            const val = parseFloat(cellInput)
-            if (!isNaN(val)) {
-                dispatch(changeStateFetching(true))
-                try { await ScoreFormsService.updateCell(boardId, editingCell.rowId, editingCell.colId, val) }
-                finally { dispatch(changeStateFetching(false)) }
-            }
+    const getCellValue = (rowId: string, colId: string) => {
+        const col = columns.find(c => c.id === colId)
+        if (col?.formula_content) {
+            const row = rows.find(r => r.id === rowId)
+            if (!row) return ""
+            const cellMap = new Map(row.cells.map(c => [c.column.id, c.value ?? ""]))
+            return computeFormulaValue(col.formula_content, cellMap) ?? ""
         }
+        return getRawCellValue(rowId, colId)
+    }
+
+    const commitCell = async (inputVal: string) => {
+        if (!editingCell || !boardId) return
+        const { rowId, colId } = editingCell
+        const currentVal = getRawCellValue(rowId, colId)
         setEditingCell(null)
+
+        if (inputVal === currentVal) return
+        const numVal = parseFloat(inputVal)
+        if (isNaN(numVal)) return
+
+        const doCommit = async () => {
+            dispatch(updateCellByRowCol({ rowId, columnId: colId, value: inputVal }))
+            const key = `${rowId}:${colId}`
+            abortControllers.current.get(key)?.abort()
+            const controller = new AbortController()
+            abortControllers.current.set(key, controller)
+            const result = await ScoreFormsService.updateCell(boardId, rowId, colId, numVal, controller.signal)
+            abortControllers.current.delete(key)
+            if (result === false) dispatch(updateCellByRowCol({ rowId, columnId: colId, value: currentVal }))
+        }
+
+        if (currentVal !== originalCellVal.current) {
+            confirmDialog({
+                header: 'Xung đột dữ liệu',
+                message: `Điểm đã được cập nhật thành ${currentVal || '(trống)'} trong lúc bạn chỉnh sửa. Bạn có muốn ghi đè thành ${inputVal} không?`,
+                acceptLabel: 'Ghi đè',
+                rejectLabel: 'Hủy',
+                acceptClassName: 'p-button-danger',
+                accept: doCommit,
+            })
+            return
+        }
+
+        await doCommit()
     }
 
     if (loading) return <div className="flex justify-center items-center h-64"><ScaleLoader color="#499c40" /></div>
@@ -179,9 +220,11 @@ const LTScoreboardsDetail: React.FC = () => {
                                                 {col.formula_content && <span className="font-mono text-mainColor/60 text-[10px]">ƒ</span>}
                                                 {col.label}
                                             </span>
-                                            {col.allowed_role && canEditColumn(col) && (
-                                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-mainColor/10 text-mainColor font-bold">
-                                                    {VNColumnAllowedRole[col.allowed_role]}
+                                            {col.formula_content ? (
+                                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-mainColor/10 text-mainColor font-bold">Tự động</span>
+                                            ) : (
+                                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-gray/10 text-gray font-bold">
+                                                    {col.allowed_role && canEditColumn(col) ? VNColumnAllowedRole[col.allowed_role] : "Nhập tay"}
                                                 </span>
                                             )}
                                         </div>
@@ -209,21 +252,31 @@ const LTScoreboardsDetail: React.FC = () => {
                                         return (
                                             <td key={col.id} className="px-4 py-3 text-center whitespace-nowrap w-px">
                                                 {isFormula ? (
-                                                    <span className={`text-smallSize font-bold ${val ? "text-mainColor" : "text-gray/30"}`}>{val || "—"}</span>
+                                                    <div className="relative group/tooltip w-full flex justify-center">
+                                                        <span className={`text-smallSize font-bold ${val ? "text-mainColor" : "text-gray/30"}`}>
+                                                            {val || "—"}
+                                                        </span>
+                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover/tooltip:block z-50 pointer-events-none">
+                                                            <div className="bg-dark dark:bg-lightDark border border-gray/20 rounded-normal px-2.5 py-1.5 shadow-lg flex items-center gap-1">
+                                                                <span className="text-[11px] text-gray-400 font-mono mr-1">ƒ =</span>
+                                                                <FormulaPreview formula={col.formula_content!} cols={columns} nowrap />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 ) : isEditing ? (
                                                     <input
                                                         type="number" value={cellInput}
                                                         onChange={e => setCellInput(e.target.value)}
-                                                        onBlur={commitCell}
-                                                        onKeyDown={e => { if (e.key === "Enter") commitCell(); if (e.key === "Escape") setEditingCell(null) }}
+                                                        onBlur={() => setEditingCell(null)}
+                                                        onKeyDown={e => { if (e.key === "Enter") commitCell(cellInput); if (e.key === "Escape") { setCellInput(getRawCellValue(editingCell!.rowId, editingCell!.colId)); setEditingCell(null) } }}
                                                         autoFocus
                                                         className="w-20 px-2 py-1 border border-mainColor rounded-normal text-smallSize text-center outline-none dark:bg-dark dark:text-white"
                                                     />
                                                 ) : (
                                                     <button
-                                                        onClick={() => { if (!detail.is_stopped && editable && !isFetching) { setEditingCell({ rowId: row.id, colId: col.id! }); setCellInput(val) } }}
+                                                        onClick={() => { if (!detail.is_stopped && editable && !isFetching) { originalCellVal.current = val; setEditingCell({ rowId: row.id, colId: col.id! }); setCellInput(val) } }}
                                                         disabled={detail.is_stopped || !editable || isFetching}
-                                                        title={detail.is_stopped ? "Bảng điểm đã khóa" : !editable ? "Bạn không có quyền nhập cột này" : "Nhấn để nhập điểm"}
+                                                        title={detail.is_stopped ? "Bảng điểm đã khóa" : !editable ? getEditableErrorMessage(col) : "Nhấn để nhập điểm"}
                                                         className={`min-w-12 px-2 py-1 rounded text-smallSize transition-colors disableState
                                                             ${val ? "font-bold text-mainColor" : "text-gray/30"}
                                                             ${!detail.is_stopped && editable ? "hover:bg-mainColor/10 cursor-pointer ring-1 ring-transparent hover:ring-mainColor/30" : "cursor-default"}

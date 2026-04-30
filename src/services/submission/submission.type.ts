@@ -1,5 +1,20 @@
 import type { Field_TypeType, SubmissionStatusType } from "../../config/enum"
 
+export type SubmissionListItem = {
+    id: string
+    status: SubmissionStatusType
+    created_at: string
+    updated_at: string
+    user: { id: string; full_name: string; email: string }
+    form: { id: string; label: string }
+    class: { id: string; label: string }
+}
+
+export type SubmissionPaginationType = {
+    data: SubmissionListItem[]
+    pagination: { total: number; page: number; size: number; totalPages: number }
+}
+
 export type UpdateSubmissionAnswer = {
     id?: string,
     fieldId: string,

@@ -213,32 +213,6 @@ export class FormsService {
         }
     }
 
-    // Get submission
-    static async getSubmission(classId: string, formId: string) {
-        let loading
-
-        try {
-            if (!classId || !formId) {
-                toast.error("Không thể lấy danh sách nộp bài")
-                return false
-            }
-
-            loading = toast.loading("Đang tải danh sách nộp bài...")
-
-            const { status, data } = await api.get(apiPath.form.getSubmission, {
-                params: { classId, formId }
-            })
-
-            if (status >= 200 && status < 300) return data
-
-        } catch (error) {
-            errorCatch(error)
-            return false
-        } finally {
-            toast.dismiss(loading)
-        }
-    }
-
     // Remove form
     static async removeForms(ids: string[]) {
         let loading

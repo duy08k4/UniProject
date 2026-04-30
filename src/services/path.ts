@@ -37,7 +37,6 @@ const apiPath = {
         getOneForm: "/form",
         updateForm: "/form",
         toggleStop: "/form/toggle-stop",
-        getSubmission: "/form/submission",
         removeForms: "/form/remove",
         removeFields: "/form/field/remove",
     },
@@ -50,6 +49,7 @@ const apiPath = {
         softDeleteScoreForms: "/scoreforms/soft",
         hardDeleteScoreForms: "/scoreforms/hard",
         updateCell: "/scoreforms/cell",
+        toggleStop: "/scoreforms/toggle-stop",
     },
 
     submission: {

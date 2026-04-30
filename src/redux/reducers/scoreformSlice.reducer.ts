@@ -47,6 +47,18 @@ export const scoreFormSlice = createSlice({
             }
         },
 
+        updateCellByRowCol: (state, action: PayloadAction<{ rowId: string; columnId: string; value: string }>) => {
+            const { rowId, columnId, value } = action.payload
+            const row = state.scoreFormRows.find(r => r.id === rowId)
+            if (!row) return
+            const cell = row.cells.find(c => c.column.id === columnId)
+            if (cell) {
+                cell.value = value
+            } else {
+                row.cells.push({ id: '', value, column: { id: columnId }, updatedBy: null, updated_at: new Date().toISOString() } as any)
+            }
+        },
+
         updateScoreFormIsStopped: (state, action: PayloadAction<{ scoreFormId: string; is_stopped: boolean }>) => {
             const { scoreFormId, is_stopped } = action.payload
             if (state.currentScoreForm && state.currentScoreForm.id === scoreFormId) {
@@ -76,6 +88,7 @@ export const {
     setCurrentScoreForm,
     setScoreFormRows,
     updateCell,
+    updateCellByRowCol,
     updateScoreFormIsStopped,
     clearCurrentScoreFormIfDeleted,
 } = scoreFormSlice.actions

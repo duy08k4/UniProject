@@ -6,7 +6,7 @@ import { ScaleLoader } from "react-spinners"
 import type { RootState } from "../../../redux/store"
 import { store } from "../../../redux/store"
 import ScoreFormsService from "../../../services/scoreforms/scoreforms.service"
-import { setCurrentScoreForm, setScoreFormRows } from "../../../redux/reducers/scoreformSlice.reducer"
+import { setCurrentScoreForm, setScoreFormRows, updateCellByRowCol } from "../../../redux/reducers/scoreformSlice.reducer"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import type { UpdateScoreFormType } from "../../../services/scoreforms/scoreforms.type"
 import { ColumnAllowedRole, ColumnLabel, ColumnType, VNColumnAllowedRole, VNColumnType } from "../../../config/enum"
@@ -15,6 +15,8 @@ import { confirmDialog } from "primereact/confirmdialog"
 import CommitteeService from "../../../services/committee/committee.service"
 import type { CommitteeMemberDetail } from "../../../services/committee/committee.type"
 import formatVNTime from "../../../utils/formatVNTime"
+import { computeFormulaValue } from "../../../utils/computeFormulaValue"
+import FormulaPreview from "../../components/FormulaPreview"
 
 type Col = {
     id?: string
@@ -24,6 +26,11 @@ type Col = {
     allowed_role: ColumnAllowedRoleType | null
     column_type: ColumnTypeType
     column_label: ColumnLabelType | null
+    // local-only flags (không gửi lên API)
+    pendingDelete?: boolean
+    formulaInvalid?: boolean
+    isNew?: boolean
+    _savedFormula?: string | null
 }
 
 type DraftCol = {
@@ -33,68 +40,14 @@ type DraftCol = {
     formula_content: string
 }
 
-const FormulaPreview: React.FC<{ formula: string; cols: Col[] }> = ({ formula, cols }) => {
-    if (!formula) return <span className="text-gray dark:text-gray/60 text-[11px]">Chưa có công thức</span>
-
-    // Tách formula thành các token để highlight
-    const parts: { text: string; type: 'col' | 'op' | 'num' | 'other' }[] = []
-    let remaining = formula
-
-    while (remaining.length > 0) {
-        // Khớp col[uuid]
-        const colMatch = remaining.match(/^col\[([^\]]+)\]/)
-        if (colMatch) {
-            const col = cols.find(c => c.id === colMatch[1])
-            parts.push({ text: col ? col.label : colMatch[0], type: 'col' })
-            remaining = remaining.slice(colMatch[0].length)
-            continue
-        }
-        // Khớp số
-        const numMatch = remaining.match(/^[\d.]+/)
-        if (numMatch) {
-            parts.push({ text: numMatch[0], type: 'num' })
-            remaining = remaining.slice(numMatch[0].length)
-            continue
-        }
-        // Khớp toán tử / dấu ngoặc / khoảng trắng
-        const opMatch = remaining.match(/^[+\-*/()% ]/)
-        if (opMatch) {
-            parts.push({ text: opMatch[0], type: 'op' })
-            remaining = remaining.slice(1)
-            continue
-        }
-        // Ký tự khác
-        parts.push({ text: remaining[0], type: 'other' })
-        remaining = remaining.slice(1)
-    }
-
-    return (
-        <span className="flex flex-wrap items-center gap-0.5 text-smallSize font-mono">
-            {parts.map((p, i) => {
-                if (p.type === 'col') return (
-                    <span key={i} className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded text-[11px] font-bold">
-                        {p.text}
-                    </span>
-                )
-                if (p.type === 'op') return (
-                    <span key={i} className="px-0.5 text-gray dark:text-gray-400 font-bold">{p.text}</span>
-                )
-                if (p.type === 'num') return (
-                    <span key={i} className="text-mainColor dark:text-mainColor font-bold">{p.text}</span>
-                )
-                return <span key={i} className="text-red-500">{p.text}</span>
-            })}
-        </span>
-    )
-}
 
 const ColumnSettingsPanel: React.FC<{
     col: Col
     allCols: Col[]
     onSave: (draft: DraftCol) => void
     onDelete: () => void
-    saving: boolean
-}> = ({ col, allCols, onSave, onDelete, saving }) => {
+    onUndoDelete: () => void
+}> = ({ col, allCols, onSave, onDelete, onUndoDelete }) => {
     const [draft, setDraft] = useState<DraftCol>({
         label: col.label,
         column_type: col.column_type,
@@ -153,10 +106,11 @@ const ColumnSettingsPanel: React.FC<{
             {/* Header panel */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-gray/10 bg-lightGray/40 dark:bg-gray/10">
                 <p className="text-smallSize font-bold text-black dark:text-white">
-                    Cài đặt cột: <span className="text-mainColor">{col.label}</span>
+                    <p className="dark:text-white">Cài đặt cột: <b className="text-mainColor">{col.label}</b></p>
                 </p>
-                <button onClick={onDelete} className="flex items-center gap-1 text-[11px] text-red-500 hover:text-red-600 font-bold transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-3.5">
+
+                <button onClick={onDelete} className="flex items-center gap-1 text-[11px] text-red-500 hover:text-red-600 font-bold transition-colors hoverBtn bg-redRGB px-2.5 py-1.5 rounded-normal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-3.5 stroke-red">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                     </svg>
                     Xóa cột
@@ -183,9 +137,9 @@ const ColumnSettingsPanel: React.FC<{
                             onChange={e => setDraft(d => ({ ...d, column_type: e.target.value as ColumnTypeType, allowed_role: "" }))}
                             className="px-3 py-2 border border-gray/20 dark:border-gray/30 rounded-normal text-smallSize bg-white dark:bg-lightDark text-black dark:text-white outline-none focus:border-mainColor transition-colors"
                         >
-                            {Object.values(ColumnType).map(t => <option key={t} value={t}>{VNColumnType[t]}</option>)}
+                            {Object.values(ColumnType).map(t => <option key={t} value={t} className="dark:text-white">{VNColumnType[t]}</option>)}
                         </select>
-                        <p className="text-[11px] text-gray dark:text-gray/60">
+                        <p className="text-[11px] text-gray dark:text-gray">
                             {draft.column_type === ColumnType.NORMAL && "Cột dữ liệu thông thường, mọi giảng viên trong lớp đều nhập được."}
                             {draft.column_type === ColumnType.COMPONENT && "Điểm thành phần, nhập tay, không tự động tính. Có thể giới hạn chỉ một vai trò nhất định mới được nhập (VD: chỉ Chủ tịch HĐ)."}
                             {draft.column_type === ColumnType.SUMMARY && "Điểm tổng kết, thường gắn công thức để tự động tính từ các cột khác. Nếu có công thức thì không cho nhập tay."}
@@ -247,6 +201,7 @@ const ColumnSettingsPanel: React.FC<{
                                 <p className="text-[11px] font-bold text-gray dark:text-gray-400">
                                     Công thức <span className="font-normal text-gray/70 dark:text-gray/50">(gõ trực tiếp hoặc nhấn tên cột bên trên để chèn)</span>
                                 </p>
+
                                 <textarea
                                     ref={taRef}
                                     value={draft.formula_content}
@@ -255,15 +210,18 @@ const ColumnSettingsPanel: React.FC<{
                                     rows={2}
                                     className="px-3 py-2 border border-gray/20 dark:border-gray/30 rounded-normal text-smallSize font-mono bg-white dark:bg-lightDark text-black dark:text-white placeholder:text-gray/40 dark:placeholder:text-gray/30 outline-none focus:border-mainColor transition-colors resize-none"
                                 />
+
                                 <div className="flex flex-col gap-1 p-2.5 rounded-normal bg-lightGray/60 dark:bg-gray/10 border border-gray/10 dark:border-gray/20">
                                     <p className="text-[11px] font-bold text-gray dark:text-gray-400">Hướng dẫn viết công thức:</p>
-                                    <ul className="text-[11px] text-gray dark:text-white flex flex-col gap-0.5 list-disc list-inside">
-                                        <li>Nhấn chip tên cột bên trên để chèn cột vào công thức</li>
-                                        <li>Dùng <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded">+</code> <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded">-</code> <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded">*</code> <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded">/</code> và dấu ngoặc <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded">( )</code></li>
-                                        <li>Ví dụ tính trung bình 3 cột: <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded">(col[...] + col[...] + col[...]) / 3</code></li>
-                                        <li>Ví dụ tính tổng có trọng số: <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded">col[...] * 0.4 + col[...] * 0.6</code></li>
+                                    <ul className="text-[11px] flex flex-col gap-0.5 list-disc list-inside">
+                                        <li className="text-gray dark:text-white">Nhấn chip tên cột bên trên để chèn cột vào công thức</li>
+                                        <li className="text-gray dark:text-white">Dùng <code className="bg-gray/10 dark:bg-gray/20 dark:text-white px-1 rounded">+</code> <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded dark:text-white">-</code> <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded dark:text-white">*</code> <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded dark:text-white">/</code> và dấu ngoặc <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded dark:text-white">( )</code></li>
+                                        
+                                        <li className="text-gray dark:text-white">Ví dụ tính trung bình 3 cột: <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded dark:text-white">(col[...] + col[...] + col[...]) / 3</code></li>
+                                        <li className="text-gray dark:text-white">Ví dụ tính tổng có trọng số: <code className="bg-gray/10 dark:bg-gray/20 px-1 rounded dark:text-white">col[...] * 0.4 + col[...] * 0.6</code></li>
                                     </ul>
                                 </div>
+
                                 <button
                                     type="button"
                                     onClick={checkFormula}
@@ -272,6 +230,7 @@ const ColumnSettingsPanel: React.FC<{
                                 >
                                     Kiểm tra công thức
                                 </button>
+                                
                                 {validateResult && (
                                     <p className={`text-[11px] font-medium ${validateResult.ok ? 'text-mainColor' : 'text-red-500 dark:text-red-400'}`}>
                                         {validateResult.ok ? '✓' : '✗'} {validateResult.msg}
@@ -297,39 +256,58 @@ const ColumnSettingsPanel: React.FC<{
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-1 border-t border-gray/10">
-                    <button
-                        onClick={() => {
-                            const isDirty = draft.label !== col.label
-                                || draft.column_type !== col.column_type
-                                || draft.allowed_role !== (col.allowed_role ?? "")
-                                || draft.formula_content !== (col.formula_content ?? "")
-                            if (!isDirty) return
-                            onSave(draft)
-                        }}
-                        disabled={saving || !draft.label.trim()}
-                        className="px-5 py-2 bg-mainColor text-white rounded-normal text-smallSize font-bold hoverBtn disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {saving ? "Đang lưu..." : "Lưu thay đổi"}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => confirmDialog({
-                            message: 'Các thay đổi chưa lưu sẽ bị hủy, dữ liệu cột sẽ về trạng thái ban đầu.',
-                            header: 'Khôi phục',
-                            acceptLabel: 'Khôi phục',
-                            rejectLabel: 'Hủy',
-                            accept: () => setDraft({
-                                label: col.label,
-                                column_type: col.column_type,
-                                allowed_role: col.allowed_role ?? "",
-                                formula_content: col.formula_content ?? "",
-                            })
-                        })}
-                        className="px-4 py-2 border border-gray/20 dark:border-gray/30 rounded-normal text-smallSize font-bold text-black dark:text-white hover:bg-lightGray dark:hover:bg-gray/20 transition-colors"
-                    >
-                        Khôi phục
-                    </button>
+                <div className="flex gap-2 pt-1 border-t border-gray/10 flex-wrap">
+                    {col.pendingDelete ? (
+                        <button
+                            onClick={onUndoDelete}
+                            className="px-5 py-2 bg-orange-500 text-white rounded-normal text-smallSize font-bold hoverBtn"
+                        >
+                            Hủy xóa
+                        </button>
+                    ) : (
+                        <>
+                            {col.formulaInvalid && (
+                                <p className="w-full text-[11px] text-orange-500 font-medium">⚠️ Công thức không còn hợp lệ vì một cột tham chiếu đã bị xóa. Vui lòng cập nhật lại công thức.</p>
+                            )}
+                            {(() => {
+                                const isDirty = draft.label !== col.label
+                                    || draft.column_type !== col.column_type
+                                    || draft.allowed_role !== (col.allowed_role ?? "")
+                                    || draft.formula_content !== (col.formula_content ?? "")
+                                return (
+                                    <>
+                                        <button
+                                            onClick={() => { if (isDirty) onSave(draft) }}
+                                            disabled={!draft.label.trim()}
+                                            className="px-5 py-2 bg-mainColor text-white rounded-normal text-smallSize font-bold hoverBtn disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Áp dụng
+                                        </button>
+                                        {isDirty && (
+                                            <button
+                                                type="button"
+                                                onClick={() => confirmDialog({
+                                                    message: 'Các thay đổi chưa lưu sẽ bị hủy, dữ liệu cột sẽ về trạng thái ban đầu.',
+                                                    header: 'Khôi phục',
+                                                    acceptLabel: 'Khôi phục',
+                                                    rejectLabel: 'Hủy',
+                                                    accept: () => setDraft({
+                                                        label: col.label,
+                                                        column_type: col.column_type,
+                                                        allowed_role: col.allowed_role ?? "",
+                                                        formula_content: col.formula_content ?? "",
+                                                    })
+                                                })}
+                                                className="px-4 py-2 border border-gray/20 dark:border-gray/30 rounded-normal text-smallSize font-bold text-black dark:text-white hover:bg-lightGray dark:hover:bg-gray/20 transition-colors"
+                                            >
+                                                Khôi phục
+                                            </button>
+                                        )}
+                                    </>
+                                )
+                            })()}
+                        </>
+                    )}
                 </div>
             </div>
         </div>
@@ -349,9 +327,9 @@ const RAScoreboardsDetail: React.FC = () => {
 
     const [loading, setLoading] = useState(true)
     const [isEditMode, setIsEditMode] = useState(false)
-    const [wasOpenBeforeEdit, setWasOpenBeforeEdit] = useState(false)
+    const [localCols, setLocalCols] = useState<Col[]>([])
+    const [localColsSnapshot, setLocalColsSnapshot] = useState<Col[]>([])
     const [selectedColId, setSelectedColId] = useState<string | null>(null)
-    const [saving, setSaving] = useState(false)
     const [editingCell, setEditingCell] = useState<{ rowId: string; colId: string } | null>(null)
     const [cellInput, setCellInput] = useState("")
     const [myCommitteeMember, setMyCommitteeMember] = useState<CommitteeMemberDetail | null>(null)
@@ -370,19 +348,25 @@ const RAScoreboardsDetail: React.FC = () => {
     ) : false
 
     const [scoreFormOriginState, setScoreFormOriginState] = useState<boolean>(false)
+    const abortControllers = useRef<Map<string, AbortController>>(new Map())
+    const originalCellVal = useRef("")
 
-    const  toggleEditMode = () => {
+    const toggleEditMode = () => {
         if (isEditMode) {
             setIsEditMode(false)
             setSelectedColId(null)
-            setWasOpenBeforeEdit(false)
+            setLocalCols([])
+            setLocalColsSnapshot([])
             if (scoreFormOriginState) {
                 handleToggleStop()
                 setScoreFormOriginState(false)
-            }    
-
+            }
         } else {
+            const snapshot = scoreCols.map(c => ({ ...c }))
+            setLocalCols(snapshot)
+            setLocalColsSnapshot(snapshot)
             setIsEditMode(true)
+            setSelectedColId(null)
             if (detail && !detail.is_stopped) {
                 handleToggleStop()
                 setScoreFormOriginState(true)
@@ -449,14 +433,18 @@ const RAScoreboardsDetail: React.FC = () => {
         fetchDetails()
     }, [boardId])
 
+    useEffect(() => {
+        if (detail?.is_stopped && editingCell) setEditingCell(null)
+    }, [detail?.is_stopped])
+
     // Kiểm tra quyền chỉnh sửa của một cột
     const canEditColumn = (col: any) => {
         if (col.formula_content) return false // Cột công thức thì không ai được sửa
-        
+
         // Mặc định RoomAdmin có quyền sửa tất cả các cột NHẬP TAY (không có formula)
         const allowed = col.allowed_role
         if (!allowed || allowed === ColumnAllowedRole.LECTURER || allowed === ColumnAllowedRole.ROOMADMIN) return true
-        
+
         // Nếu cột yêu cầu vai trò hội đồng cụ thể, kiểm tra xem RoomAdmin này có vai trò đó không
         return myCommitteeMember?.role === allowed
     }
@@ -476,6 +464,8 @@ const RAScoreboardsDetail: React.FC = () => {
     const nameCols = columns.filter(c => c.column_label !== null)
     // Các cột điểm do user tạo
     const scoreCols = columns.filter(c => c.column_label === null)
+    // Khi edit mode dùng localCols, khi không dùng scoreCols từ Redux
+    const activeCols = isEditMode ? localCols : scoreCols
 
     // Cột Tên để sort rows
     const firstNameCol = nameCols.find(c => c.column_label === ColumnLabel.FIRST_NAME)
@@ -489,11 +479,12 @@ const RAScoreboardsDetail: React.FC = () => {
 
     const toPayload = (cols: Col[]): UpdateScoreFormType["columns"] =>
         cols.map((c, i) => ({
-            id: c.id, label: c.label,
+            id: c.isNew ? undefined : c.id,
+            label: c.label,
             formula_content: c.formula_content || undefined,
             allowed_role: c.allowed_role || undefined,
             column_type: c.column_type,
-            index: String(i + 2), // offset 2 vì 2 cột mặc định chiếm index 0, 1
+            index: String(i + 2),
         }))
 
     const submitUpdate = async (cols: Col[]) => {
@@ -510,118 +501,149 @@ const RAScoreboardsDetail: React.FC = () => {
         })
     }
 
-    // Column actions
-    const addColumn = async (afterIndex: number) => {
+    // Column actions — chỉ mutate localCols, không gọi API
+    const addColumn = (afterIndex: number) => {
+        const tempId = `new-${Date.now()}`
         const newCol: Col = {
-            label: `Cột ${scoreCols.length + 1}`,
+            id: tempId,
+            label: `Cột ${localCols.length + 1}`,
             index: afterIndex + 1,
             formula_content: null,
             allowed_role: null,
             column_type: ColumnType.NORMAL,
             column_label: null,
+            isNew: true,
         }
-        const updated = [
-            ...scoreCols.slice(0, afterIndex + 1),
+        setLocalCols(prev => [
+            ...prev.slice(0, afterIndex + 1),
             newCol,
-            ...scoreCols.slice(afterIndex + 1),
-        ].map((c, i) => ({ ...c, index: i + 2 }))
-
-        dispatch(changeStateFetching(true))
-        try {
-            const result = await submitUpdate(updated)
-            if (result) {
-                const newDetail = result as any
-                const newScoreCols: Col[] = [...(newDetail.columns ?? [])]
-                    .filter((c: any) => !c.column_label)
-                    .sort((a: any, b: any) => a.index - b.index)
-                const created = newScoreCols[afterIndex + 1]
-                if (created?.id) setSelectedColId(created.id)
-            }
-        } finally { dispatch(changeStateFetching(false)) }
+            ...prev.slice(afterIndex + 1),
+        ].map((c, i) => ({ ...c, index: i + 2 })))
+        setSelectedColId(tempId)
     }
 
-    const saveColumn = async (colId: string, draft: DraftCol) => {
-        setSaving(true)
-        dispatch(changeStateFetching(true))
-        const updated = scoreCols.map(c => c.id === colId ? {
-            ...c,
-            label: draft.label,
-            column_type: draft.column_type,
-            allowed_role: draft.allowed_role || null,
-            formula_content: draft.formula_content || null,
-        } : c)
-        try {
-            const result = await submitUpdate(updated)
-            if (result) setSelectedColId(null)
-        } finally {
-            setSaving(false)
-            dispatch(changeStateFetching(false))
+    const saveColumn = (colId: string | undefined, draft: DraftCol) => {
+        setLocalCols(prev => prev.map(c =>
+            c.id === colId ? {
+                ...c,
+                label: draft.label,
+                column_type: draft.column_type,
+                allowed_role: draft.allowed_role || null,
+                formula_content: draft.formula_content || null,
+                formulaInvalid: false,
+            } : c
+        ))
+        setSelectedColId(null)
+    }
+
+    const moveColumn = (colId: string, direction: 'left' | 'right') => {
+        setLocalCols(prev => {
+            const idx = prev.findIndex(c => c.id === colId || (c.isNew && c.label === colId))
+            if (direction === 'left' && idx === 0) return prev
+            if (direction === 'right' && idx === prev.length - 1) return prev
+            const updated = [...prev]
+            const swapIdx = direction === 'left' ? idx - 1 : idx + 1
+            ;[updated[idx], updated[swapIdx]] = [updated[swapIdx], updated[idx]]
+            return updated.map((c, i) => ({ ...c, index: i + 2 }))
+        })
+    }
+
+    const deleteColumn = (colId: string) => {
+        const col = localCols.find(c => c.id === colId)
+        if (!col) return
+
+        // Tìm các cột có công thức tham chiếu đến cột này
+        const affected = localCols.filter(c =>
+            c.id !== colId && c.formula_content?.includes(`col[${colId}]`)
+        )
+
+        if (affected.length > 0) {
+            confirmDialog({
+                message: `Cột "${col.label}" đang được dùng trong công thức của: ${affected.map(c => `"${c.label}"`).join(', ')}. Các công thức đó sẽ bị xóa. Tiếp tục?`,
+                header: 'Xóa cột ảnh hưởng công thức',
+                acceptLabel: 'Xóa',
+                rejectLabel: 'Hủy',
+                acceptClassName: 'p-button-danger',
+                accept: () => {
+                    setLocalCols(prev => prev.map(c => {
+                        if (c.id === colId) return { ...c, pendingDelete: true }
+                        if (affected.find(a => a.id === c.id)) return { ...c, formulaInvalid: true, _savedFormula: c.formula_content, formula_content: null }
+                        return c
+                    }))
+                    setSelectedColId(null)
+                }
+            })
+        } else {
+            confirmDialog({
+                message: `Cột "${col.label}" sẽ bị xóa khi bạn lưu cấu trúc. Tiếp tục?`,
+                header: 'Xóa cột',
+                acceptLabel: 'Xóa',
+                rejectLabel: 'Hủy',
+                acceptClassName: 'p-button-danger',
+                accept: () => {
+                    setLocalCols(prev => prev.map(c => c.id === colId ? { ...c, pendingDelete: true } : c))
+                    setSelectedColId(null)
+                }
+            })
         }
     }
 
-    const moveColumn = async (colId: string, direction: 'left' | 'right') => {
-        const idx = scoreCols.findIndex(c => c.id === colId)
-        if (direction === 'left' && idx === 0) return
-        if (direction === 'right' && idx === scoreCols.length - 1) return
-        const updated = [...scoreCols]
-        const swapIdx = direction === 'left' ? idx - 1 : idx + 1
-        ;[updated[idx], updated[swapIdx]] = [updated[swapIdx], updated[idx]]
-        dispatch(changeStateFetching(true))
-        try { await submitUpdate(updated.map((c, i) => ({ ...c, index: i + 2 }))) }
-        finally { dispatch(changeStateFetching(false)) }
-    }
-
-    const deleteColumn = async (colId: string) => {
-        confirmDialog({
-            message: 'Toàn bộ dữ liệu điểm của cột này sẽ bị xóa vĩnh viễn. Bạn có chắc chắn?',
-            header: 'Xóa cột',
-            acceptLabel: 'Xóa',
-            rejectLabel: 'Hủy',
-            acceptClassName: 'p-button-danger',
-            accept: async () => {
-                dispatch(changeStateFetching(true))
-                try {
-                    const updated = scoreCols.filter(c => c.id !== colId).map((c, i) => ({ ...c, index: i + 2 }))
-                    const result = await submitUpdate(updated)
-                    if (result) setSelectedColId(null)
-                } finally { dispatch(changeStateFetching(false)) }
-            }
-        })
+    const undoDeleteColumn = (colId: string) => {
+        setLocalCols(prev => prev.map(c => {
+            if (c.id === colId) return { ...c, pendingDelete: false }
+            if (c.formulaInvalid && c._savedFormula?.includes(`col[${colId}]`))
+                return { ...c, formulaInvalid: false, formula_content: c._savedFormula, _savedFormula: undefined }
+            return c
+        }))
     }
 
     // Cell actions
     const getCellValue = (rowId: string, colId: string) =>
         rows.find(r => r.id === rowId)?.cells.find(c => c.column.id === colId)?.value ?? ""
 
-    const commitCell = async () => {
+    const commitCell = async (inputVal: string) => {
         if (!editingCell || !boardId) return
-        const originalVal = getCellValue(editingCell.rowId, editingCell.colId)
-        if (cellInput !== originalVal) {
-            const val = parseFloat(cellInput)
-            if (!isNaN(val)) {
-                dispatch(changeStateFetching(true))
-                try { await ScoreFormsService.updateCell(boardId, editingCell.rowId, editingCell.colId, val) }
-                finally { dispatch(changeStateFetching(false)) }
-            }
-        }
+        const { rowId, colId } = editingCell
+        const originalVal = originalCellVal.current
+        const currentVal = getCellValue(rowId, colId)
         setEditingCell(null)
+
+        if (inputVal === currentVal) return
+        const numVal = parseFloat(inputVal)
+        if (isNaN(numVal)) return
+
+        const doCommit = async () => {
+            dispatch(updateCellByRowCol({ rowId, columnId: colId, value: inputVal }))
+            const key = `${rowId}:${colId}`
+            abortControllers.current.get(key)?.abort()
+            const controller = new AbortController()
+            abortControllers.current.set(key, controller)
+            const result = await ScoreFormsService.updateCell(boardId, rowId, colId, numVal, controller.signal)
+            abortControllers.current.delete(key)
+            if (result === false) dispatch(updateCellByRowCol({ rowId, columnId: colId, value: currentVal }))
+        }
+
+        // Conflict: người khác đã đổi trong lúc đang nhập
+        if (currentVal !== originalVal) {
+            confirmDialog({
+                header: 'Xung đột dữ liệu',
+                message: `Điểm đã được cập nhật thành ${currentVal || '(trống)'} trong lúc bạn chỉnh sửa. Bạn có muốn ghi đè thành ${inputVal} không?`,
+                acceptLabel: 'Ghi đè',
+                rejectLabel: 'Hủy',
+                acceptClassName: 'p-button-danger',
+                accept: doCommit,
+            })
+            return
+        }
+
+        await doCommit()
     }
 
     const handleToggleStop = async () => {
         if (!detail) return
         dispatch(changeStateFetching(true))
-        try {
-            await ScoreFormsService.updateScoreForm({
-                id: detail.id, classId: detail.class.id, label: detail.label,
-                score_form_type: detail.score_form_type, description: detail.description ?? undefined,
-                field_count: String(scoreCols.length),
-                is_auto_open: detail.is_auto_open, is_auto_close: detail.is_auto_close,
-                is_deleted: detail.is_deleted, is_stopped: !detail.is_stopped,
-                open_at: detail.open_at ? new Date(detail.open_at) : null,
-                close_at: detail.close_at ? new Date(detail.close_at) : null,
-                columns: toPayload(scoreCols),
-            })
-        } finally { dispatch(changeStateFetching(false)) }
+        try { await ScoreFormsService.toggleStop(detail.id, detail.class.id) }
+        finally { dispatch(changeStateFetching(false)) }
     }
 
     const handleSaveSchedule = async () => {
@@ -694,7 +716,7 @@ const RAScoreboardsDetail: React.FC = () => {
         <div className="flex justify-center items-center h-64 text-gray">Không tìm thấy bảng điểm</div>
     )
 
-    const selectedCol = scoreCols.find(c => c.id === selectedColId) ?? null
+    const selectedCol = activeCols.find(c => c.id === selectedColId) ?? null
     const filledRows = rows.filter(r => scoreCols.some(c => getCellValue(r.id, c.id!) !== "")).length
 
     return (
@@ -715,6 +737,7 @@ const RAScoreboardsDetail: React.FC = () => {
                     </div>
                     {detail.description && <p className="text-smallSize text-gray mt-0.5">{detail.description}</p>}
                 </div>
+                
                 <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-smallSize text-gray dark:text-gray-400 mr-2">
                         <b className="text-mainColor dark:text-white">{filledRows}</b>/{rows.length} SV có điểm
@@ -726,11 +749,12 @@ const RAScoreboardsDetail: React.FC = () => {
                             onClick={handleDeleteScoreBoard}
                             disabled={isFetching}
                             title={detail.is_stopped ? "Lưu trữ bảng điểm" : "Xóa vĩnh viễn"}
-                            className="p-2 hover:bg-red/10 text-red rounded-normal transition-all disableState"
+                            className="p-2 hover:bg-red/10 text-red rounded-normal text-smallSize transition-all disableState flex items-center-safe gap-2.5 bg-redRGB"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-4.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-4.5 stroke-red">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                             </svg>
+                            Xóa bảng điểm
                         </button>
                     )}
                     <button
@@ -740,14 +764,50 @@ const RAScoreboardsDetail: React.FC = () => {
                     >
                         {detail.is_stopped ? "Mở bảng điểm" : "Đóng bảng điểm"}
                     </button>
+
                     {isEditMode ? (
-                        <button
-                            onClick={toggleEditMode}
-                            disabled={isFetching}
-                            className="px-4 py-2 border border-gray/20 dark:border-gray/30 rounded-normal text-smallSize font-bold text-black dark:text-white hover:bg-lightGray dark:hover:bg-gray/20 transition-colors disableState"
-                        >
-                            Hủy chỉnh sửa
-                        </button>
+                        <>
+                            <button
+                                onClick={async () => {
+                                    const toCommit = localCols.filter(c => !c.pendingDelete)
+                                    dispatch(changeStateFetching(true))
+                                    try {
+                                        const result = await submitUpdate(toCommit)
+                                        if (result) {
+                                            setIsEditMode(false)
+                                            setSelectedColId(null)
+                                            setLocalCols([])
+                                            setLocalColsSnapshot([])
+                                            if (scoreFormOriginState) {
+                                                handleToggleStop()
+                                                setScoreFormOriginState(false)
+                                            }
+                                        }
+                                    } finally { dispatch(changeStateFetching(false)) }
+                                }}
+                                disabled={isFetching}
+                                className="px-4 py-2 bg-mainColor text-white rounded-normal text-smallSize font-bold hoverBtn disableState"
+                            >
+                                Lưu cấu trúc cột
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setLocalCols(localColsSnapshot.map(c => ({ ...c })))
+                                    setSelectedColId(null)
+                                }}
+                                disabled={isFetching}
+                                className="px-4 py-2 border border-gray/20 dark:border-gray/30 rounded-normal text-smallSize font-bold text-black dark:text-white hover:bg-lightGray dark:hover:bg-gray/20 transition-colors disableState"
+                            >
+                                Hoàn tác
+                            </button>
+                            <button
+                                onClick={toggleEditMode}
+                                disabled={isFetching}
+                                className="px-4 py-2 border border-red/30 rounded-normal text-smallSize font-bold text-red hover:bg-red/5 transition-colors disableState"
+                            >
+                                Hủy chỉnh sửa
+                            </button>
+                        </>
                     ) : (
                         <button
                             onClick={toggleEditMode}
@@ -819,27 +879,33 @@ const RAScoreboardsDetail: React.FC = () => {
                                 ))}
 
                                 {/* Các cột điểm */}
-                                {scoreCols.map((col, idx) => (
-                                    <th key={col.id} className="px-2 py-2 whitespace-nowrap w-px group/col relative">
-                                        {/* Nút di chuyển — absolute, hiện khi hover, nằm trên */}
-                                        {!detail.is_stopped && isEditMode && (
-                                            <div className="opacity-0 group-hover/col:opacity-100 transition-opacity absolute top-0 left-1/2 -translate-x-1/2 flex gap-0.5 z-10">
+                                {activeCols.map((col, idx) => (
+                                    <th key={col.id ?? `new-${idx}`} className={`px-2 py-2 whitespace-nowrap w-px group/col relative transition-opacity ${col.pendingDelete ? 'opacity-40' : ''}`}>
+                                        {/* Nút di chuyển */}
+                                        {detail.is_stopped && isEditMode && !col.pendingDelete && (
+                                            <div className="opacity-0 group-hover/col:opacity-100 transition-opacity absolute top-[-5px] left-1/2 -translate-x-1/2 flex gap-5 z-10">
                                                 <button onClick={e => { e.stopPropagation(); moveColumn(col.id!, 'left') }}
                                                     disabled={idx === 0}
                                                     title="Di chuyển sang trái"
-                                                    className="w-5 h-4 rounded text-[10px] text-gray dark:text-gray-400 hover:bg-lightGray dark:hover:bg-gray disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center">
-                                                    ←
+                                                    className="w-5 h-4 rounded text-[10px] text-gray dark:text-gray-400 hover:bg-lightGray dark:hover:bg-gray disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18" />
+                                                    </svg>
                                                 </button>
                                                 <button onClick={e => { e.stopPropagation(); moveColumn(col.id!, 'right') }}
-                                                    disabled={idx === scoreCols.length - 1}
+                                                    disabled={idx === activeCols.length - 1}
                                                     title="Di chuyển sang phải"
-                                                    className="w-5 h-4 rounded text-[10px] text-gray dark:text-gray-400 hover:bg-lightGray dark:hover:bg-gray disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center">
-                                                    →
+                                                    className="w-5 h-4 rounded text-[10px] text-gray dark:text-gray-400 hover:bg-lightGray dark:hover:bg-gray disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                                    </svg>
                                                 </button>
                                             </div>
                                         )}
                                         <div className="flex items-center">
-                                            {!detail.is_stopped && isEditMode && (
+                                            {detail.is_stopped && isEditMode && !col.pendingDelete && (
                                                 <button
                                                     onClick={e => { e.stopPropagation(); addColumn(idx - 1) }}
                                                     title="Thêm cột bên trái"
@@ -847,18 +913,25 @@ const RAScoreboardsDetail: React.FC = () => {
                                                 >+</button>
                                             )}
                                             <button
-                                                onClick={() => isEditMode && setSelectedColId(selectedColId === col.id ? null : col.id!)}
-                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-normal text-tinySize font-bold uppercase tracking-wider transition-colors ${selectedColId === col.id ? 'bg-mainColor text-white' : 'text-gray dark:text-gray-400 hover:bg-lightGray dark:hover:bg-gray'} ${!isEditMode ? 'cursor-default' : ''}`}
+                                                onClick={() => isEditMode && setSelectedColId(selectedColId === (col.id ?? `new-${idx}`) ? null : (col.id ?? `new-${idx}`))}
+                                                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-normal text-tinySize font-bold uppercase tracking-wider transition-colors
+                                                    ${selectedColId === (col.id ?? `new-${idx}`) ? 'bg-mainColor text-white' : col.pendingDelete ? 'text-red-400 line-through' : 'text-gray dark:text-gray-400 hover:bg-lightGray dark:hover:bg-gray'}
+                                                    ${!isEditMode ? 'cursor-default' : ''}`}
                                             >
-                                                {col.formula_content && <span className="font-mono">ƒ</span>}
-                                                {col.label}
-                                                {col.allowed_role && (
-                                                    <span className={`text-[9px] px-1 py-0.5 rounded normal-case font-bold ${selectedColId === col.id ? 'bg-white/20 text-white' : 'bg-mainColor/10 text-mainColor'}`}>
-                                                        {VNColumnAllowedRole[col.allowed_role]}
+                                                <span className="flex items-center gap-1">
+                                                    {col.formulaInvalid && <span title="Công thức không hợp lệ">⚠️</span>}
+                                                    {col.formula_content && !col.formulaInvalid && <span className="font-mono">ƒ</span>}
+                                                    {col.label}
+                                                    {col.isNew && <span className="text-[8px] px-1 py-0.5 rounded bg-green-100 text-green-600 normal-case font-bold">Mới</span>}
+                                                </span>
+                                                {col.formula_content && !col.formulaInvalid
+                                                    ? <span className={`text-[8px] px-1 py-0.5 rounded normal-case font-bold ${selectedColId === (col.id ?? `new-${idx}`) ? 'bg-white/20 text-white' : 'bg-mainColor/10 text-mainColor'}`}>Tự động</span>
+                                                    : !col.pendingDelete && <span className={`text-[8px] px-1 py-0.5 rounded normal-case font-bold ${selectedColId === (col.id ?? `new-${idx}`) ? 'bg-white/20 text-white' : 'bg-gray/10 text-gray'}`}>
+                                                        {col.allowed_role ? VNColumnAllowedRole[col.allowed_role] : "Nhập tay"}
                                                     </span>
-                                                )}
+                                                }
                                             </button>
-                                            {!detail.is_stopped && isEditMode && (
+                                            {detail.is_stopped && isEditMode && !col.pendingDelete && (
                                                 <button
                                                     onClick={e => { e.stopPropagation(); addColumn(idx) }}
                                                     title="Thêm cột bên phải"
@@ -869,10 +942,10 @@ const RAScoreboardsDetail: React.FC = () => {
                                     </th>
                                 ))}
 
-                                {!detail.is_stopped && isEditMode && (
+                                {detail.is_stopped && isEditMode && (
                                     <th className="px-3 py-4">
                                         <button
-                                            onClick={() => addColumn(scoreCols.length - 1)}
+                                            onClick={() => addColumn(activeCols.length - 1)}
                                             title="Thêm cột mới"
                                             className="w-7 h-7 rounded-full border-2 border-dashed border-gray/30 text-gray hover:border-mainColor hover:text-mainColor flex items-center justify-center text-sm font-bold transition-colors"
                                         >+</button>
@@ -883,48 +956,68 @@ const RAScoreboardsDetail: React.FC = () => {
                         <tbody className={selectedColId ? "hidden" : ""}>
                             {sortedRows.length === 0 ? (
                                 <tr>
-                                    <td colSpan={nameCols.length + scoreCols.length + 1} className="px-5 py-10 text-center text-gray text-smallSize">
+                                    <td colSpan={nameCols.length + activeCols.length + 1} className="px-5 py-10 text-center text-gray text-smallSize">
                                         Chưa có sinh viên nào trong bảng điểm này.
                                     </td>
                                 </tr>
                             ) : sortedRows.map((row, idx) => (
                                 <tr key={row.id} className={`border-b border-gray/5 hover:bg-lightGray/20 dark:hover:bg-gray/5 transition-colors ${idx === sortedRows.length - 1 ? "border-b-0" : ""}`}>
-                                    {/* 2 cột tên — read only, sticky */}
                                     {nameCols.map(col => (
                                         <td key={col.id} className="px-5 py-3 whitespace-nowrap sticky left-0 bg-white dark:bg-lightDark z-10">
                                             <p className="text-smallSize dark:text-white">{getCellValue(row.id, col.id!) || "—"}</p>
                                         </td>
                                     ))}
-
-                                    {/* Cột điểm */}
-                                    {scoreCols.map(col => {
-                                        const val = getCellValue(row.id, col.id!)
-                                        const isFormula = !!col.formula_content
+                                    {activeCols.map(col => {
+                                        if (col.pendingDelete) return (
+                                            <td key={col.id} className="px-4 py-3 text-center whitespace-nowrap w-px opacity-30">
+                                                <span className="text-smallSize line-through text-gray">—</span>
+                                            </td>
+                                        )
+                                        // Tính giá trị: công thức → computeFormulaValue, nhập tay → getCellValue
+                                        const val = col.formula_content && !col.formulaInvalid
+                                            ? (() => {
+                                                const rowData = rows.find(r => r.id === row.id)
+                                                if (!rowData) return ""
+                                                const cellMap = new Map(rowData.cells.map(c => [c.column.id, c.value ?? ""]))
+                                                return computeFormulaValue(col.formula_content!, cellMap) ?? ""
+                                            })()
+                                            : getCellValue(row.id, col.id ?? "")
+                                        const isFormula = !!col.formula_content && !col.formulaInvalid
                                         const isEditing = editingCell?.rowId === row.id && editingCell?.colId === col.id
                                         const editable = canEditColumn(col)
 
                                         return (
-                                            <td key={col.id} className="px-4 py-3 text-center whitespace-nowrap w-px">
-                                                {isFormula ? (
-                                                    <span className={`text-smallSize ${val ? "font-bold text-mainColor" : "text-gray/40"}`}>
-                                                        {val || "—"}
-                                                    </span>
+                                            <td key={col.id ?? col.label} className="px-4 py-3 text-center whitespace-nowrap w-px">
+                                                {col.formulaInvalid ? (
+                                                    <span className="text-smallSize text-orange-400" title="Công thức không hợp lệ">⚠️</span>
+                                                ) : isFormula ? (
+                                                    <div className="relative group/tooltip w-full flex justify-center">
+                                                        <span className={`text-smallSize ${val ? "font-bold text-mainColor" : "text-gray/40"}`}>
+                                                            {val || "—"}
+                                                        </span>
+                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover/tooltip:block z-50 pointer-events-none">
+                                                            <div className="bg-dark dark:bg-lightDark border border-gray/20 rounded-normal px-2.5 py-1.5 shadow-lg flex items-center gap-1">
+                                                                <span className="text-[11px] text-gray-400 font-mono mr-1">ƒ =</span>
+                                                                <FormulaPreview formula={col.formula_content!} cols={activeCols} nowrap />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 ) : isEditing ? (
                                                     <input
                                                         type="number"
                                                         value={cellInput}
                                                         onChange={e => setCellInput(e.target.value)}
-                                                        onBlur={commitCell}
-                                                        onKeyDown={e => { if (e.key === "Enter") commitCell(); if (e.key === "Escape") setEditingCell(null) }}
+                                                        onBlur={() => setEditingCell(null)}
+                                                        onKeyDown={e => { if (e.key === "Enter") commitCell(cellInput); if (e.key === "Escape") { setCellInput(getCellValue(editingCell!.rowId, editingCell!.colId)); setEditingCell(null) } }}
                                                         autoFocus
                                                         className="w-20 px-2 py-1 border border-mainColor rounded-normal text-smallSize text-center outline-none dark:bg-dark dark:text-white"
                                                     />
                                                 ) : (
                                                     <button
-                                                        onClick={() => { if (!detail.is_stopped && editable && !isFetching) { setEditingCell({ rowId: row.id, colId: col.id! }); setCellInput(val) } }}
+                                                        onClick={() => { if (!detail.is_stopped && editable && !isFetching) { originalCellVal.current = val; setEditingCell({ rowId: row.id, colId: col.id! }); setCellInput(val) } }}
                                                         disabled={detail.is_stopped || !editable || isFetching}
                                                         title={detail.is_stopped ? "Bảng điểm đã khóa" : !editable ? "Bạn không có quyền nhập cột này" : "Nhấn để nhập điểm"}
-                                                        className={`min-w-[3rem] px-2 py-1 rounded text-smallSize transition-colors disableState ${val ? "font-bold text-mainColor" : "text-gray/40"} ${(!detail.is_stopped && editable) ? "hover:bg-lightGray dark:hover:bg-gray cursor-pointer" : "cursor-default opacity-60"}`}
+                                                        className={`min-w-12 px-2 py-1 rounded text-smallSize transition-colors disableState ${val ? "font-bold text-mainColor" : "text-gray/40"} ${(!detail.is_stopped && editable) ? "hover:bg-lightGray dark:hover:bg-gray cursor-pointer" : "cursor-default opacity-60"}`}
                                                     >
                                                         {val || "—"}
                                                     </button>
@@ -932,7 +1025,7 @@ const RAScoreboardsDetail: React.FC = () => {
                                             </td>
                                         )
                                     })}
-                                    {!detail.is_stopped && isEditMode && <td />}
+                                    {detail.is_stopped && isEditMode && <td />}
                                 </tr>
                             ))}
                         </tbody>
@@ -942,12 +1035,12 @@ const RAScoreboardsDetail: React.FC = () => {
                 {/* Column settings panel — hiện bên dưới bảng khi click cột */}
                 {selectedCol && isEditMode && (
                     <ColumnSettingsPanel
-                        key={selectedCol.id}
+                        key={selectedCol.id ?? selectedCol.label}
                         col={selectedCol}
                         allCols={columns}
-                        onSave={(draft) => saveColumn(selectedCol.id!, draft)}
+                        onSave={(draft) => saveColumn(selectedCol.id, draft)}
                         onDelete={() => deleteColumn(selectedCol.id!)}
-                        saving={saving}
+                        onUndoDelete={() => undoDeleteColumn(selectedCol.id!)}
                     />
                 )}
             </div>
