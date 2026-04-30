@@ -10,7 +10,6 @@ import {
     setCurrentScoreForm,
     setScoreFormPagination,
     setScoreFormRows,
-    updateCell,
 } from "../../redux/reducers/scoreformSlice.reducer"
 
 export default class ScoreFormsService {
@@ -137,15 +136,22 @@ export default class ScoreFormsService {
     }
 
     // Update cell
-    static async updateCell(scoreFormId: string, rowId: string, columnId: string, value: number) {
+    static async updateCell(scoreFormId: string, rowId: string, columnId: string, value: number, signal?: AbortSignal) {
         try {
-            const { status, data } = await api.post(apiPath.scoreform.updateCell, { scoreFormId, rowId, columnId, value })
-            if (status >= 200 && status < 300) {
-                store.dispatch(updateCell({ cellId: data.id, value: value.toString() }))
-                // Reload rows để lấy giá trị formula cells đã được recalculate
-                await ScoreFormsService.getScoreFormRows(scoreFormId)
-                return true
-            }
+            const { status } = await api.post(apiPath.scoreform.updateCell, { scoreFormId, rowId, columnId, value }, { signal })
+            if (status >= 200 && status < 300) return true
+        } catch (error: any) {
+            if (error?.name === 'CanceledError' || error?.name === 'AbortError') return 'aborted'
+            errorCatch(error)
+            return false
+        }
+    }
+
+    // Toggle stop
+    static async toggleStop(id: string, classId: string) {
+        try {
+            const { status, data } = await api.patch<{ is_stopped: boolean }>(apiPath.scoreform.toggleStop, { id, classId })
+            if (status >= 200 && status < 300) return data
         } catch (error) {
             errorCatch(error)
             return false

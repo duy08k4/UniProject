@@ -69,6 +69,7 @@ import LTCommittee from "./ui/pages/lecturer/LTCommittee"
 import LTTopics from "./ui/pages/lecturer/LTTopics"
 import RANewsfeed from "./ui/pages/roomadmin/RANewsfeed"
 import RAMilestoneDetail from "./ui/pages/roomadmin/RAMilestoneDetail"
+import SDForms from "./ui/pages/student/SDForm"
 
 function App() {
   useTheme();
@@ -144,7 +145,8 @@ function App() {
               <Route index element={<SDScoreboards />} />
               <Route path=":boardId" element={<SDScoreboardsDetail />} />
             </Route>
-            <Route path="submission" element={<SDSubmission />} />
+            {/* <Route path="submission" element={<SDSubmission />} /> */}
+            <Route path="forms" element={<SDForms />} />
             <Route path="topics" element={<SDTopics />} />
             <Route path="milestones" element={<SDMilestones />} />
             <Route path="milestones/:milestoneId" element={<RAMilestoneDetail />} />
