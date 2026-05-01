@@ -42,7 +42,7 @@ const RACommittee = () => {
         await ProgressService.getProgressDetail(classData.id)
 
         // Load members
-        const membersResult = await ClassService.getMembers(1, 100)
+        const membersResult = await ClassService.getMembers(1, 200, undefined, "lecturer")
         if (membersResult && membersResult.data) {
             dispatch(currentClass_SetMembers(membersResult))
         }

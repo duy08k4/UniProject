@@ -3,6 +3,11 @@ import { useState } from "react"
 import { ClassService } from "../../services/class/class.service"
 import { ScaleLoader } from "react-spinners"
 import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
+import { useSelector } from "react-redux"
+import type { RootState } from "../../redux/store"
+import SubmissionService from "../../services/submission/submission.service"
+import FormViewer from "./FormViewer"
 
 type NewClassFormValues = {
     joinCode: string
@@ -14,34 +19,69 @@ interface JoinClassForm_Interface {
 
 const JoinClassForm: React.FC<JoinClassForm_Interface> = ({ toggleForm }) => {
     const navigate = useNavigate()
+    const userData = useSelector((state: RootState) => state.auth.user.info)
 
-    const [newClassFormValues, setNewClassFormValues] = useState<NewClassFormValues>({
-        joinCode: ""
-    })
-
-    // State
+    const [newClassFormValues, setNewClassFormValues] = useState<NewClassFormValues>({ joinCode: "" })
     const [isJoin, setIsJoin] = useState<boolean>(false)
+    const [joinFormData, setJoinFormData] = useState<{ classId: string; formId: string; joinCode: string } | null>(null)
 
-    // Handler
     const handleChange = (field: keyof NewClassFormValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setNewClassFormValues(prev => ({
-            ...prev,
-            [field]: e.target.value
-        }))
+        setNewClassFormValues(prev => ({ ...prev, [field]: e.target.value }))
     }
 
     const handleJoin = async () => {
         setIsJoin(true)
-        const data = await ClassService.joinClass(newClassFormValues.joinCode).finally(() => {
+        const result = await ClassService.getJoinForm(newClassFormValues.joinCode).finally(() => setIsJoin(false))
+
+        if (!result) return
+
+        if (result.formId) {
+            // Cần điền form trước
+            setJoinFormData({ classId: result.classId, formId: result.formId, joinCode: newClassFormValues.joinCode })
+        } else {
+            // Không cần form, join thẳng
+            await doJoin(newClassFormValues.joinCode)
+        }
+    }
+
+    const doJoin = async (joinCode: string) => {
+        setIsJoin(true)
+        const data = await ClassService.joinClass(joinCode).finally(() => {
             setIsJoin(false)
             setNewClassFormValues({ joinCode: "" })
         })
-        
+
         if (data && data.user.roomadmin_approved) {
             navigate(`/main/${data.user.role}/class/${data.id}`)
         } else {
             toggleForm()
         }
+    }
+
+    const handleFormViewerClose = async () => {
+        if (!joinFormData) return
+
+        // Kiểm tra submission sau khi đóng form
+        const submission = await SubmissionService.getOneSubmission(joinFormData.classId, joinFormData.formId, userData.id)
+
+        if (!submission) {
+            toast.error("Bạn chưa điền form tham gia. Không thể tham gia lớp học.")
+            setJoinFormData(null)
+            return
+        }
+
+        setJoinFormData(null)
+        await doJoin(joinFormData.joinCode)
+    }
+
+    if (joinFormData) {
+        return (
+            <FormViewer
+                formId={joinFormData.formId}
+                classIdProp={joinFormData.classId}
+                onClose={handleFormViewerClose}
+            />
+        )
     }
 
     return (
@@ -71,7 +111,7 @@ const JoinClassForm: React.FC<JoinClassForm_Interface> = ({ toggleForm }) => {
                 <span className="flex items-center-safe gap-5">
                     <button className="flex-1 bg-lightGray hoverBtn py-2.5 rounded-small max-sm:text-smallSize disableState" onClick={toggleForm} disabled={isJoin}>Hủy</button>
                     <button className="flex-2 bg-mainColor hoverBtn text-white py-2.5 rounded-small max-sm:text-smallSize disableState" onClick={handleJoin} disabled={isJoin}>
-                        {isJoin ? <><ScaleLoader height={10} width={4} color="white" /></> : <>Tham gia</>}
+                        {isJoin ? <ScaleLoader height={10} width={4} color="white" /> : <>Tham gia</>}
                     </button>
                 </span>
             </div>

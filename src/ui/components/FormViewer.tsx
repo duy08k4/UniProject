@@ -17,10 +17,12 @@ interface Props {
     formId: string
     onClose: () => void
     readonly?: boolean
+    classIdProp?: string
 }
 
-const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp }) => {
-    const { classId } = useParams()
+const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp, classIdProp }) => {
+    const { classId: classIdParam } = useParams()
+    const classId = classIdParam ?? classIdProp
     const [originalSubmission, setOriginalSubmission] = useState<{
         answer: UpdateSubmissionAnswer[],
         answer_checkbox: UpdateSubmissionAnswerCheckbox[]
@@ -106,6 +108,11 @@ const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp }
         setOriginalSubmission(imbedSubmission());
 
     }, [currentForm, currentSubmission])
+
+    if (!classId) {
+        toast.error("Không thể xử lý yêu cầu")
+        return null
+    }
 
     if (!currentForm) return
 
