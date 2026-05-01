@@ -21,9 +21,6 @@ interface RAUpdateUserForm_Interface {
 const RAUpdateUserForm: React.FC<RAUpdateUserForm_Interface> = ({ toggleForm, memberData }) => {
     const [formData, setFormData] = useState<Partial<Members>>({
         role: memberData.role,
-        can_create_forms: memberData.can_create_forms,
-        can_create_notifications: memberData.can_create_notifications,
-        can_create_score_forms: memberData.can_create_score_forms,
     });
 
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
@@ -39,14 +36,7 @@ const RAUpdateUserForm: React.FC<RAUpdateUserForm_Interface> = ({ toggleForm, me
         if (listCheck.some((c) => c)) {
             dispatch(changeStateFetching(true))
 
-            const updateData = {
-                role: formData.role,
-                can_create_forms: formData.role === "roomadmin" ? true : formData.can_create_forms,
-                can_create_notifications: formData.role === "roomadmin" ? true : formData.can_create_notifications,
-                can_create_score_forms: formData.role === "roomadmin" ? true : formData.can_create_score_forms,
-            }
-
-            const data = await ClassService.updateMember(classData.id, memberData.user.id, updateData)
+            const data = await ClassService.updateMember(classData.id, memberData.user.id, { role: formData.role })
                 .finally(() => {
                     dispatch(changeStateFetching(false))
                 })
@@ -102,56 +92,6 @@ const RAUpdateUserForm: React.FC<RAUpdateUserForm_Interface> = ({ toggleForm, me
                             <option value="roomadmin">Quản trị viên</option>
                         </select>
                     </div>
-
-                    {formData.role !== "roomadmin" && (
-                        <div className="flex flex-col gap-4">
-                            <p className="text-normalSize font-bold dark:text-white">Quyền hạn</p>
-
-                            <div className="flex flex-col gap-3">
-                                <label className="flex items-center-safe justify-between p-3 rounded-small border-[0.5px] border-lightGray dark:border-darkGray hover:border-mainColor transition-all cursor-pointer group">
-                                    <div className="flex flex-col">
-                                        <p className="font-medium dark:text-white group-hover:text-mainColor transition-colors text-smallSize">Tạo biểu mẫu</p>
-                                        <p className="text-tinySize text-gray font-medium uppercase">can_create_forms</p>
-                                    </div>
-                                    <input
-                                        type="checkbox"
-                                        className="size-5 accent-mainColor cursor-pointer disableState"
-                                        checked={formData.can_create_forms}
-                                        onChange={(e) => setFormData({ ...formData, can_create_forms: e.target.checked })}
-                                        disabled={isFetching}
-                                    />
-                                </label>
-
-                                <label className="flex items-center-safe justify-between p-3 rounded-small border-[0.5px] border-lightGray dark:border-darkGray hover:border-mainColor transition-all cursor-pointer group">
-                                    <div className="flex flex-col">
-                                        <p className="font-medium dark:text-white group-hover:text-mainColor transition-colors text-smallSize">Tạo thông báo</p>
-                                        <p className="text-tinySize text-gray font-medium uppercase">can_create_notifications</p>
-                                    </div>
-                                    <input
-                                        type="checkbox"
-                                        className="size-5 accent-mainColor cursor-pointer disableState"
-                                        checked={formData.can_create_notifications}
-                                        onChange={(e) => setFormData({ ...formData, can_create_notifications: e.target.checked })}
-                                        disabled={isFetching}
-                                    />
-                                </label>
-
-                                <label className="flex items-center-safe justify-between p-3 rounded-small border-[0.5px] border-lightGray dark:border-darkGray hover:border-mainColor transition-all cursor-pointer group">
-                                    <div className="flex flex-col">
-                                        <p className="font-medium dark:text-white group-hover:text-mainColor transition-colors text-smallSize">Tạo biểu mẫu điểm</p>
-                                        <p className="text-tinySize text-gray font-medium uppercase">can_create_score_forms</p>
-                                    </div>
-                                    <input
-                                        type="checkbox"
-                                        className="size-5 accent-mainColor cursor-pointer disableState"
-                                        checked={formData.can_create_score_forms}
-                                        onChange={(e) => setFormData({ ...formData, can_create_score_forms: e.target.checked })}
-                                        disabled={isFetching}
-                                    />
-                                </label>
-                            </div>
-                        </div>
-                    )}
 
                 </div>
 

@@ -200,8 +200,8 @@ export class ClassGateway {
 
     // Update member data in class
     static OnUpdateMemberData() {
-        socket.on(classSocketEventName.OnUpdateMemberData, (data: { memberId: string, classId: string, role: RoomRoleType, can_create_forms: boolean, can_create_score_forms: boolean, can_create_notifications: boolean }) => {
-            const { classId, memberId, role, can_create_forms, can_create_notifications, can_create_score_forms } = data
+        socket.on(classSocketEventName.OnUpdateMemberData, (data: { memberId: string, classId: string, role: RoomRoleType }) => {
+            const { classId, memberId, role } = data
             const currentClass = store.getState().class.currentClass.info
             const userData = store.getState().auth.user.info
 
@@ -214,9 +214,6 @@ export class ClassGateway {
                     store.dispatch(currentClass_UpdateMember({
                         ...memberUpdated,
                         role,
-                        can_create_forms,
-                        can_create_notifications,
-                        can_create_score_forms
                     }))
                 } else {
                     toast.info("Danh sách thành viên có cập nhật mới. Hãy làm mới danh sách!", {

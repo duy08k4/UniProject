@@ -59,7 +59,7 @@ const SignUp: React.FC = () => {
             ]
         },
         gmail: {
-            label: "Gmail",
+            label: "Email",
             rules: [
                 {
                     message: "Không được để trống",
@@ -67,8 +67,11 @@ const SignUp: React.FC = () => {
                 },
                 {
                     message: "Đúng định dạng email",
-                    validate: (value: string) =>
-                        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                    validate: (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                },
+                {
+                    message: "Phải thuộc tên miền hcmuaf.edu.vn",
+                    validate: (value: string) => /^[a-zA-Z0-9._%+-]+@(st\.)?hcmuaf\.edu\.vn$/.test(value)
                 }
             ]
         },
@@ -164,8 +167,8 @@ const SignUp: React.FC = () => {
                     </span>
 
                     <span className="w-full">
-                        <p className="font-medium dark:text-white">Gmail <b className="text-red">*</b></p>
-                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("gmail")} value={formValues.gmail} placeholder="VD: nguyenvana@gmail.com" />
+                        <p className="font-medium dark:text-white">Email <b className="text-red">*</b></p>
+                        <input type="text" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("gmail")} value={formValues.gmail} placeholder="VD: nguyenvana@st.hcmuaf.edu.vn" />
                     </span>
 
                     <span className="w-full">
