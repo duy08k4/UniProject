@@ -58,7 +58,8 @@ const apiPath = {
         removeFile: "/submission/remove-file",
         getSubmissionPagination: "/submission/pagination",
         getOneSubmission: "/submission",
-        updateSubmission: "/submission"
+        updateSubmission: "/submission",
+        updateStatus: "/submission/status",
     },
 
     admin: {

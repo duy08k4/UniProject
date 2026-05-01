@@ -46,8 +46,6 @@ import RAForms from "./ui/pages/roomadmin/RAForms"
 import RADetailForms from "./ui/components/RADetailForms"
 import RAScoreboards from "./ui/pages/roomadmin/RAScoreboards"
 import RAScoreboardsDetail from "./ui/pages/roomadmin/RAScoreboardsDetail"
-import RASubmissions from "./ui/pages/roomadmin/RASubmissions"
-import RASubmissionDetail from "./ui/pages/roomadmin/RASubmissionDetail"
 import RACommittee from "./ui/pages/roomadmin/RACommittee"
 import RATopics from "./ui/pages/roomadmin/RATopics"
 
@@ -129,12 +127,6 @@ function App() {
             </Route>
 
             <Route path="committee" element={<RACommittee />} />
-            <Route path="topics" element={<RATopics />} />
-
-            <Route path="submission">
-              <Route index element={<RASubmissions />} />
-              <Route path=":formId" element={<RASubmissionDetail />} />
-            </Route>
           </Route>
 
           {/* Student */}

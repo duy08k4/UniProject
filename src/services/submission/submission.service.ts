@@ -86,6 +86,24 @@ export default class SubmissionService {
         }
     }
 
+    // Update submission status (bulk)
+    static async updateStatus(ids: string[], status: 'accept' | 'reject') {
+        let loading
+        try {
+            loading = toast.loading("Đang cập nhật trạng thái...")
+            const { status: httpStatus, data } = await api.patch<{ updated: number }>(apiPath.submission.updateStatus, { ids, status })
+            if (httpStatus >= 200 && httpStatus < 300) {
+                toast.success(`Đã cập nhật ${data.updated} câu trả lời`)
+                return true
+            }
+        } catch (error) {
+            errorCatch(error)
+            return false
+        } finally {
+            toast.dismiss(loading)
+        }
+    }
+
     // Update submission
     static async updateSubmission(submission: UpdateSubmission) {
         let loading

@@ -18,9 +18,11 @@ interface Props {
     onClose: () => void
     readonly?: boolean
     classIdProp?: string
+    isFullScreen?: boolean
+    viewUserId?: string
 }
 
-const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp, classIdProp }) => {
+const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp, classIdProp, isFullScreen = true, viewUserId }) => {
     const { classId: classIdParam } = useParams()
     const classId = classIdParam ?? classIdProp
     const [originalSubmission, setOriginalSubmission] = useState<{
@@ -42,18 +44,17 @@ const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp, 
 
     useEffect(() => {
         if (!classId || !userData.id) return
-        (async () => {
+        const targetUserId = viewUserId ?? userData.id
+        ;(async () => {
             dispatch(changeStateFetching(true))
-
             Promise.all([
                 FormsService.getFormDetail(classId, formId),
-                SubmissionService.getOneSubmission(classId, formId, userData.id)
+                SubmissionService.getOneSubmission(classId, formId, targetUserId)
             ]).finally(() => {
                 dispatch(changeStateFetching(false))
             })
-
         })()
-    }, [formId, userData.id])
+    }, [formId, userData.id, viewUserId])
 
     // Imbed if there is a submission's existance
     useEffect(() => {
@@ -248,7 +249,7 @@ const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp, 
     if (!submission) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 backdrop-blur-sm overflow-y-auto py-8 px-4">
+        <div className={isFullScreen ? "fixed inset-0 z-50 flex items-start justify-center bg-black/40 backdrop-blur-sm overflow-y-auto py-8 px-4" : "w-full h-full overflow-y-auto"}>
             <div className="w-full max-w-2xl flex flex-col gap-4 bg-lighterGray dark:bg-[#1e1e1e] rounded-normal p-5 shadow-[0_8px_40px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_8px_40px_rgba(0,0,0,0.6)]">
 
                 {/* Header */}
