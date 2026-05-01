@@ -10,7 +10,7 @@ import formatVNTime from "../../../utils/formatVNTime"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import { removeFormFromPagination } from "../../../redux/reducers/formSlice.reducer"
 import { ScaleLoader } from "react-spinners"
-import FormViewer from "../../components/FormViewer"
+import RAFormSubmissions from "../../components/RAFormSubmissions"
 import type { DetailForm } from "../../../services/forms/forms.type"
 
 const RAForms: React.FC = () => {
@@ -88,7 +88,7 @@ const RAForms: React.FC = () => {
 
     return (
         <div className="w-full flex flex-col gap-5 py-mainTwoSidePadding">
-            {previewForm && <FormViewer formId={previewForm.id} onClose={() => setPreviewForm(null)} readonly />}
+            {previewForm && <RAFormSubmissions form={previewForm} classId={classId!} onClose={() => setPreviewForm(null)} />}
             {/* Header */}
             <div className="w-full flex justify-between items-center-safe">
                 <h1 className="text-largeSize font-bold dark:text-white">Quản lý biểu mẫu</h1>
