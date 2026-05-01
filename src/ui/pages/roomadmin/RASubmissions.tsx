@@ -33,16 +33,18 @@ const RASubmissions: React.FC = () => {
 
     const debouncedSearch = useDebounce(search, 400)
 
-    useEffect(() => { setPage(1) }, [debouncedSearch, statusFilter])
-
-    useEffect(() => {
+    const fetchData = () => {
         if (!classInfo.id) return
         setLoading(true)
         const params: any = { page: String(page), size: String(PAGE_SIZE), classId: classInfo.id }
         if (debouncedSearch) params.search = debouncedSearch
         if (statusFilter) params.status = statusFilter
         SubmissionService.getSubmissionPagination(params).finally(() => setLoading(false))
-    }, [page, debouncedSearch, statusFilter, classInfo.id])
+    }
+
+    useEffect(() => { setPage(1) }, [debouncedSearch, statusFilter])
+
+    useEffect(() => { fetchData() }, [page, debouncedSearch, statusFilter, classInfo.id])
 
     return (
         <div className="w-full flex flex-col gap-6 pt-topPadding pb-BottomPadding">
@@ -50,6 +52,11 @@ const RASubmissions: React.FC = () => {
 
             {/* Filters */}
             <div className="flex gap-3 max-md:flex-col">
+                <button onClick={fetchData} disabled={loading} className="p-2.5 border border-gray/10 rounded-normal bg-white dark:bg-lightDark hoverBtn disableState">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4 dark:stroke-white">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                </button>
                 <div className="relative flex-1">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray dark:text-white/40 pointer-events-none">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />

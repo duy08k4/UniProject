@@ -289,6 +289,21 @@ export class ClassService {
         }
     }
 
+    // Get join form info by join code
+    static async getJoinForm(joinCode: string) {
+        try {
+            const { status, data } = await api.get<{ classId: string; formId: string | null }>(apiPath.class.getJoinForm, {
+                params: { joinCode }
+            })
+            if (status >= 200 && status < 300) return data
+        } catch (error) {
+            errorCatch(error, {
+                404: { message: "Lớp học không tồn tại", type: "error" }
+            })
+            return false
+        }
+    }
+
     // Join class
     static async joinClass(joinCode: string) {
         let loading

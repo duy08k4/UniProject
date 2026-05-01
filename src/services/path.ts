@@ -16,6 +16,7 @@ const apiPath = {
         updateClass: "/classes",
         joinClass: "/classes/join",
         removeMember: "/classes/member",
+        getJoinForm: "/classes/join-form",
     },
 
     progress: {
