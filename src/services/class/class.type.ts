@@ -25,7 +25,7 @@ export type CreateNewClass = ClassType & {
         email: string;
         role: string;
     };
-    counts: Record<"student" | "lecturer" | "committee" | "pending", string>;
+    counts: Record<"student" | "lecturer" | "committee" | "pending" | "forms" | "milestones", string>;
     owner: {
         full_name: string;
         email: string;

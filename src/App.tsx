@@ -55,7 +55,6 @@ import SDMilestones from "./ui/pages/student/SDMilestones"
 import SDMembers from "./ui/pages/student/SDMembers"
 import SDScoreboards from "./ui/pages/student/SDScoreboards"
 import SDScoreboardsDetail from "./ui/pages/student/SDScoreboardsDetail"
-import SDSubmission from "./ui/pages/student/SDSubmission"
 import SDTopics from "./ui/pages/student/SDTopics"
 import SDNewsfeed from "./ui/pages/student/SDNewsfeed"
 
@@ -127,6 +126,8 @@ function App() {
             </Route>
 
             <Route path="committee" element={<RACommittee />} />
+            <Route path="topics" element={<RATopics />} />
+
           </Route>
 
           {/* Student */}

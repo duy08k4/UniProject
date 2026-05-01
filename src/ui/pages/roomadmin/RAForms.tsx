@@ -23,7 +23,7 @@ const RAForms: React.FC = () => {
     const [isStopped, setIsStopped] = useState<string>("") // "" (Tất cả), "false" (Hoạt động), "true" (Đã đóng)
     const [isDeleted, setIsDeleted] = useState<boolean>(false)
     const [previewForm, setPreviewForm] = useState<DetailForm | null>(null)
-    
+
     const searchDebounce = useDebounce(search, 1500)
 
     const formPagination = useSelector((state: RootState) => state.form.formPagination)
@@ -35,10 +35,10 @@ const RAForms: React.FC = () => {
     const fetchForms = async (p: number = page) => {
         if (!classId) return
         dispatch(changeStateFetching(true))
-        
+
         // Convert string state to boolean or undefined for API
         const stoppedParam = isStopped === "" ? undefined : isStopped === "true"
-        
+
         await FormsService.formsPagination(p, pageSize, searchDebounce, isDeleted, stoppedParam, classId).finally(() => {
             dispatch(changeStateFetching(false))
         })
@@ -91,8 +91,11 @@ const RAForms: React.FC = () => {
             {previewForm && <RAFormSubmissions form={previewForm} classId={classId!} onClose={() => setPreviewForm(null)} />}
             {/* Header */}
             <div className="w-full flex justify-between items-center-safe">
-                <h1 className="text-largeSize font-bold dark:text-white">Quản lý biểu mẫu</h1>
-                
+                <div className="flex flex-col">
+                    <h1 className="text-largeSize font-bold dark:text-white">Quản lý biểu mẫu</h1>
+                    <p className="dark:text-gray">Lớp học có <b className="text-red">{formPagination?.pagination.total} biểu mẫu</b></p>
+                </div>
+
                 <button
                     disabled={isFetching}
                     onClick={() => navigate("new")}
@@ -107,9 +110,9 @@ const RAForms: React.FC = () => {
 
             {/* Sticky Controls Bar */}
             <div className="sticky top-0 z-10 left-0 w-full bg-bgLight dark:bg-bgDark flex items-center-safe gap-5 py-5 flex-wrap">
-                <button 
-                    className="h-full aspect-square p-1.5 border-[0.5px] border-lightGray rounded-full hoverBtn disableState" 
-                    disabled={isFetching} 
+                <button
+                    className="h-full aspect-square p-1.5 border-[0.5px] border-lightGray rounded-full hoverBtn disableState"
+                    disabled={isFetching}
                     onClick={handleRefresh}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4 dark:stroke-white max-sm:size-3.5 stroke-2">
@@ -169,9 +172,9 @@ const RAForms: React.FC = () => {
                         Trang {page}/{formPagination?.pagination.totalPages || 1}
                     </p>
 
-                    <button 
-                        className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState" 
-                        disabled={isFetching || page <= 1} 
+                    <button
+                        className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState"
+                        disabled={isFetching || page <= 1}
                         onClick={() => changePage("prev")}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white stroke-2">
@@ -179,9 +182,9 @@ const RAForms: React.FC = () => {
                         </svg>
                     </button>
 
-                    <button 
-                        className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState" 
-                        disabled={isFetching || page >= (formPagination?.pagination.totalPages || 1)} 
+                    <button
+                        className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState"
+                        disabled={isFetching || page >= (formPagination?.pagination.totalPages || 1)}
                         onClick={() => changePage("next")}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white stroke-2">
@@ -217,24 +220,23 @@ const RAForms: React.FC = () => {
                         </div>
 
                         <div className="flex items-center-safe gap-2.5 mt-3 border-t border-gray/10 pt-3">
-                            <button 
-                                className="flex-1 bg-mainColorRGB text-mainColor px-2.5 py-1.5 rounded-small hoverBtn disableState font-bold text-smallSize"
-                                disabled={isFetching}
-                                onClick={() => navigate(`/main/roomadmin/class/${classId}/forms/${form.id}`)}
-                            >
-                                Xem chi tiết
-                            </button>
                             <button
-                                className="bg-gray/5 text-gray px-3 py-1.5 rounded-small hoverBtn disableState dark:bg-white/5 dark:text-white"
+                                className="flex-1 bg-mainColorRGB text-mainColor px-2.5 py-1.5 rounded-small hoverBtn disableState font-bold text-smallSize"
                                 disabled={isFetching}
                                 onClick={() => handlePreview(form.id)}
                                 title="Xem trước"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 stroke-gray dark:stroke-white">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.573-3.007-9.964-7.178Z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                </svg>
+                                Xem câu trả lời
                             </button>
+
+                            <button
+                                className="bg-gray/5 text-gray px-3 py-1.5 rounded-small hoverBtn disableState dark:bg-white/5 dark:text-white font-bold text-smallSize"
+                                disabled={isFetching}
+                                onClick={() => navigate(`/main/roomadmin/class/${classId}/forms/${form.id}`)}
+                            >
+                                Chỉnh sửa
+                            </button>
+
                             <button
                                 className="bg-red/5 text-red px-3 py-1.5 rounded-small hoverBtn disableState dark:bg-red/10"
                                 disabled={isFetching}
@@ -249,7 +251,7 @@ const RAForms: React.FC = () => {
                     </div>
                 ))}
             </div>
-            
+
             {formPagination?.data.length === 0 && !isFetching && (
                 <div className="w-full py-20 flex flex-col items-center justify-center-safe text-gray opacity-50">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-20">

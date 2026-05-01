@@ -249,8 +249,8 @@ const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp, 
     if (!submission) return null;
 
     return (
-        <div className={isFullScreen ? "fixed inset-0 z-50 flex items-start justify-center bg-black/40 backdrop-blur-sm overflow-y-auto py-8 px-4" : "w-full h-full overflow-y-auto"}>
-            <div className="w-full max-w-2xl flex flex-col gap-4 bg-lighterGray dark:bg-[#1e1e1e] rounded-normal p-5 shadow-[0_8px_40px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_8px_40px_rgba(0,0,0,0.6)]">
+        <div className={isFullScreen ? "fixed inset-0 z-50 flex items-start justify-center bg-black/40 backdrop-blur-sm overflow-y-auto py-8 px-4" : "w-full h-full overflow-y-auto flex justify-center-safe py-8 px-4"}>
+            <div className="h-fit w-full max-w-2xl flex flex-col gap-4 bg-lighterGray dark:bg-[#1e1e1e] rounded-normal p-5 shadow-[0_8px_40px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_8px_40px_rgba(0,0,0,0.6)]">
 
                 {/* Header */}
                 <div className="bg-white dark:bg-lightDark rounded-normal overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.1)]">
