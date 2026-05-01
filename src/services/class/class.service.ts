@@ -142,9 +142,6 @@ export class ClassService {
         memberId: string,
         option?: {
             role?: Members["role"],
-            can_create_forms?: boolean,
-            can_create_notifications?: boolean,
-            can_create_score_forms?: boolean,
             roomadmin_approved?: boolean,
             is_banned?: boolean
         }
@@ -161,13 +158,10 @@ export class ClassService {
                 toast.error("Không có dữ liệu cần cập nhật")
                 return false
             }
-            const { role, can_create_forms, can_create_notifications, can_create_score_forms, is_banned, roomadmin_approved } = option
+            const { role, is_banned, roomadmin_approved } = option
             const dataUpdate: any = {}
 
             if (role !== undefined) dataUpdate.role = role
-            if (can_create_forms !== undefined) dataUpdate.can_create_forms = can_create_forms
-            if (can_create_score_forms !== undefined) dataUpdate.can_create_score_forms = can_create_score_forms
-            if (can_create_notifications !== undefined) dataUpdate.can_create_notifications = can_create_notifications
             if (roomadmin_approved !== undefined) dataUpdate.roomadmin_approved = roomadmin_approved
             if (is_banned !== undefined) dataUpdate.is_banned = is_banned
 
