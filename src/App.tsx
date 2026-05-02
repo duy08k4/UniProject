@@ -32,7 +32,7 @@ import SAClassDetail from "./ui/pages/superadmin/SAClassDetail"
 import Milestones from "./ui/pages/superadmin/SAMilestones"
 import FormManagement from "./ui/pages/superadmin/SAFormManagement"
 import SAScoreBoardManagement from "./ui/pages/superadmin/SAScoreBoardManagement"
-import SASubmission from "./ui/pages/superadmin/SASubmission"
+import SAScoreboardsDetail from "./ui/pages/superadmin/SAScoreboardsDetail"
 import SAProgressDetail from "./ui/components/SAProgressDetail"
 
 // Main
@@ -101,8 +101,10 @@ function App() {
             <Route path=":classId/:progressId" element={<SAProgressDetail />} />
           </Route>
           <Route path="forms" element={<FormManagement />} />
-          <Route path="scoreboards" element={<SAScoreBoardManagement />} />
-          <Route path="submission" element={<SASubmission />} />
+          <Route path="scoreboards">
+            <Route index element={<SAScoreBoardManagement />} />
+            <Route path=":boardId" element={<SAScoreboardsDetail />} />
+          </Route>
         </Route>
 
         <Route path="main">

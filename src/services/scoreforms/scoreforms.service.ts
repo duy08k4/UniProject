@@ -158,6 +158,26 @@ export default class ScoreFormsService {
         }
     }
 
+    // Approve score form (SA only)
+    static async approveScoreForm(id: string, classId: string) {
+        let loading
+        try {
+            loading = toast.loading("Đang duyệt bảng điểm...")
+            const { status, data } = await api.patch(apiPath.scoreform.approve, { id, classId })
+            if (status >= 200 && status < 300) {
+                toast.success("Duyệt bảng điểm thành công")
+                const current = store.getState().scoreForm.currentScoreForm
+                if (current) store.dispatch(setCurrentScoreForm({ ...current, status: "accept" }))
+                return true
+            }
+        } catch (error) {
+            errorCatch(error)
+            return false
+        } finally {
+            toast.dismiss(loading)
+        }
+    }
+
     // Remove score form (soft)
     static async softDeleteScoreForms(ids: string[]) {
         let loading

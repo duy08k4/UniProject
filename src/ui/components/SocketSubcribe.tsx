@@ -39,6 +39,7 @@ const SocketSubcriber = () => {
         ScoreFormsGateway.OnScoreFormSaved()
         ScoreFormsGateway.OnScoreFormDeleted()
         ScoreFormsGateway.OnCellUpdated()
+        ScoreFormsGateway.OnScoreFormApproved()
 
         return () => {
             GlobalGateway.off(globalSocketEventName.OnApproveMember)
@@ -65,6 +66,7 @@ const SocketSubcriber = () => {
             ScoreFormsGateway.off(scoreFormsSocketEventName.OnScoreFormSaved)
             ScoreFormsGateway.off(scoreFormsSocketEventName.OnScoreFormDeleted)
             ScoreFormsGateway.off(scoreFormsSocketEventName.OnCellUpdated)
+            ScoreFormsGateway.off(scoreFormsSocketEventName.OnScoreFormApproved)
         }
     }, [userData.id])
 

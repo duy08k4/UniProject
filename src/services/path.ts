@@ -51,6 +51,7 @@ const apiPath = {
         hardDeleteScoreForms: "/scoreforms/hard",
         updateCell: "/scoreforms/cell",
         toggleStop: "/scoreforms/toggle-stop",
+        approve: "/scoreforms/approve",
     },
 
     submission: {
