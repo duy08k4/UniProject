@@ -64,7 +64,9 @@ const apiPath = {
     },
 
     admin: {
-       
+        getUsers: "/admin/users/pagination",
+        getOneUser: "/admin/user",
+        updateUser: "/admin/user/update",
     },
 
     topics: {
