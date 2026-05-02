@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { memberSizePage } from "../config/pageSize"
 import { Role, type RoomRoleType } from "../config/enum"
 import { confirmDialog } from "primereact/confirmdialog"
+import { AuthService } from "../services/auth/auth.service"
 
 const socket = io(`${import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL_LOCAL}`)
 
@@ -13,7 +14,8 @@ export const globalSocketEventName = {
     OnApproveMember: "approve-member",
     OnNewMember: "new-member",
     OnCreateNewClass: "new-class",
-    OnUpdateClassStatus: "update-class-status"
+    OnUpdateClassStatus: "update-class-status",
+    OnForceLogout: "force-logout"
 }
 
 export class GlobalGateway {
@@ -175,6 +177,21 @@ export class GlobalGateway {
                 }
 
             }
+        })
+    }
+
+    static OnForceLogout() {
+        socket.on(globalSocketEventName.OnForceLogout, async (data: { userId: string, reason: 'banned' | 'deleted' }) => {
+            const currentUserId = store.getState().auth.user.info.id
+            if (data.userId !== currentUserId) return
+
+            const message = data.reason === 'deleted'
+                ? "Tài khoản của bạn đã bị xóa khỏi hệ thống."
+                : "Tài khoản của bạn đã bị đình chỉ."
+
+            toast.error(message, { duration: 6000 })
+            await AuthService.signOut()
+            window.location.pathname = "/"
         })
     }
 

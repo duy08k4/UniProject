@@ -19,6 +19,7 @@ const SocketSubcriber = () => {
         GlobalGateway.OnNewMember()
         GlobalGateway.OnCreateNewClass()
         GlobalGateway.OnUpdateClassStatus()
+        GlobalGateway.OnForceLogout()
 
         ClassGateway.OnSuspendMemberFromClass()
         ClassGateway.OnLeaveTheClass()
@@ -46,6 +47,7 @@ const SocketSubcriber = () => {
             GlobalGateway.off(globalSocketEventName.OnNewMember)
             GlobalGateway.off(globalSocketEventName.OnCreateNewClass)
             GlobalGateway.off(globalSocketEventName.OnUpdateClassStatus)
+            GlobalGateway.off(globalSocketEventName.OnForceLogout)
 
             ClassGateway.off(classSocketEventName.OnSuspendMemberFromClass)
             ClassGateway.off(classSocketEventName.OnLeaveTheClass)
