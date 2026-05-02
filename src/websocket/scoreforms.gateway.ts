@@ -14,7 +14,8 @@ export const scoreFormsSocketEventName = {
     OnToggleStop: "toggle-stop",
     OnScoreFormSaved: "score-form-saved",
     OnScoreFormDeleted: "score-form-deleted",
-    OnCellUpdated: "cell-updated"
+    OnCellUpdated: "cell-updated",
+    OnScoreFormApproved: "scoreform-approved",
 }
 
 export class ScoreFormsGateway {
@@ -65,6 +66,16 @@ export class ScoreFormsGateway {
                 cellId: cell.id,
                 value: cell.value
             }))
+        })
+    }
+
+    static OnScoreFormApproved() {
+        socket.on(scoreFormsSocketEventName.OnScoreFormApproved, (data: { scoreFormId: string }) => {
+            const current = store.getState().scoreForm.currentScoreForm
+            if (current?.id === data.scoreFormId) {
+                store.dispatch(setCurrentScoreForm({ ...current, status: "accept" }))
+                toast.info("Bảng điểm đã được duyệt.")
+            }
         })
     }
 
