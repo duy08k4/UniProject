@@ -9,6 +9,7 @@ import formReducer from './reducers/formSlice.reducer'
 import notificationReducer from './reducers/notification.reducer'
 import scoreFormReducer from './reducers/scoreformSlice.reducer'
 import submissionReducer from './reducers/submissionSlice.reducer'
+import thesisReducer from './reducers/thesisSlice.reducer'
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     submission: submissionReducer,
     stateGlobal: globalReducer,
     scoreForm: scoreFormReducer,
+    thesis: thesisReducer,
   },
 })
 
