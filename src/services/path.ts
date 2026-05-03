@@ -69,6 +69,10 @@ const apiPath = {
         updateUser: "/admin/user/update",
     },
 
+    public: {
+        getTheses: "/public/theses",
+    },
+
     topics: {
         getTopics: "/topics",
         getOneTopic: "/topics",
