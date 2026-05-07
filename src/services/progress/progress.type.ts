@@ -1,4 +1,4 @@
-import type { RoomRoleType, ScoreFormStatusType, ScoreFormTagType } from "../../config/enum"
+import type { RoomRoleType, ScoreFormStatusType, ScoreForm_TypeType as ScoreFormTagType } from "../../config/enum"
 
 export type MilestoneShortDetail = {
     id: string,

@@ -206,7 +206,11 @@ export class FormsService {
             }
 
         } catch (error) {
-            errorCatch(error)
+            if ((error as any)?.response?.status === 409 && (error as any)?.response?.data?.errorCode === 'DUPLICATE_FIELD_LABEL') {
+                toast.error(`Nhãn file đặc biệt chỉ được dùng 1 lần trong toàn bộ lớp học`)
+            } else {
+                errorCatch(error)
+            }
             return false
         } finally {
             toast.dismiss(loading)
