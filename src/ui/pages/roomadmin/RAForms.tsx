@@ -29,6 +29,10 @@ const RAForms: React.FC = () => {
     const formPagination = useSelector((state: RootState) => state.form.formPagination)
     const currentForm = useSelector((state: RootState) => state.form.currentForm)
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
+    const classInfo = useSelector((state: RootState) => state.class.currentClass.info)
+
+    const MAX_FORMS = 20
+    const isFormLimitReached = Number(classInfo.counts.forms) >= MAX_FORMS
 
     const pageSize = 12
 
@@ -97,8 +101,9 @@ const RAForms: React.FC = () => {
                 </div>
 
                 <button
-                    disabled={isFetching}
+                    disabled={isFetching || isFormLimitReached}
                     onClick={() => navigate("new")}
+                    title={isFormLimitReached ? `Đã đạt giới hạn ${MAX_FORMS} biểu mẫu` : undefined}
                     className="bg-mainColor text-white px-4 py-2 rounded-normal font-bold flex items-center gap-2 hoverBtn shadow-md transition-all disableState"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="size-5 stroke-white">

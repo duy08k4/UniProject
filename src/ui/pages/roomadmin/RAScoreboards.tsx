@@ -120,6 +120,10 @@ const RAScoreboards: React.FC = () => {
     const dispatch = useDispatch()
     const pagination = useSelector((state: RootState) => state.scoreForm.scoreFormPagination)
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
+    const classInfo = useSelector((state: RootState) => state.class.currentClass.info)
+
+    const MAX_SCORE_FORMS = 20
+    const isScoreFormLimitReached = Number(classInfo.counts.score_forms) >= MAX_SCORE_FORMS
     const scoreforms = pagination?.data ?? []
     const [loading, setLoading] = useState(true)
     const [showCreateModal, setShowCreateModal] = useState(false)
@@ -225,7 +229,8 @@ const RAScoreboards: React.FC = () => {
                 <span className="flex gap-1.5 items-center flex-1 justify-end">
                     <button
                         onClick={() => setShowCreateModal(true)}
-                        disabled={isFetching}
+                        disabled={isFetching || isScoreFormLimitReached}
+                        title={isScoreFormLimitReached ? `Đã đạt giới hạn ${MAX_SCORE_FORMS} bảng điểm` : undefined}
                         className="bg-mainColor text-white px-4 py-1.5 rounded-normal font-bold flex items-center gap-1.5 hoverBtn text-smallSize disableState"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="size-4 stroke-white">
