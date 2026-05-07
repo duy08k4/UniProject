@@ -558,16 +558,23 @@ const RADetailForms: React.FC = () => {
                                                                 <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={field.is_multiple} onChange={(e) => { const n = [...allFields]; n[idx].is_multiple = e.target.checked; setAllFields(n); }} className="size-4 accent-blue-500" /><span className="text-[11px] font-bold text-blue-500 uppercase">Chọn nhiều</span></label>
                                                             )}
                                                             {field.uiType === 'regular' && field.input_type === Field_Type.FILE && (
-                                                                <select
-                                                                    className="flex-1 bg-transparent text-smallSize dark:text-white outline-none border-b border-lightGray/50 py-1 font-bold cursor-pointer"
-                                                                    value={field.field_label ?? Field_Label.NULL}
-                                                                    onChange={(e) => { const n = [...allFields]; n[idx].field_label = e.target.value; setAllFields(n); }}
-                                                                >
-                                                                    {Object.entries(VNFieldLabel).map(([val, name]) => {
-                                                                        const usedByOther = allFields.some((f, i) => i !== idx && f.uiType === 'regular' && f.input_type === Field_Type.FILE && f.field_label === val && val !== Field_Label.NULL);
-                                                                        return <option key={val} value={val} disabled={usedByOther}>{name}{usedByOther ? ' (đã dùng)' : ''}</option>;
-                                                                    })}
-                                                                </select>
+                                                                <div className="flex-1 flex flex-col gap-1">
+                                                                    <select
+                                                                        className="w-full bg-transparent text-smallSize dark:text-white outline-none border-b border-lightGray/50 py-1 font-bold cursor-pointer"
+                                                                        value={field.field_label ?? Field_Label.NULL}
+                                                                        onChange={(e) => { const n = [...allFields]; n[idx].field_label = e.target.value; setAllFields(n); }}
+                                                                    >
+                                                                        {Object.entries(VNFieldLabel).map(([val, name]) => {
+                                                                            const usedByOther = allFields.some((f, i) => i !== idx && f.uiType === 'regular' && f.input_type === Field_Type.FILE && f.field_label === val && val !== Field_Label.NULL);
+                                                                            return <option key={val} value={val} disabled={usedByOther}>{name}{usedByOther ? ' (đã dùng)' : ''}</option>;
+                                                                        })}
+                                                                    </select>
+                                                                    {field.field_label && field.field_label !== Field_Label.NULL && (
+                                                                        <p className="text-[10px] text-amber-500 leading-snug">
+                                                                            ⚠ Nhãn đặc biệt — chỉ được dùng 1 lần trong toàn bộ lớp học.{field.field_label === Field_Label.FINAL_THESIS && " File này sẽ hiển thị công khai trên trang Đồ án."}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
                                                             )}
                                                         </div>
                                                     </div>
