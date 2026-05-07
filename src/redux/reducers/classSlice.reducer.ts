@@ -52,7 +52,8 @@ const initialState: ClassSlice = {
                 committee: "",
                 pending: "",
                 forms: "",
-                milestones: ""
+                milestones: "",
+                score_forms: ""
             },
             owner: {
                 full_name: "",
@@ -168,7 +169,8 @@ export const classSlice = createSlice({
                         committee: "",
                         pending: "",
                         forms: "",
-                        milestones: ""
+                        milestones: "",
+                        score_forms: ""
                     },
                     owner: {
                         full_name: "",

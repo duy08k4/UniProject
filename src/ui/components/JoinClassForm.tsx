@@ -35,6 +35,11 @@ const JoinClassForm: React.FC<JoinClassForm_Interface> = ({ toggleForm }) => {
 
         if (!result) return
 
+        if (result.isFull) {
+            toast.error("Lớp học đã đạt giới hạn thành viên (150)")
+            return
+        }
+
         if (result.formId) {
             // Cần điền form trước
             setJoinFormData({ classId: result.classId, formId: result.formId, joinCode: newClassFormValues.joinCode })

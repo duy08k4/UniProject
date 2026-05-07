@@ -1,3 +1,4 @@
+import axios from "axios"
 import { toast } from "sonner"
 import errorCatch from "../../config/errorCatch"
 import api from "../../config/gateway"
@@ -286,7 +287,7 @@ export class ClassService {
     // Get join form info by join code
     static async getJoinForm(joinCode: string) {
         try {
-            const { status, data } = await api.get<{ classId: string; formId: string | null }>(apiPath.class.getJoinForm, {
+            const { status, data } = await api.get<{ classId: string; formId: string | null; isFull: boolean }>(apiPath.class.getJoinForm, {
                 params: { joinCode }
             })
             if (status >= 200 && status < 300) return data
@@ -322,10 +323,14 @@ export class ClassService {
                 return data
             }
         } catch (error) {
-            errorCatch(error, {
-                404: { message: "Lớp học không tồn tại", type: "error" },
-                409: { message: "Bạn đã là thành viên của lớp", type: "error" }
-            })
+            if (axios.isAxiosError(error) && error.response?.status === 400) {
+                toast.error(error.response.data?.message || "Không thể tham gia lớp học")
+            } else {
+                errorCatch(error, {
+                    404: { message: "Lớp học không tồn tại", type: "error" },
+                    409: { message: "Bạn đã là thành viên của lớp", type: "error" }
+                })
+            }
 
             return false
         } finally {
