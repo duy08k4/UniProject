@@ -7,6 +7,7 @@ import { NotificationGateway, notificationSocketEventName } from "../../websocke
 import { ProgressGateway, progressSocketEventName } from "../../websocket/progress.gateway"
 import { FormsGateway, formsSocketEventName } from "../../websocket/forms.gateway"
 import { ScoreFormsGateway, scoreFormsSocketEventName } from "../../websocket/scoreforms.gateway"
+import { TopicsGateway, topicsSocketEventName } from "../../websocket/topics.gateway"
 
 const SocketSubcriber = () => {
     const userData = useSelector((state: RootState) => state.auth.user.info)
@@ -42,6 +43,8 @@ const SocketSubcriber = () => {
         ScoreFormsGateway.OnCellUpdated()
         ScoreFormsGateway.OnScoreFormApproved()
 
+        TopicsGateway.OnTopicUpdated()
+
         return () => {
             GlobalGateway.off(globalSocketEventName.OnApproveMember)
             GlobalGateway.off(globalSocketEventName.OnNewMember)
@@ -69,6 +72,8 @@ const SocketSubcriber = () => {
             ScoreFormsGateway.off(scoreFormsSocketEventName.OnScoreFormDeleted)
             ScoreFormsGateway.off(scoreFormsSocketEventName.OnCellUpdated)
             ScoreFormsGateway.off(scoreFormsSocketEventName.OnScoreFormApproved)
+
+            TopicsGateway.off(topicsSocketEventName.OnTopicUpdated)
         }
     }, [userData.id])
 
