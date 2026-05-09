@@ -6,7 +6,7 @@ import type { RootState } from "../../../redux/store"
 import TopicsService from "../../../services/topics/topics.service"
 import { ClassService } from "../../../services/class/class.service"
 import ProgressService from "../../../services/progress/progress.service"
-import type { TopicDetail } from "../../../services/topics/topics.type"
+import { setMyTopicAsStudent } from "../../../redux/reducers/topicsSlice.reducer"
 import type { Members } from "../../../services/class/class.type"
 import { ThesisType, TopicStatus, VNThesisType, VNTopicStatus } from "../../../config/enum"
 import Loading from "../../components/Loading"
@@ -19,8 +19,8 @@ const SDTopics: React.FC = () => {
     const userData = useSelector((state: RootState) => state.auth.user.info)
     const progress = useSelector((state: RootState) => state.progress.currentProgress)
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
+    const topic = useSelector((state: RootState) => state.topics.myTopicAsStudent)
 
-    const [topic, setTopic] = useState<TopicDetail | null>(null)
     const [loading, setLoading] = useState(true)
     const [lecturers, setLecturers] = useState<Members[]>([])
 
@@ -29,7 +29,18 @@ const SDTopics: React.FC = () => {
     const [thesisType, setThesisType] = useState(ThesisType.THESIS)
     const [selectedSupervisor, setSelectedSupervisor] = useState("")
     const [outlineUrl, setOutlineUrl] = useState("")
-    const pendingOutlineRef = useRef<string>("")  // track URL chưa submit để cleanup khi unmount
+    const pendingOutlineRef = useRef<string>("")
+
+    const [showCreateConfirm, setShowCreateConfirm] = useState(false)
+    const [createCountdown, setCreateCountdown] = useState(5)
+
+    useEffect(() => {
+        if (!showCreateConfirm) { setCreateCountdown(5); return }
+        const interval = setInterval(() => {
+            setCreateCountdown(prev => prev <= 1 ? (clearInterval(interval), 0) : prev - 1)
+        }, 1000)
+        return () => clearInterval(interval)
+    }, [showCreateConfirm])
 
     const registrationMilestone = progress?.milestones?.find((m: any) => m.is_registration_milestone)
 
@@ -37,7 +48,7 @@ const SDTopics: React.FC = () => {
         if (!classId || !registrationMilestone?.id || !userData?.id) { setLoading(false); return }
         setLoading(true)
         const result = await TopicsService.getMyTopic(classId, registrationMilestone.id, userData.id)
-        setTopic(result)
+        dispatch(setMyTopicAsStudent(result))
         setLoading(false)
     }
 
@@ -55,18 +66,17 @@ const SDTopics: React.FC = () => {
 
     useEffect(() => { fetchTopic() }, [classId, userData?.id, registrationMilestone?.id])
 
-    // Xóa file đã upload nếu rời trang mà chưa submit
     useEffect(() => {
         return () => {
             if (pendingOutlineRef.current) TopicsService.deleteOutlineFile(pendingOutlineRef.current)
         }
-    }, []) // chỉ chạy cleanup khi unmount
+    }, [])
 
     const handleCreate = async () => {
         if (!classId || !registrationMilestone?.id || !title.trim()) return
         dispatch(changeStateFetching(true))
         const result = await TopicsService.createTopic(classId, registrationMilestone.id, title, thesisType, description || undefined)
-        if (result) setTopic(result)
+        if (result) dispatch(setMyTopicAsStudent(result))
         dispatch(changeStateFetching(false))
     }
 
@@ -74,7 +84,7 @@ const SDTopics: React.FC = () => {
         if (!topic || !classId || !selectedSupervisor) return
         dispatch(changeStateFetching(true))
         const result = await TopicsService.inviteSupervisor(topic.id, classId, selectedSupervisor)
-        if (result) setTopic(result)
+        if (result) dispatch(setMyTopicAsStudent(result))
         dispatch(changeStateFetching(false))
     }
 
@@ -82,7 +92,7 @@ const SDTopics: React.FC = () => {
         if (!topic || !classId || !outlineUrl.trim()) return
         dispatch(changeStateFetching(true))
         const result = await TopicsService.submitOutline(topic.id, classId, outlineUrl)
-        if (result) { setTopic(result); setOutlineUrl(""); pendingOutlineRef.current = "" }
+        if (result) { dispatch(setMyTopicAsStudent(result)); setOutlineUrl(""); pendingOutlineRef.current = "" }
         dispatch(changeStateFetching(false))
     }
 
@@ -138,10 +148,40 @@ const SDTopics: React.FC = () => {
                                 </select>
                             </div>
 
-                            <button onClick={handleCreate} disabled={isFetching || !title.trim()}
+                            <button onClick={() => title.trim() && setShowCreateConfirm(true)} disabled={isFetching || !title.trim()}
                                 className="self-start px-5 py-2 bg-mainColor text-white rounded-md text-normalSize font-medium hover:opacity-80 transition-opacity disableState">
                                 Tạo đề tài
                             </button>
+                        </div>
+                    )}
+
+                    {/* Confirm dialog tạo đề tài */}
+                    {showCreateConfirm && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowCreateConfirm(false)}>
+                            <div className="bg-white dark:bg-lightDark shadow-xl w-[420px] max-w-[calc(100vw-2rem)] rounded-small overflow-hidden" onClick={e => e.stopPropagation()}>
+                                <div className="flex items-center justify-between px-5 py-4 bg-lightGray dark:bg-darkGray">
+                                    <h2 className="font-bold dark:text-white">Xác nhận tạo đề tài</h2>
+                                    <button onClick={() => setShowCreateConfirm(false)} className="p-1 hover:opacity-60 transition-opacity">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="size-4 dark:stroke-white">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div className="px-5 py-5 flex flex-col gap-2">
+                                    <p className="text-smallSize text-gray dark:text-gray-400">Bạn đang tạo đề tài:</p>
+                                    <p className="text-normalSize font-bold dark:text-white">"{title}"</p>
+                                    <p className="text-smallSize text-red mt-1 font-medium">⚠ Lưu ý: Thông tin đề tài không thể chỉnh sửa sau khi tạo. Hãy kiểm tra kỹ trước khi xác nhận.</p>
+                                </div>
+                                <div className="flex justify-end gap-2 px-5 py-4 bg-lightGray dark:bg-darkGray">
+                                    <button onClick={() => setShowCreateConfirm(false)} className="px-4 py-2 text-smallSize font-bold dark:text-white hover:opacity-60 transition-opacity rounded-small">
+                                        Hủy
+                                    </button>
+                                    <button onClick={() => { setShowCreateConfirm(false); handleCreate() }} disabled={createCountdown > 0}
+                                        className="px-5 py-2 bg-mainColor text-white text-smallSize font-bold rounded-small hoverBtn disabled:opacity-50 disabled:cursor-not-allowed">
+                                        {createCountdown > 0 ? `Xác nhận (${createCountdown}s)` : "Xác nhận"}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -191,9 +231,21 @@ const SDTopics: React.FC = () => {
                             )}
 
                             {topic.status === TopicStatus.INVITED && (
-                                <p className="text-yellow-500 text-smallSize italic border-t border-gray/10 pt-4">
-                                    Đang chờ GVHD <b>{topic.supervisor?.full_name}</b> phản hồi...
-                                </p>
+                                <div className="flex items-center justify-between gap-3 border-t border-gray/10 pt-4">
+                                    <p className="text-yellow-500 text-smallSize italic">
+                                        Đang chờ GVHD <b>{topic.supervisor?.full_name}</b> phản hồi...
+                                    </p>
+                                    <button onClick={async () => {
+                                        if (!classId) return
+                                        dispatch(changeStateFetching(true))
+                                        const result = await TopicsService.cancelInvite(topic.id, classId)
+                                        if (result) dispatch(setMyTopicAsStudent(result))
+                                        dispatch(changeStateFetching(false))
+                                    }} disabled={isFetching}
+                                        className="shrink-0 px-4 py-2 border border-red text-red rounded-md text-smallSize font-medium hover:bg-red hover:text-white transition-colors disableState">
+                                        Thu hồi lời mời
+                                    </button>
+                                </div>
                             )}
 
                             {[TopicStatus.SUPERVISOR_ACCEPTED, TopicStatus.OUTLINE_REJECTED].includes(topic.status as any) && (

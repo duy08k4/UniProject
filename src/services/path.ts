@@ -76,8 +76,10 @@ const apiPath = {
     topics: {
         getTopics: "/topics",
         getOneTopic: "/topics",
+        myTopics: "/topics/my",
         createTopic: "/topics",
         inviteSupervisor: "/topics",   // PATCH /topics/:id/invite
+        cancelInvite: "/topics",       // PATCH /topics/:id/cancel-invite
         supervisorResponse: "/topics", // PATCH /topics/:id/supervisor-response
         submitOutline: "/topics",      // PATCH /topics/:id/submit-outline
         reviewTopic: "/topics",        // PATCH /topics/:id/review

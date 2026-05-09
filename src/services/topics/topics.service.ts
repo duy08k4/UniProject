@@ -6,6 +6,16 @@ import type { TopicDetail } from "./topics.type"
 import type { ThesisTypeType } from "../../config/enum"
 
 export default class TopicsService {
+    static async getOneTopic(topicId: string) {
+        try {
+            const { status, data } = await api.get<TopicDetail>(`${apiPath.topics.getOneTopic}/${topicId}`)
+            if (status >= 200 && status < 300) return data
+        } catch (error) {
+            errorCatch(error)
+        }
+        return null
+    }
+
     static async getTopics(classId: string, milestoneId?: string) {
         try {
             const params: any = { classId }
@@ -29,6 +39,32 @@ export default class TopicsService {
             loading = toast.loading("Đang tạo đề tài...")
             const { status, data } = await api.post<TopicDetail>(apiPath.topics.createTopic, { classId, milestoneId, title, thesis_type, description })
             if (status >= 200 && status < 300) { toast.success("Tạo đề tài thành công"); return data }
+        } catch (error) {
+            errorCatch(error)
+        } finally {
+            toast.dismiss(loading)
+        }
+        return null
+    }
+
+    static async getMyTopicsAsLecturer(classId: string, milestoneId?: string) {
+        try {
+            const params: any = { classId }
+            if (milestoneId) params.milestoneId = milestoneId
+            const { status, data } = await api.get<TopicDetail[]>(apiPath.topics.myTopics, { params })
+            if (status >= 200 && status < 300) return data
+        } catch (error) {
+            errorCatch(error)
+        }
+        return null
+    }
+
+    static async cancelInvite(topicId: string, classId: string) {
+        let loading
+        try {
+            loading = toast.loading("Đang thu hồi lời mời...")
+            const { status, data } = await api.patch<TopicDetail>(`${apiPath.topics.cancelInvite}/${topicId}/cancel-invite`, { classId })
+            if (status >= 200 && status < 300) { toast.success("Đã thu hồi lời mời"); return data }
         } catch (error) {
             errorCatch(error)
         } finally {
