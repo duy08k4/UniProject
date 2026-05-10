@@ -4,20 +4,16 @@ import HeroImage from "../../assets/HeroImage.png"
 
 const painPoints = [
     {
-        before: "Nhiều lần nộp bài trong suốt quá trình làm đồ án nhưng chỉ có một form duy nhất. Đề cương, báo cáo, giải trình chỉnh sửa... đều nộp vào cùng một chỗ.",
-        after: "Mỗi mốc tiến độ có form nộp bài riêng, gắn đúng giai đoạn: đề cương, báo cáo tiến độ, báo cáo cuối, giải trình chỉnh sửa. Không lẫn lộn giữa các lần nộp.",
+        before: "Sử dụng một biểu mẫu duy nhất cho nhiều giai đoạn khác nhau sẽ làm sinh viên dễ nhầm lẫn trong việc nộp bài",
+        after: "Mỗi cột mốc trong quy trình sẽ có một hoặc nhiều biểu mẫu riêng biệt và có thể quản lý thời gian nhận câu trả lời.",
     },
     {
         before: "Điểm tổng kết gồm nhiều thành phần từ nhiều giảng viên khác nhau, phải tổng hợp và nhập liệu tính toán.",
-        after: "Quản lý lớp tự thiết kế cột điểm và công thức tính phù hợp với từng loại đồ án. Phân quyền nhập đúng vai trò, hệ thống tự tính kết quả.",
+        after: "Quản lý lớp tự thiết kế cột điểm và công thức tính toán tự động. Phân quyền nhập điểm cho từng cột",
     },
     {
-        before: "Quy trình nhiều bước, nhiều hạn nộp theo từng đợt. Theo dõi qua email và bảng tính, dễ bỏ sót.",
-        after: "Toàn bộ quy trình được số hóa thành các mốc tiến độ trên hệ thống.",
-    },
-    {
-        before: "Muốn tham khảo đồ án khóa trước phải đến thư viện trường mượn quyển in hoặc tìm các anh chị khóa trước để mượn.",
-        after: "Toàn bộ đồ án được lưu trữ và tra cứu online. Tìm kiếm theo tên đề tài hoặc sinh viên, trước khi đến thư viện để mượn.",
+        before: "Tìm kiếm đề tài tốt nghiệp của các sinh viên khóa trước thông qua thư viện số của nhà trường với phạm vi tìm kiếm toàn trường.",
+        after: "Tìm kiếm đề tài tốt nghiệp của các sinh viên khóa trước với phạm vi trong Khoa Môi Trường và Tài Nguyên.",
     },
 ]
 
@@ -29,7 +25,7 @@ const features = [
             </svg>
         ),
         title: "Quy trình tùy chỉnh",
-        desc: "Quản lý lớp tự thiết kế các mốc tiến độ phù hợp với từng học kỳ. Mỗi mốc có thể gắn form nộp bài và phiếu chấm điểm riêng, không còn dùng chung một form cho tất cả.",
+        desc: "Thiết kế các mốc phù hợp với từng học kỳ và có thể tùy chỉnh. Mỗi mốc có thể gắn nhiều biểu mẫu và bảng điểm. Quản lý thời gian đóng mở cho từng cột mốc.",
         highlight: "Linh hoạt theo từng yêu cầu",
     },
     {
@@ -39,7 +35,7 @@ const features = [
             </svg>
         ),
         title: "Bảng điểm tùy chỉnh",
-        desc: "Tự thiết kế cột điểm và công thức tính phù hợp với quy định của từng lớp. Ví dụ: Điểm HĐ = (Chủ tịch + Ủy viên PB + Ủy viên) / 3, Điểm TK = GVHDx40% + HĐx60%. Phân quyền nhập theo vai trò: Chủ tịch HĐ chỉ nhập cột của mình,...",
+        desc: "Thiết kế bảng điểm với các cột điểm và công thức tính toán tự động có thể tùy chỉnh. Phân quyền nhập điểm cho từng cột.",
         highlight: "Phân quyền nhập + tính điểm tự động",
     },
     {
@@ -49,7 +45,7 @@ const features = [
             </svg>
         ),
         title: "Kho đồ án trực tuyến",
-        desc: "Toàn bộ đồ án sau khi hoàn thành được lưu trữ và công khai trên hệ thống. Sinh viên khóa sau có thể tìm kiếm, đọc tham khảo trước khi đến thư viện trường.",
+        desc: "Toàn bộ đồ án sau khi hoàn thành được lưu trữ và công khai trên hệ thống. Sinh viên khóa sau có thể tìm kiếm và sử dụng làm tài liệu tham khảo.",
         highlight: "Tra cứu tiện lợi",
     },
 ]
@@ -58,7 +54,7 @@ const Home: React.FC = () => {
     return (
         <div className="min-h-screen pb-20">
 
-            {/* ── 1. HERO ── */}
+            {/* 1. HERO */}
             <section className="relative py-20 border-b border-gray/10 dark:border-white/5 overflow-hidden">
                 {/* subtle gradient blob */}
                 <div className="pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-mainColor/5 blur-3xl" />
@@ -74,7 +70,7 @@ const Home: React.FC = () => {
                             <span className="text-mainColor">Đồ án Tốt nghiệp</span>
                         </h1>
                         <p className="text-normalSize text-gray mb-8 leading-relaxed max-w-lg max-sm:text-mobile-normalSize">
-                            Từ đăng ký đề tài, nộp bài theo từng mốc tiến độ, đến chấm điểm tự động. Tất cả trên một nền tảng duy nhất, thay thế hoàn toàn Google Form và Excel.
+                            Thiết kế quy trình linh hoạt theo yêu cầu với các biểu mẫu và bảng điểm được tùy chỉnh giúp thu thập câu trả lời và điểm số một cách linh hoạt trên cùng một nền tảng. 
                         </p>
                         <div className="flex gap-4 flex-wrap">
                             <NavLink
@@ -98,7 +94,7 @@ const Home: React.FC = () => {
                 </div>
             </section>
 
-            {/* ── 2. PAIN vs GAIN ── */}
+            {/* 2. PAIN vs GAIN */}
             <section className="py-20 border-b border-gray/10 dark:border-white/5">
                 <div className="max-w-6xl mx-auto">
                     <div className="mb-12">
@@ -140,7 +136,7 @@ const Home: React.FC = () => {
                 </div>
             </section>
 
-            {/* ── 3. FEATURES ── */}
+            {/* 3. FEATURES */}
             <section className="py-20 border-b border-gray/10 dark:border-white/5">
                 <div className="max-w-6xl mx-auto">
                     <div className="mb-12">
@@ -168,7 +164,7 @@ const Home: React.FC = () => {
                 </div>
             </section>
 
-            {/* ── 4. THESIS ACCESS ── */}
+            {/* 4. THESIS ACCESS */}
             <section className="py-20 border-b border-gray/10 dark:border-white/5">
                 <div className="max-w-6xl mx-auto">
                     <div className="relative overflow-hidden rounded-normal border border-mainColor/20 bg-mainColor/5 dark:bg-mainColor/8 p-10 flex flex-col md:flex-row items-center gap-8">
@@ -192,7 +188,7 @@ const Home: React.FC = () => {
                 </div>
             </section>
 
-            {/* ── 5. CONTACT ── */}
+            {/* 5. CONTACT */}
             <section className="py-16">
                 <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="p-8 bg-white dark:bg-lightDark border border-gray/10 rounded-normal">

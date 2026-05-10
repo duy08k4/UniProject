@@ -1,20 +1,14 @@
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { toast } from "sonner"
 import { ClassService } from "../../services/class/class.service"
 import { ScaleLoader } from "react-spinners"
 import { confirmDialog } from "primereact/confirmdialog"
-import { useNavigate } from "react-router-dom"
 
 type NewClassFormValues = {
     className: string
     subject: string
     description: string
-}
-
-type AdvanceSetting = {
-    approval: boolean,
-    startForm: boolean
 }
 
 type Validations = {
@@ -26,9 +20,7 @@ interface NewClassForm_Interface {
     toggleForm: () => void
 }
 
-const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
-    const navigate = useNavigate()
-    
+const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {    
     const [newClassFormValues, setNewClassFormValues] = useState<NewClassFormValues>({
         className: "",
         subject: "",

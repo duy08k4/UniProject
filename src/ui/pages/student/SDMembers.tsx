@@ -61,8 +61,6 @@ const SDMembers: React.FC = () => {
 
     if (!classMembers.data) return null
 
-    const allMembersCount = Object.values(classMembers.data).flatMap(m => m).length
-
     return (
         <div className="w-full flex flex-col gap-5 py-mainTwoSidePadding">
             <div className="w-full h-fit">

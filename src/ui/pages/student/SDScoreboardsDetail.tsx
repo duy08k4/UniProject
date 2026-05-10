@@ -39,7 +39,7 @@ const SDScoreboardsDetail: React.FC = () => {
     const getCellValue = (colId: string) => {
         const col = columns.find(c => c.id === colId)
         if (col?.formula_content && myRow) {
-            const cellMap = new Map(myRow.cells.map(c => [c.column.id, c.value]))
+            const cellMap = new Map(myRow.cells.filter(c => c.value !== null).map(c => [c.column.id, c.value as string]))
             return computeFormulaValue(col.formula_content, cellMap) ?? "—"
         }
         return myRow?.cells.find(c => c.column.id === colId)?.value ?? "—"

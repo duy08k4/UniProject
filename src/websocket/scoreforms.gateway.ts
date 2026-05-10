@@ -3,7 +3,8 @@ import { store } from "../redux/store"
 import {
     updateScoreFormIsStopped,
     clearCurrentScoreFormIfDeleted,
-    updateCell
+    updateCell,
+    setCurrentScoreForm
 } from "../redux/reducers/scoreformSlice.reducer"
 import { toast } from "sonner"
 import ScoreFormsService from "../services/scoreforms/scoreforms.service"

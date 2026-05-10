@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { ClassService } from "../../services/class/class.service";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
-import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 import { changeStateFetching } from "../../redux/reducers/global.reducer";
 import { currentClass_UpdateMember } from "../../redux/reducers/classSlice.reducer";
