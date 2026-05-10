@@ -163,7 +163,7 @@ export default class ScoreFormsService {
         let loading
         try {
             loading = toast.loading("Đang duyệt bảng điểm...")
-            const { status, data } = await api.patch(apiPath.scoreform.approve, { id, classId })
+            const { status } = await api.patch(apiPath.scoreform.approve, { id, classId })
             if (status >= 200 && status < 300) {
                 toast.success("Duyệt bảng điểm thành công")
                 const current = store.getState().scoreForm.currentScoreForm

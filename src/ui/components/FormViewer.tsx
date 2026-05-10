@@ -167,7 +167,7 @@ const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp, 
         });
     };
 
-    const uploadFile = async (event: React.ChangeEvent<HTMLInputElement>, fieldId: string, fieldType: "checkbox" | "normal", value: string) => {
+    const uploadFile = async (event: React.ChangeEvent<HTMLInputElement>, fieldId: string, fieldType: "checkbox" | "normal") => {
         const file = event.target.files?.[0]
 
         if (file) {
@@ -334,7 +334,7 @@ const FormViewer: React.FC<Props> = ({ formId, onClose, readonly: readonlyProp, 
                                             {submission && submission.answer.find(a => a.fieldId === item.data.id && a.input_type === Field_Type.FILE)?.file_name || "Chọn tệp PDF..."}
                                         </span>
 
-                                        <input type="file" accept=".pdf" disabled={readonly} className="hidden" onChange={e => !readonly && uploadFile(e, item.data.id, item.kind, e.target.files?.[0]?.name || "")} />
+                                        <input type="file" accept=".pdf" disabled={readonly} className="hidden" onChange={e => !readonly && uploadFile(e, item.data.id, item.kind)} />
 
                                     </label>
 

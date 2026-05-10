@@ -6,7 +6,7 @@ import UniLogo from "../../assets/UniLogo.png"
 // Component
 import ToggleTheme from "../components/ToggleTheme.comp"
 import { useRef, type ReactElement } from "react"
-import { NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router-dom"
+import { NavLink, Outlet, useLocation, useParams } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../redux/store"
 import getShortName from "../../utils/getShortName"

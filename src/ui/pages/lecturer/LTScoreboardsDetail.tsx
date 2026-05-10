@@ -75,7 +75,7 @@ const LTScoreboardsDetail: React.FC = () => {
         return myCommitteeMember?.role === allowed
     }, [detail, isRoomAdmin, myCommitteeMember])
 
-    const getEditableErrorMessage = (col: any) => {
+    const getEditableErrorMessage = () => {
         const now = new Date()
         if (detail?.is_stopped) return "Bảng điểm đã bị khóa bởi RA."
         if (detail?.is_auto_open && detail.open_at && new Date(detail.open_at) > now) return `Chưa đến giờ mở (từ ${formatVNTime(detail.open_at)})`
@@ -103,7 +103,9 @@ const LTScoreboardsDetail: React.FC = () => {
         const col = columns.find(c => c.id === colId)
         if (col?.formula_content) {
             const row = rows.find(r => r.id === rowId)
+            
             if (!row) return ""
+
             const cellMap = new Map(row.cells.map(c => [c.column.id, c.value ?? ""]))
             return computeFormulaValue(col.formula_content, cellMap) ?? ""
         }
@@ -124,10 +126,13 @@ const LTScoreboardsDetail: React.FC = () => {
             dispatch(updateCellByRowCol({ rowId, columnId: colId, value: inputVal }))
             const key = `${rowId}:${colId}`
             abortControllers.current.get(key)?.abort()
+
             const controller = new AbortController()
             abortControllers.current.set(key, controller)
+
             const result = await ScoreFormsService.updateCell(boardId, rowId, colId, numVal, controller.signal)
             abortControllers.current.delete(key)
+            
             if (result === false) dispatch(updateCellByRowCol({ rowId, columnId: colId, value: currentVal }))
         }
 
@@ -276,7 +281,7 @@ const LTScoreboardsDetail: React.FC = () => {
                                                     <button
                                                         onClick={() => { if (!detail.is_stopped && editable && !isFetching) { originalCellVal.current = val; setEditingCell({ rowId: row.id, colId: col.id! }); setCellInput(val) } }}
                                                         disabled={detail.is_stopped || !editable || isFetching}
-                                                        title={detail.is_stopped ? "Bảng điểm đã khóa" : !editable ? getEditableErrorMessage(col) : "Nhấn để nhập điểm"}
+                                                        title={detail.is_stopped ? "Bảng điểm đã khóa" : !editable ? getEditableErrorMessage() : "Nhấn để nhập điểm"}
                                                         className={`min-w-12 px-2 py-1 rounded text-smallSize transition-colors disableState
                                                             ${val ? "font-bold text-mainColor" : "text-gray/30"}
                                                             ${!detail.is_stopped && editable ? "hover:bg-mainColor/10 cursor-pointer ring-1 ring-transparent hover:ring-mainColor/30" : "cursor-default"}

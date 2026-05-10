@@ -5,7 +5,6 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 import ProgressService from "../../../services/progress/progress.service"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
-import RANewProgress from "../../components/RANewProgress"
 import Loading from "../../components/Loading"
 import formatVNTime from "../../../utils/formatVNTime"
 
