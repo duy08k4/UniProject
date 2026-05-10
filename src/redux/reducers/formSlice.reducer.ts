@@ -16,9 +16,7 @@ export const formSlice = createSlice({
     name: 'form',
     initialState,
     reducers: {
-        resetAllStateProgress: (state) => {
-            state = initialState
-        },
+        resetAllStateProgress: () => initialState,
 
         setFormPagination: (state, action: PayloadAction<FormPaginationType | null>) => {
             state.formPagination = action.payload

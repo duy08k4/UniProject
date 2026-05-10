@@ -18,9 +18,7 @@ export const progressSlice = createSlice({
     name: 'progress',
     initialState,
     reducers: {
-        resetAllStateProgress: (state) => {
-            state = initialState
-        },
+        resetAllStateProgress: () => initialState,
 
         // Progress
         setProgressPaginationData: (state, action: PayloadAction<ProgressPagination | null>) => {
