@@ -16,9 +16,7 @@ export const notificationSlice = createSlice({
     name: 'notification',
     initialState,
     reducers: {
-        resetAllStateNotification: (state) => {
-            state = initialState
-        },
+        resetAllStateNotification: () => initialState,
 
         setNotificationPagination: (state, action: PayloadAction<NotificationPagination | null>) => {
             state.notificationPagination = action.payload
