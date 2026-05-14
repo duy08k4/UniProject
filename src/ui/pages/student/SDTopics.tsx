@@ -206,6 +206,10 @@ const SDTopics: React.FC = () => {
                                     <p className="text-smallSize text-gray italic">GVHD</p>
                                     <p className="font-medium dark:text-white">{topic.supervisor?.full_name ?? "Chưa có"}</p>
                                 </div>
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-smallSize text-gray italic">GVPB</p>
+                                    <p className="font-medium dark:text-white">{topic.reviewer?.full_name ?? "Chưa phân công"}</p>
+                                </div>
                             </div>
 
                             {topic.rejection_note && (

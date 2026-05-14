@@ -97,11 +97,11 @@ export class ClassService {
     }
 
     // Get members
-    static async getMembers(page?: number, size?: number, search?: string, roleSearch?: string) {
+    static async getMembers(page?: number, size?: number, search?: string, roleSearch?: string, classIdOverride?: string) {
         let loading
 
         try {
-            const classId = store.getState().class.currentClass.info.id
+            const classId = classIdOverride || store.getState().class.currentClass.info.id
 
             if (!classId) {
                 toast.error("Không tìm thấy danh sách thành viên")

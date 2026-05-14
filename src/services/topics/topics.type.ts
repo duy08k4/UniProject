@@ -13,4 +13,5 @@ export type TopicDetail = {
     milestone: { id: string; label: string; is_registration_milestone: boolean }
     student: { id: string; full_name: string; email: string }
     supervisor: { id: string; full_name: string; email: string } | null
+    reviewer: { id: string; full_name: string; email: string } | null
 }

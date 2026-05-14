@@ -137,3 +137,6 @@
 .dark .ProseMirror li,
 .dark .ProseMirror blockquote { color: white; }
 .ProseMirror:focus { outline: none; }
+
+/* Dark mode overrides */
+[data-theme="dark"] .dark-text-bright { color: #6fcf65 !important; }
