@@ -212,8 +212,8 @@ const Home: React.FC = () => {
                     <div className="p-8 bg-white dark:bg-lightDark border border-gray/10 rounded-normal">
                         <h3 className="font-bold text-normalSize dark:text-white mb-6 uppercase">Liên hệ Khoa</h3>
                         <div className="text-smallSize text-gray dark:text-white/70 space-y-3">
-                            <p><b className="dark:text-white">Địa chỉ:</b><span className="dark:text-white"> Phòng 101, Tòa nhà trung tâm</span></p>
-                            <p><b className="dark:text-white">Email:</b><span className="dark:text-white"> moitruong@hcmuaf.edu.vn</span></p>
+                            <p><b className="dark:text-white">Địa chỉ:</b><span className="dark:text-white"> ...</span></p>
+                            <p><b className="dark:text-white">Email:</b><span className="dark:text-white"> ...</span></p>
                             <p><b className="dark:text-white">Điện thoại:</b><span className="dark:text-white"> (028) xxxx xxxx</span></p>
                             <p className="pt-4 border-t border-gray/10 text-tinySize italic dark:text-white/50">
                                 Vui lòng liên hệ trong giờ hành chính để được hỗ trợ tốt nhất.

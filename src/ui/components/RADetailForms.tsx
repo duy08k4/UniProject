@@ -26,7 +26,7 @@ const RADetailForms: React.FC = () => {
     const [isEdit, setIsEdit] = useState<boolean>(!formId);
     const [formType, setFormType] = useState<'join' | 'milestone' | null>(!formId ? null : undefined as any);
     const [milestoneId, setMilestoneId] = useState<string | null>(null);
-    const [milestoneList, setMilestoneList] = useState<MilestoneShortDetail[]>([]);
+    const [_, setMilestoneList] = useState<MilestoneShortDetail[]>([]);
 
     const [formInfo, setFormInfo] = useState<any>({
         label: "",
@@ -38,7 +38,6 @@ const RADetailForms: React.FC = () => {
     });
 
     const [allFields, setAllFields] = useState<any[]>([]);
-    const [submissionSearch] = useState<string>("");
     const [showPreview, setShowPreview] = useState(false);
     const [formOriginalState, setFormOriginalState] = useState<boolean>() // Open and close the current form automaticaly when original state is true
 
@@ -88,34 +87,6 @@ const RADetailForms: React.FC = () => {
         };
         fetchMilestones();
     }, [formType, classId]);
-
-    const formatToInputDate = (dateStr: string | null | undefined) => {
-        if (!dateStr) return "";
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return "";
-        const pad = (n: number) => n < 10 ? '0' + n : n;
-        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-    };
-
-    const formatToInputTime = (dateStr: string | null | undefined) => {
-        if (!dateStr) return "";
-
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return "";
-
-        const pad = (n: number) => n < 10 ? '0' + n : n;
-        return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-    };
-
-    const mergeDateTimeToISO = (dateVal: string, timeVal: string) => {
-        if (!dateVal) return null;
-
-        const offset = -new Date().getTimezoneOffset();
-        const sign = offset >= 0 ? '+' : '-';
-        const pad = (n: number) => String(Math.abs(Math.floor(n))).padStart(2, '0');
-
-        return `${dateVal}T${timeVal || '00:00'}:00${sign}${pad(offset / 60)}:${pad(offset % 60)}`;
-    };
 
 
     const fetchDetail = async () => {

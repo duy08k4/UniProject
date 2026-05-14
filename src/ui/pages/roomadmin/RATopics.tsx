@@ -148,16 +148,16 @@ const RATopics: React.FC = () => {
                                         {canAssignReviewer ? (
                                             <button
                                                 onClick={e => openAssignModal(e, topic)}
-                                                className="flex items-center gap-1.5 text-sm font-medium hover:underline !text-mainColor dark:!text-green-400"
+                                                className="flex items-center gap-1.5 text-sm font-medium hover:underline text-mainColor! dark:text-green-400!"
                                             >
                                                 {topic.reviewer ? (
-                                                    <span className="!text-mainColor dark:!text-green-400">{topic.reviewer.full_name}</span>
+                                                    <span className="text-mainColor! dark:text-green-400!">{topic.reviewer.full_name}</span>
                                                 ) : (
                                                     <>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-3.5 !stroke-mainColor dark:!stroke-green-400">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-3.5 stroke-mainColor! dark:stroke-green-400!">
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                                         </svg>
-                                                        <span className="!text-mainColor dark:!text-green-400 font-bold">Chỉ định</span>
+                                                        <span className="text-mainColor! dark:text-green-400! font-bold">Chỉ định</span>
                                                     </>
                                                 )}
                                             </button>
@@ -213,6 +213,7 @@ const RATopics: React.FC = () => {
 
                         <div className="px-5 py-3 shrink-0 border-b-[0.5px] border-lightGray dark:border-gray/30">
                             <p className="text-smallSize text-gray dark:text-white/60 mb-2">Đề tài: <span className="font-medium dark:text-white/80">{assignTarget.title}</span></p>
+                            
                             <input
                                 autoFocus
                                 value={search}
@@ -234,11 +235,11 @@ const RATopics: React.FC = () => {
                                         onClick={() => handleAssignReviewer(l.user.id)}
                                         className={`w-full flex items-center justify-between px-5 py-3 text-left border-b-[0.5px] border-lightGray dark:border-gray/20 last:border-0 hover:bg-lighterGray dark:hover:bg-white/5 transition-colors disabled:opacity-50 ${isCurrentReviewer ? "bg-mainColor/5 dark:bg-mainColor/10" : ""}`}>
                                         <div>
-                                            <p className={`text-smallSize font-semibold ${isCurrentReviewer ? "!text-mainColor" : "dark:text-white"}`}>{l.user.full_name}</p>
+                                            <p className={`text-smallSize font-semibold ${isCurrentReviewer ? "text-mainColor!" : "dark:text-white"}`}>{l.user.full_name}</p>
                                             <p className="text-tinySize text-gray dark:text-white/50 mt-0.5">{l.user.email}</p>
                                         </div>
                                         {isCurrentReviewer && (
-                                            <span className="text-tinySize !text-mainColor font-bold shrink-0 ml-3">✓ Đang phản biện</span>
+                                            <span className="text-tinySize text-mainColor! font-bold shrink-0 ml-3">✓ Đang phản biện</span>
                                         )}
                                     </button>
                                 )
