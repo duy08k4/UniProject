@@ -1,15 +1,14 @@
 import type React from "react"
 import { useState } from "react"
+import { toast } from "sonner"
+import { ClassService } from "../../services/class/class.service"
+import { ScaleLoader } from "react-spinners"
+import { confirmDialog } from "primereact/confirmdialog"
 
 type NewClassFormValues = {
     className: string
     subject: string
     description: string
-}
-
-type AdvanceSetting = {
-    approval: boolean,
-    startForm: boolean
 }
 
 type Validations = {
@@ -21,38 +20,96 @@ interface NewClassForm_Interface {
     toggleForm: () => void
 }
 
-const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
+const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {    
     const [newClassFormValues, setNewClassFormValues] = useState<NewClassFormValues>({
         className: "",
         subject: "",
         description: ""
     })
 
-    const [_, setAdvanceSetting] = useState<AdvanceSetting>({
-        approval: false,
-        startForm: false
-    })
-
     const validations: Record<keyof NewClassFormValues, Validations> = {
         className: {
             wordLength: (value: string) => value.length.toString(),
-            validate: (value: string) => value.trim().length <= 100 && value.trim().length > 0
+            validate: (value: string) => value.trim().length <= 100 && value.trim().length >= 0
         },
         subject: {
             wordLength: (value: string) => value.length.toString(),
-            validate: (value: string) => value.trim().length <= 100 && value.trim().length > 0
+            validate: (value: string) => value.trim().length <= 100 && value.trim().length >= 0
         },
         description: {
             wordLength: (value: string) => value.length.toString(),
-            validate: (value: string) => value.trim().length <= 300 && value.trim().length > 0
+            validate: (value: string) => {
+                const trimmed = value.trim()
+                return !trimmed || trimmed.length <= 300
+            }
         }
     }
+
+    // State
+    const [isCreating, setIsCreating] = useState<boolean>(false)
 
     const handleChange = (field: keyof NewClassFormValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setNewClassFormValues(prev => ({
             ...prev,
             [field]: e.target.value
         }))
+    }
+
+    const handleClose = () => {
+        const isData = Object.values(newClassFormValues).some((field: string) => field)
+
+        if (isData) {
+            confirmDialog({
+                header: "Xác nhận đóng form",
+                message: "Dữ liệu trong form sẽ mất khi bạn đóng form.",
+
+                acceptLabel: "Đồng ý",
+                rejectLabel: "Hủy",
+
+                accept: () => {
+                    toggleForm()
+                }
+            })
+        } else toggleForm()
+    }
+
+    const checkFormValid = () => {
+        return (Object.keys(validations) as (keyof NewClassFormValues)[])
+            .every((fieldKey) => {
+                const value = newClassFormValues[fieldKey]
+
+                if (typeof value === "string" && !value.trim() && fieldKey != "description") return false
+                return validations[fieldKey].validate(value)
+            })
+    }
+
+    const handleCreateClass = async () => {
+        if (!checkFormValid()) {
+            toast.error("Vui lòng điền đầy đủ thông tin")
+            return false
+        }
+
+        setIsCreating(true)
+        const newclass = await ClassService.createNewClass(
+            newClassFormValues.className,
+            newClassFormValues.subject,
+            newClassFormValues.description
+        ).finally(() => {
+            setIsCreating(false)
+            setNewClassFormValues({
+                className: "",
+                description: "",
+                subject: ""
+            })
+
+        })
+        
+        if (!newclass) {
+            toggleForm()
+            return
+        }
+
+        toast.success("Yêu cầu tạo lớp học của bạn đã được gửi")
     }
 
     return (
@@ -73,9 +130,11 @@ const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
                             type="text"
                             value={newClassFormValues.className}
                             placeholder="Nhập tên lớp học"
-                            className="w-full shadow-[0_0_10px_rgba(128,128,128,0.25)] text-normalSize font-light py-2.5 px-5 rounded-small max-sm:text-smallSize"
+                            className="w-full shadow-[0_0_10px_rgba(128,128,128,0.25)] text-normalSize font-light py-2.5 px-5 rounded-small max-sm:text-smallSize disableState"
                             maxLength={100}
                             onChange={handleChange("className")}
+                            disabled={isCreating}
+                            autoFocus
                         />
                     </span>
 
@@ -89,9 +148,10 @@ const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
                             type="text"
                             value={newClassFormValues.subject}
                             placeholder="Nhập tên môn học"
-                            className="w-full shadow-[0_0_10px_rgba(128,128,128,0.25)] text-normalSize font-light py-2.5 px-5 rounded-small max-sm:text-smallSize"
+                            className="w-full shadow-[0_0_10px_rgba(128,128,128,0.25)] text-normalSize font-light py-2.5 px-5 rounded-small max-sm:text-smallSize disableState"
                             maxLength={100}
                             onChange={handleChange("subject")}
+                            disabled={isCreating}
                         />
                     </span>
 
@@ -104,33 +164,20 @@ const NewClassForm: React.FC<NewClassForm_Interface> = ({ toggleForm }) => {
                         <textarea
                             placeholder="Nhập mô tả lớp học"
                             value={newClassFormValues.description}
-                            className="h-30 w-full shadow-[0_0_10px_rgba(128,128,128,0.25)] text-normalSize font-light py-2.5 px-5 rounded-small max-sm:text-smallSize resize-none"
+                            className="h-30 w-full shadow-[0_0_10px_rgba(128,128,128,0.25)] text-normalSize font-light py-2.5 px-5 rounded-small max-sm:text-smallSize resize-none disableState"
                             onChange={handleChange("description")}
                             maxLength={300}
+                            disabled={isCreating}
                         ></textarea>
 
                     </span>
                 </span>
 
-                <span className="flex flex-col gap-2.5">
-                    <h4 className="text-mediumSize font-semibold max-sm:text-normalSize">Cài đặt lớp học:</h4>
-                    
-                    <span className="flex flex-col pl-2.5 gap-1.5">
-                        <span className="flex items-center-safe gap-2.5">
-                            <input id="approval" type="checkbox" onChange={(e) => { setAdvanceSetting(prev => ({ ...prev, approval: e.target.checked })) }} />
-                            <label htmlFor="approval" className="select-none max-sm:text-smallSize">Phê duyệt yêu cầu tham gia</label>
-                        </span>
-
-                        <span className="flex items-center-safe gap-2.5">
-                            <input id="startForm" type="checkbox" onChange={(e) => { setAdvanceSetting(prev => ({ ...prev, startForm: e.target.checked })) }} />
-                            <label htmlFor="startForm" className="select-none max-sm:text-smallSize">Điền form khi tham gia nhóm</label>
-                        </span>
-                    </span>
-                </span>
-
                 <span className="flex items-center-safe gap-5">
-                    <button className="flex-1 bg-lightGray hover:cursor-pointer hoverBtn py-2.5 rounded-small max-sm:text-smallSize" onClick={toggleForm}>Hủy</button>
-                    <button className="flex-2 bg-mainColor hover:cursor-pointer hoverBtn text-white py-2.5 rounded-small max-sm:text-smallSize">Tạo lớp</button>
+                    <button className="flex-1 bg-lightGray hover:cursor-pointer hoverBtn py-2.5 rounded-small max-sm:text-smallSize disableState" disabled={isCreating} onClick={handleClose}>Hủy</button>
+                    <button className="flex-2 bg-mainColor hover:cursor-pointer hoverBtn text-white py-2.5 rounded-small max-sm:text-smallSize disableState" disabled={isCreating} onClick={handleCreateClass}>
+                        {isCreating ? <><ScaleLoader height={10} width={4} color="white" /></> : <>Tạo lớp</>}
+                    </button>
                 </span>
             </div>
         </div>
