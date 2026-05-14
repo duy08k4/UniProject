@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function useDebounce<T>(value: T, delay: number): T {
-  // State to store the debounced value
+export function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
@@ -12,9 +11,7 @@ function useDebounce<T>(value: T, delay: number): T {
     return () => {
       clearTimeout(handler);
     };
-  }, [value, delay]); // Only re-run if value or delay changes
+  }, [value, delay]);
 
   return debouncedValue;
 }
-
-export default useDebounce;

@@ -1,115 +1,227 @@
 import type React from "react"
-
-// Assets
+import { NavLink } from "react-router-dom"
 import HeroImage from "../../assets/HeroImage.png"
-import DbHeroImage from "../../assets/DbHeroImage.svg"
-import DarkModeDBHeroImage from "../../assets/DbHeroImage_DarkMode.png"
 
-// Component
-import SignUpDirect from "../components/SignUpDirect.comp"
-import ProjectDirect from "../components/ProjectDirect.comp"
-
-const objectiveContent: string[] = [
-    "Quản lý tập trung đồ án tốt nghiệp",
-    "Số hóa quy trình một cách linh hoạt",
-    "Theo dỏi tiến độ thực hiện đồ án",
-    "Nhập điểm và đánh giá đồ án"
+const painPoints = [
+    {
+        before: "Sử dụng một biểu mẫu duy nhất cho nhiều giai đoạn khác nhau sẽ làm sinh viên dễ nhầm lẫn trong việc nộp bài",
+        after: "Mỗi cột mốc trong quy trình sẽ có một hoặc nhiều biểu mẫu riêng biệt và có thể quản lý thời gian nhận câu trả lời.",
+    },
+    {
+        before: "Điểm tổng kết gồm nhiều thành phần từ nhiều giảng viên khác nhau, phải tổng hợp và nhập liệu tính toán.",
+        after: "Quản lý lớp tự thiết kế cột điểm và công thức tính toán tự động. Phân quyền nhập điểm cho từng cột",
+    },
+    {
+        before: "Tìm kiếm đề tài tốt nghiệp của các sinh viên khóa trước thông qua thư viện số của nhà trường với phạm vi tìm kiếm toàn trường.",
+        after: "Tìm kiếm đề tài tốt nghiệp của các sinh viên khóa trước với phạm vi trong Khoa Môi Trường và Tài Nguyên.",
+    },
 ]
 
-const objectiveIcon: React.ReactNode[] = [
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-8 fill-mainColor max-sm:size-5">
-        <path d="M19.5 21a3 3 0 0 0 3-3v-4.5a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3V18a3 3 0 0 0 3 3h15ZM1.5 10.146V6a3 3 0 0 1 3-3h5.379a2.25 2.25 0 0 1 1.59.659l2.122 2.121c.14.141.331.22.53.22H19.5a3 3 0 0 1 3 3v1.146A4.483 4.483 0 0 0 19.5 9h-15a4.483 4.483 0 0 0-3 1.146Z" />
-    </svg>,
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-8 fill-mainColor max-sm:size-5">
-        <path fillRule="evenodd" d="M3 6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6Zm14.25 6a.75.75 0 0 1-.22.53l-2.25 2.25a.75.75 0 1 1-1.06-1.06L15.44 12l-1.72-1.72a.75.75 0 1 1 1.06-1.06l2.25 2.25c.141.14.22.331.22.53Zm-10.28-.53a.75.75 0 0 0 0 1.06l2.25 2.25a.75.75 0 1 0 1.06-1.06L8.56 12l1.72-1.72a.75.75 0 1 0-1.06-1.06l-2.25 2.25Z" clipRule="evenodd" />
-    </svg>,
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-8 fill-mainColor max-sm:size-5">
-        <path d="M5.625 3.75a2.625 2.625 0 1 0 0 5.25h12.75a2.625 2.625 0 0 0 0-5.25H5.625ZM3.75 11.25a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5H3.75ZM3 15.75a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75ZM3.75 18.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5H3.75Z" />
-    </svg>,
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-8 fill-mainColor max-sm:size-5">
-        <path d="M11.7 2.805a.75.75 0 0 1 .6 0A60.65 60.65 0 0 1 22.83 8.72a.75.75 0 0 1-.231 1.337 49.948 49.948 0 0 0-9.902 3.912l-.003.002c-.114.06-.227.119-.34.18a.75.75 0 0 1-.707 0A50.88 50.88 0 0 0 7.5 12.173v-.224c0-.131.067-.248.172-.311a54.615 54.615 0 0 1 4.653-2.52.75.75 0 0 0-.65-1.352 56.123 56.123 0 0 0-4.78 2.589 1.858 1.858 0 0 0-.859 1.228 49.803 49.803 0 0 0-4.634-1.527.75.75 0 0 1-.231-1.337A60.653 60.653 0 0 1 11.7 2.805Z" />
-        <path d="M13.06 15.473a48.45 48.45 0 0 1 7.666-3.282c.134 1.414.22 2.843.255 4.284a.75.75 0 0 1-.46.711 47.87 47.87 0 0 0-8.105 4.342.75.75 0 0 1-.832 0 47.87 47.87 0 0 0-8.104-4.342.75.75 0 0 1-.461-.71c.035-1.442.121-2.87.255-4.286.921.304 1.83.634 2.726.99v1.27a1.5 1.5 0 0 0-.14 2.508c-.09.38-.222.753-.397 1.11.452.213.901.434 1.346.66a6.727 6.727 0 0 0 .551-1.607 1.5 1.5 0 0 0 .14-2.67v-.645a48.549 48.549 0 0 1 3.44 1.667 2.25 2.25 0 0 0 2.12 0Z" />
-        <path d="M4.462 19.462c.42-.419.753-.89 1-1.395.453.214.902.435 1.347.662a6.742 6.742 0 0 1-1.286 1.794.75.75 0 0 1-1.06-1.06Z" />
-    </svg>
+const features = [
+    {
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7 stroke-mainColor group-hover:stroke-white transition-all">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+            </svg>
+        ),
+        title: "Quy trình tùy chỉnh",
+        desc: "Thiết kế các mốc phù hợp với từng học kỳ và có thể tùy chỉnh. Mỗi mốc có thể gắn nhiều biểu mẫu và bảng điểm. Quản lý thời gian đóng mở cho từng cột mốc.",
+        highlight: "Linh hoạt theo từng yêu cầu",
+    },
+    {
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7 stroke-mainColor group-hover:stroke-white transition-all">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h1.5C5.496 19.5 6 18.996 6 18.375m-3.75.125v-5.25A2.25 2.25 0 0 1 4.5 11.25h15A2.25 2.25 0 0 1 21.75 13.5v5.25m-18.375.125A1.125 1.125 0 0 0 2.25 19.5m0 0v-5.25A2.25 2.25 0 0 1 4.5 12h15a2.25 2.25 0 0 1 2.25 2.25v5.25m0 0a1.125 1.125 0 0 1-1.125 1.125m0 0h-1.5c-.621 0-1.125-.504-1.125-1.125M6 18.375v-5.25A2.25 2.25 0 0 1 8.25 11.25h7.5A2.25 2.25 0 0 1 18 13.5v5.25" />
+            </svg>
+        ),
+        title: "Bảng điểm tùy chỉnh",
+        desc: "Thiết kế bảng điểm với các cột điểm và công thức tính toán tự động có thể tùy chỉnh. Phân quyền nhập điểm cho từng cột.",
+        highlight: "Phân quyền nhập + tính điểm tự động",
+    },
+    {
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7 stroke-mainColor group-hover:stroke-white transition-all">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+            </svg>
+        ),
+        title: "Kho đồ án trực tuyến",
+        desc: "Toàn bộ đồ án sau khi hoàn thành được lưu trữ và công khai trên hệ thống. Sinh viên khóa sau có thể tìm kiếm và sử dụng làm tài liệu tham khảo.",
+        highlight: "Tra cứu tiện lợi",
+    },
 ]
 
 const Home: React.FC = () => {
     return (
-        <div className="h-fit flex flex-col gap-40 max-sm:gap-20">
-            <div className="h-fit flex flex-col gap-5">
-                {/* Hero image */}
-                <div className="h-fit relative flex justify-center-safe items-center-safe">
-                    <div className="h-[400px] aspect-square blur-2xl rounded-full bg-mainColorRGB max-sm:h-[300px]"></div>
-                    <img src={HeroImage} loading="lazy" className="absolute top-1/2 left-1/2 h-[250px] -translate-1/2 max-sm:h-[200px]" />
-                </div>
+        <div className="min-h-screen pb-20">
 
-                {/* Hero section */}
-                <div className="flex flex-col gap-10 items-center-safe mt-topPadding max-sm:gap-5">
-                    <h1 className="uppercase flex gap-2.5 font-bold text-[48px] dark:text-white max-sm:text-mobile-hugeSize max-sm:block">
-                        hệ thống quản lý 
-                        <p className="text-black dark:text-white max-sm:dark:text-gray">đồ án tốt nghiệp</p>
+            {/* 1. HERO */}
+            <section className="relative py-20 border-b border-gray/10 dark:border-white/5 overflow-hidden">
+                {/* subtle gradient blob */}
+                <div className="pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-mainColor/5 blur-3xl" />
+                <div className="pointer-events-none absolute -bottom-20 -right-20 w-[400px] h-[400px] rounded-full bg-mainColor/5 blur-3xl" />
 
-                    </h1>
-                    <p className="uppercase text-mainColor text-mediumSize font-light max-sm:text-mobile-mediumSize">khoa môi trường và tài nguyên</p>
-                    <nav className="flex gap-2.5 max-sm:mt-5">
-                        <button className="text-mainColor font-bold bg-mainColorRGB px-10 rounded-normal flex items-center-safe gap-2.5 hover:cursor-pointer max-sm:text-mobile-smallSize max-sm:py-2.5">
-                            Truy cập
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" className="size-6 stroke-mainColor">
-                                <path strokeLinecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
-                            </svg>
-
-                        </button>
-                        <SignUpDirect content="Tạo tài khoản UNI" />
-                    </nav>
-                </div>
-            </div>
-
-            {/* Objective */}
-            <div className="h-fit flex flex-col items-center-safe gap-5">
-                <div className="">
-                    <h1 className="uppercase font-bold text-largeSize dark:text-white max-sm:text-mobile-bigSize">Mục tiêu</h1>
-                </div>
-
-                <div className="w-full grid grid-cols-2 gap-y-5 gap-x-5 max-sm:grid-cols-1">
-                    {objectiveContent.map((value, index) => {
-                        return (
-                            <span key={index} className="flex gap-2.5 items-center-safe shadow-[0_0_12px_rgba(0,0,0,0.1)] px-5 py-5 rounded-normal dark:bg-lightDark">
-                                <span className="bg-mainColorRGB h-[60px] max-sm:h-[38px] aspect-square flex items-center-safe justify-center-safe rounded-full">{objectiveIcon[index]}</span>
-                                <p className="font-semibold text-mediumSize dark:text-white max-sm:text-smallSize">{value}</p>
-                            </span>
-                        )
-                    })}
-                </div>
-            </div>
-
-            {/* Database */}
-            <div className="flex gap-5">
-                <div className="w-2/5 flex flex-col gap-10 max-sm:w-full">
-                    <div className="flex flex-col gap-2.5">
-                        <h1 className="text-hugeSize uppercase font-bold flex items-center-safe gap-2.5 dark:text-white max-sm:text-mobile-bigSize">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-14 fill-mainColor max-sm:size-6">
-                                <path d="M21 6.375c0 2.692-4.03 4.875-9 4.875S3 9.067 3 6.375 7.03 1.5 12 1.5s9 2.183 9 4.875Z" />
-                                <path d="M12 12.75c2.685 0 5.19-.586 7.078-1.609a8.283 8.283 0 0 0 1.897-1.384c.016.121.025.244.025.368C21 12.817 16.97 15 12 15s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.285 8.285 0 0 0 1.897 1.384C6.809 12.164 9.315 12.75 12 12.75Z" />
-                                <path d="M12 16.5c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 15.914 9.315 16.5 12 16.5Z" />
-                                <path d="M12 20.25c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 19.664 9.315 20.25 12 20.25Z" />
-                            </svg>
-
-                            Cơ sở dữ liệu
+                <div className="relative max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                    <div className="flex-1">
+                        <span className="inline-block text-mainColor font-bold tracking-widest uppercase text-tinySize mb-4 px-3 py-1 bg-mainColor/10 rounded-small">
+                            Khoa Môi trường và Tài nguyên · HCMUAF
+                        </span>
+                        <h1 className="text-hugeSize font-extrabold text-lightDark dark:text-white mb-5 uppercase tracking-tight leading-tight max-sm:text-mobile-hugeSize">
+                            Quản lý<br />
+                            <span className="text-mainColor">Đồ án Tốt nghiệp</span>
                         </h1>
-                        <p className="text-mediumSize font-light ml-3.5 dark:text-lightGray max-sm:text-mobile-normalSize">Các công trình nghiên cứu của sinh viên được lưu trữ tập trung
-                            nhằm mục tiêu viết báo cáo và làm nguồn tham khảo cho các sinh viên
-                            chuẩn bị thực hiện đồ án tốt nghiệp
+                        <p className="text-normalSize text-gray mb-8 leading-relaxed max-w-lg max-sm:text-mobile-normalSize">
+                            Thiết kế quy trình linh hoạt theo yêu cầu với các biểu mẫu và bảng điểm được tùy chỉnh giúp thu thập câu trả lời và điểm số một cách linh hoạt trên cùng một nền tảng. 
+                        </p>
+                        <div className="flex gap-4 flex-wrap">
+                            <NavLink
+                                to="/auth/sign-in"
+                                className="px-8 py-3.5 bg-mainColor text-white font-bold rounded-small shadow-lg shadow-mainColor/25 hover:brightness-110 transition-all"
+                            >
+                                Truy cập hệ thống
+                            </NavLink>
+                            <NavLink
+                                to="/projects"
+                                className="px-8 py-3.5 border border-gray/20 dark:border-white/10 text-lightDark dark:text-white font-bold rounded-small hover:bg-gray/5 dark:hover:bg-white/5 transition-all"
+                            >
+                                Tra cứu đồ án
+                            </NavLink>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 flex justify-center">
+                        <img src={HeroImage} alt="Hero" className="w-1/2 h-auto drop-shadow-2xl" />
+                    </div>
+                </div>
+            </section>
+
+            {/* 2. PAIN vs GAIN */}
+            <section className="py-20 border-b border-gray/10 dark:border-white/5">
+                <div className="max-w-6xl mx-auto">
+                    <div className="mb-12">
+                        <h2 className="text-bigSize font-bold text-lightDark dark:text-white uppercase border-l-4 border-mainColor pl-4 max-sm:text-mobile-bigSize">
+                            Tại sao cần hệ thống này?
+                        </h2>
+                        <p className="mt-3 text-smallSize text-gray pl-5">
+                            Những vấn đề thực tế trong quy trình quản lý đồ án hiện tại của khoa.
                         </p>
                     </div>
 
-                    <ProjectDirect content="Truy cập dữ liệu đồ án" />
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Header row */}
+                        <div className="px-5 py-3 rounded-normal bg-red/5 border border-red/15">
+                            <p className="text-smallSize font-bold text-red uppercase tracking-wider">❌ Cách làm hiện tại</p>
+                        </div>
+                        <div className="px-5 py-3 rounded-normal bg-mainColor/5 border border-mainColor/15">
+                            <p className="text-smallSize font-bold text-mainColor uppercase tracking-wider">✅ Với UniProject</p>
+                        </div>
 
-                <div className="relative flex-1 flex justify-center-safe items-center-safe max-sm:hidden">
-                    <img src={DarkModeDBHeroImage} />
-                    <img className="absolute dark:opacity-0" src={DbHeroImage} />
+                        {/* Pain/Gain rows */}
+                        {painPoints.map((p, i) => (
+                            <>
+                                <div key={`before-${i}`} className="px-5 py-4 rounded-normal bg-lighterGray/60 dark:bg-white/3 border border-gray/10 flex items-start gap-3">
+                                    <span className="mt-0.5 shrink-0 size-5 rounded-full bg-red/10 flex items-center justify-center">
+                                        <span className="text-red text-tinySize font-bold">✕</span>
+                                    </span>
+                                    <p className="text-smallSize text-gray dark:text-white/70 leading-relaxed">{p.before}</p>
+                                </div>
+                                <div key={`after-${i}`} className="px-5 py-4 rounded-normal bg-mainColor/3 dark:bg-mainColor/5 border border-mainColor/10 flex items-start gap-3">
+                                    <span className="mt-0.5 shrink-0 size-5 rounded-full bg-mainColor/15 flex items-center justify-center">
+                                        <span className="text-mainColor text-tinySize font-bold">✓</span>
+                                    </span>
+                                    <p className="text-smallSize text-lightDark dark:text-white leading-relaxed">{p.after}</p>
+                                </div>
+                            </>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            {/* 3. FEATURES */}
+            <section className="py-20 border-b border-gray/10 dark:border-white/5">
+                <div className="max-w-6xl mx-auto">
+                    <div className="mb-12">
+                        <h2 className="text-bigSize font-bold text-lightDark dark:text-white uppercase border-l-4 border-mainColor pl-4 max-sm:text-mobile-bigSize">
+                            Tính năng nổi bật
+                        </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {features.map((f, i) => (
+                            <div key={i} className="flex flex-col gap-5 p-6 rounded-normal border border-gray/10 dark:border-white/5 bg-white dark:bg-lightDark hover:border-mainColor/40 hover:shadow-lg hover:shadow-mainColor/5 transition-all group">
+                                <div className="size-12 rounded-normal bg-mainColor/10 flex items-center justify-center group-hover:bg-mainColor transition-all">
+                                    {f.icon}
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <h3 className="font-bold text-normalSize text-lightDark dark:text-white max-sm:text-mobile-normalSize">{f.title}</h3>
+                                    <p className="text-smallSize text-gray leading-relaxed">{f.desc}</p>
+                                </div>
+                                <div className="mt-auto pt-4 border-t border-gray/10 dark:border-white/5">
+                                    <span className="text-tinySize font-bold text-mainColor uppercase tracking-wider">{f.highlight}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* 4. THESIS ACCESS */}
+            <section className="py-20 border-b border-gray/10 dark:border-white/5">
+                <div className="max-w-6xl mx-auto">
+                    <div className="relative overflow-hidden rounded-normal border border-mainColor/20 bg-mainColor/5 dark:bg-mainColor/8 p-10 flex flex-col md:flex-row items-center gap-8">
+                        <div className="pointer-events-none absolute -right-20 -top-20 w-64 h-64 rounded-full bg-mainColor/10 blur-3xl" />
+                        <div className="flex-1">
+                            <span className="text-tinySize font-bold text-mainColor uppercase tracking-widest">Dành cho sinh viên</span>
+                            <h3 className="mt-2 text-mediumSize font-bold text-lightDark dark:text-white max-sm:text-mobile-mediumSize">
+                                Đọc đồ án khóa trước
+                            </h3>
+                            <p className="mt-3 text-smallSize text-gray leading-relaxed max-w-lg">
+                                Toàn bộ đồ án tốt nghiệp của các khóa được lưu trữ và công khai trên hệ thống. Tìm kiếm theo tên đề tài, sinh viên, loại đồ án. Mọi lúc, mọi nơi.
+                            </p>
+                        </div>
+                        <NavLink
+                            to="/projects"
+                            className="shrink-0 px-8 py-3.5 bg-mainColor text-white font-bold rounded-small shadow-lg shadow-mainColor/25 hover:brightness-110 transition-all whitespace-nowrap"
+                        >
+                            Xem kho đồ án →
+                        </NavLink>
+                    </div>
+                </div>
+            </section>
+
+            {/* 5. CONTACT */}
+            <section className="py-16">
+                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="p-8 bg-white dark:bg-lightDark border border-gray/10 rounded-normal">
+                        <h3 className="font-bold text-normalSize dark:text-white mb-6 uppercase">Truy cập nhanh</h3>
+                        <div className="flex flex-col gap-3">
+                            <NavLink to="/auth/sign-in" className="flex items-center gap-3 p-4 rounded-normal bg-mainColor/5 hover:bg-mainColor/10 transition-all group">
+                                <span className="font-bold text-mainColor">▸</span>
+                                <p className="text-smallSize font-bold dark:text-white group-hover:text-mainColor">Đăng nhập (Sinh viên / Giảng viên)</p>
+                            </NavLink>
+                            <NavLink to="/auth/sign-up" className="flex items-center gap-3 p-4 rounded-normal bg-gray/5 hover:bg-gray/10 transition-all group">
+                                <span className="font-bold text-gray">▸</span>
+                                <p className="text-smallSize font-bold dark:text-white group-hover:text-mainColor">Đăng ký tài khoản</p>
+                            </NavLink>
+                            <NavLink to="/projects" className="flex items-center gap-3 p-4 rounded-normal bg-gray/5 hover:bg-gray/10 transition-all group">
+                                <span className="font-bold text-gray">▸</span>
+                                <p className="text-smallSize font-bold dark:text-white group-hover:text-mainColor">Tra cứu đồ án tốt nghiệp</p>
+                            </NavLink>
+                        </div>
+                    </div>
+
+                    <div className="p-8 bg-white dark:bg-lightDark border border-gray/10 rounded-normal">
+                        <h3 className="font-bold text-normalSize dark:text-white mb-6 uppercase">Liên hệ Khoa</h3>
+                        <div className="text-smallSize text-gray dark:text-white/70 space-y-3">
+                            <p><b className="dark:text-white">Địa chỉ:</b><span className="dark:text-white"> ...</span></p>
+                            <p><b className="dark:text-white">Email:</b><span className="dark:text-white"> ...</span></p>
+                            <p><b className="dark:text-white">Điện thoại:</b><span className="dark:text-white"> (028) xxxx xxxx</span></p>
+                            <p className="pt-4 border-t border-gray/10 text-tinySize italic dark:text-white/50">
+                                Vui lòng liên hệ trong giờ hành chính để được hỗ trợ tốt nhất.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     )
 }

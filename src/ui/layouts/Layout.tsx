@@ -97,12 +97,12 @@ const LandingPageLayout: React.FC = () => {
 
                     <button className={`hidden max-sm:block h-full aspect-square rounded-full p-2 hover:cursor-pointer hover:bg-lightGray ${open && "bg-lightGray"}`} onClick={() => { setOpen(!open) }}>
                         {open ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                             </svg>
                         ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 max-sm:dark:stroke-white">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 max-sm:dark:stroke-white">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                             </svg>
                         )}
 
@@ -119,7 +119,7 @@ const LandingPageLayout: React.FC = () => {
 
             {/* Footer */}
             <footer className="w-full h-fit border-t-2 border-lightGray flex flex-col items-center-safe justify-center-safe py-5 dark:border-gray">
-                <p className="dark:text-white max-sm:text-mobile-smallSize">Thiết kế và xây dựng bởi <b><i className="dark:text-mainColor max-sm:text-mobile-smallSize">WallDy</i></b></p>
+                <p className="dark:text-white max-sm:text-mobile-smallSize">Thiết kế và xây dựng bởi <b><a href="https://github.com/duy08k4" target="_blank" className="italic dark:text-mainColor max-sm:text-mobile-smallSize">WallDy</a></b></p>
                 <p className="dark:text-white max-sm:text-mobile-smallSize">&copy; 2026 UniProject. Tất cả các quyền được bảo lưu.</p>
             </footer>
         </div>
