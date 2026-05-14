@@ -1,11 +1,27 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme=light], [data-theme=dark] *));
+
+@layer utilities {
+
+    .no-spinner::-webkit-outer-spin-button,
+    .no-spinner::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .no-spinner {
+        -moz-appearance: textfield;
+    }
+}
 
 @layer base {
     * {
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
         font-family: "K2D", sans-serif;
+        color: #3e3f46;
+        transition: 0.5s;
+        box-sizing: border-box !important;
     }
 
     html,
@@ -18,22 +34,109 @@
         height: 100%;
         width: 100%;
     }
+
+    [data-theme="dark"] #root {
+        background: var(--color-bgDark);
+    }
+
+    .hoverBtn:hover {
+        cursor: pointer;
+        filter: brightness(1.1);
+    }
+
+    .hoverBtn:active {
+        cursor: grabbing;
+    }
+
+    .disableState:disabled {
+        opacity: 0.5 !important;
+        cursor: default !important;
+    }
+
+    input {
+        outline: none !important;
+    }
+
+    .dialogHide {
+        display: none;
+    }
+
+    /* Prime React */
+    .p-confirm-dialog-accept {
+        background: #499C40 !important;
+        border: none !important;
+
+        span {
+            color: white !important;
+        }
+    }
 }
 
 @theme {
     /* Size */
+    --text-hugeSize: 46px;
     --text-largeSize: 34px;
     --text-bigSize: 28px;
-    --text-mediumSize: 24px;
+    --text-mediumSize: 22px;
     --text-normalSize: 18px;
     --text-smallSize: 14px;
     --text-tinySize: 10px;
 
-    /* Main color */
+    --text-mobile-hugeSize: 34px;
+    --text-mobile-largeSize: 28px;
+    --text-mobile-bigSize: 22px;
+    --text-mobile-mediumSize: 20px;
+    --text-mobile-normalSize: 14px;
+    --text-mobile-smallSize: 12px;
+    --text-mobile-tinySize: 10px;
+
+    /* Padding */
+    --spacing-twoSidePadding: 120px;
+    --spacing-topPadding: 20px;
+    --spacing-BottomPadding: 20px;
+
+    --spacing-mobile-twoSidePadding: 40px;
+
+    --spacing-mainTwoSidePadding: 40px;
+
+    /* Border radius */
+    --radius-big: 20px;
+    --radius-medium: 15px;
+    --radius-normal: 10px;
+    --radius-small: 5px;
+
+    /* Color */
     --color-mainColor: #499C40;
+    --color-mainColorRGB: rgba(73, 156, 64, 0.25);
+
+    --color-lightDark: #262626;
+    --color-gray: #808080;
+    --color-lightGray: #d3d3d3;
+    --color-lighterGray: #f2f2f2;
+    --color-darkGray: #333333;
+    --color-red: #ff0000;
+    --color-redRGB: rgba(255, 0, 0, 0.25);
+    --color-oranged: #FF8C00;
+    --color-orangedRGB: rgba(255, 140, 0, 0.25);
+    --color-lightOrange: #FFE0B2;
+    --color-lightOrangeRGB: rgba(255, 224, 178, 0.25);
 
     /* Light mode */
-    --color-bg: #f6f6f6;
+    --color-bgLight: #ffffff;
 
     /* Darkmode */
+    --color-bgDark: #171717;
 }
+
+/* Tiptap dark mode */
+.dark .ProseMirror { color: white; }
+.dark .ProseMirror p,
+.dark .ProseMirror h1,
+.dark .ProseMirror h2,
+.dark .ProseMirror h3,
+.dark .ProseMirror li,
+.dark .ProseMirror blockquote { color: white; }
+.ProseMirror:focus { outline: none; }
+
+/* Dark mode overrides */
+[data-theme="dark"] .dark-text-bright { color: #6fcf65 !important; }

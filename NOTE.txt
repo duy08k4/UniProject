@@ -1,0 +1,47 @@
+CHƯA LÀM
+- 
+
+
+MODULE: PROGRESS (Chưa real-time)
+- Uniadmin
+    = Duyệt quy trình.
+    = Đình chỉ quy trình.
+    = Xóa quy trình.
+- Room admin
+    = Lần đầu, yêu cầu tạo quy trình.
+    = Sau khi tạo quy trình thì cần gửi YÊU CẦU DUYỆT đến Uniadmin.
+    = Khi quy trình chưa được duyệt thì chủ phòng vẫn có thể chỉnh sửa Thông tin quy trình và các cột mốc.
+    = Khi quy trình bị đình chỉ thì chủ phòng không thể truy cập vào Quy trình.
+    = Khi quy trình đã được duyệt bởi Uniadmin và chủ phòng thực hiện chỉnh sửa thông tin quy trình hoặc cột mốc thì cần phải duyệt lại. (Không áp dụng khi thao tác với Thông báo, biểu mẫu, bảng điểm)
+
+- Student / Lecturer
+    = Không thể truy cập khi quy trình bị đình chỉ.
+    = Không thể submit khi quy trình chưa được duyệt.
+
+
+MODULE: NOTIFICATION
+- Uniadmin
+    = Xem và xóa các thông báo.
+- Room admin
+    = Tạo thông báo cho lớp hoặc cho 1 cột mốc.
+    = Bảng tin sẽ hiện cả thông báo của cả lớp và thông báo cho 1 cột mốc.
+    = Gửi email đến tất cả thành viên lớp khi vừa tạo thông báo (tùy chọn)
+    = Có nút nhắc nhở (Gửi lại email)
+    = Trang bảng tin lớp học (Chưa làm)
+
+- Student / Lecturer
+    = Trang bảng tin lớp học (Chưa làm)
+    = Bảng tin sẽ hiện cả thông báo của cả lớp và thông báo cho 1 cột mốc.
+
+
+
+
+- Uniadmin
+- Room admin
+- Student
+- Lecturer
+
+
+
+
+Cần xây thêm 1 cái thùng rác
