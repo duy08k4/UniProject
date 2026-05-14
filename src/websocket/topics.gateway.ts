@@ -27,8 +27,8 @@ export class TopicsGateway {
 
             const userId = store.getState().auth.user.info.id
 
-            // Lecturer: cập nhật vào danh sách nếu mình là supervisor
-            if (topic.supervisor?.id === userId) {
+            // Lecturer: cập nhật vào danh sách nếu mình là supervisor hoặc reviewer
+            if (topic.supervisor?.id === userId || topic.reviewer?.id === userId) {
                 store.dispatch(updateTopicInLecturerList(topic))
             }
 

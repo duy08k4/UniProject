@@ -426,11 +426,12 @@ const SAClassDetail: React.FC = () => {
                     <div className="border-[0.5px] border-lightGray dark:border-gray rounded-normal overflow-hidden">
                         <table className="w-full bg-transparent">
                             <colgroup>
-                                <col className="w-[22%]" />
-                                <col className="w-[30%]" />
-                                <col className="w-[10%]" />
-                                <col className="w-[20%]" />
                                 <col className="w-[18%]" />
+                                <col className="w-[28%]" />
+                                <col className="w-[8%]" />
+                                <col className="w-[15%]" />
+                                <col className="w-[15%]" />
+                                <col className="w-[16%]" />
                             </colgroup>
                             <thead className="bg-lightGray/50 dark:bg-white/5">
                                 <tr>
@@ -438,6 +439,7 @@ const SAClassDetail: React.FC = () => {
                                     <th className="text-left dark:text-white text-sm uppercase tracking-wider">Tên đề tài</th>
                                     <th className="text-left dark:text-white text-sm uppercase tracking-wider">Loại</th>
                                     <th className="text-left dark:text-white text-sm uppercase tracking-wider">GVHD</th>
+                                    <th className="text-left dark:text-white text-sm uppercase tracking-wider">Phản biện</th>
                                     <th className="text-left dark:text-white text-sm uppercase tracking-wider">Trạng thái</th>
                                 </tr>
                             </thead>
@@ -445,9 +447,10 @@ const SAClassDetail: React.FC = () => {
                                 {topics.map((topic) => (
                                     <tr key={topic.id} className="border-t-[0.5px] border-lightGray dark:border-lightGray hover:bg-lighterGray dark:hover:bg-white/5">
                                         <td className="px-5 py-3 dark:text-white text-sm">{topic.student.full_name}</td>
-                                        <td className="px-5 py-3 dark:text-white text-sm max-w-[200px] truncate">{topic.title}</td>
-                                        <td className="px-5 py-3 text-gray text-sm">{VNThesisType[topic.thesis_type]?.split(" ")[0]}</td>
-                                        <td className="px-5 py-3 text-gray text-sm">{topic.supervisor?.full_name ?? "—"}</td>
+                                        <td className="py-3 dark:text-white text-sm max-w-[200px] truncate">{topic.title}</td>
+                                        <td className="py-3 text-gray text-sm">{VNThesisType[topic.thesis_type]?.split(" ")[0]}</td>
+                                        <td className="py-3 text-gray text-sm">{topic.supervisor?.full_name ?? "—"}</td>
+                                        <td className="py-3 text-gray text-sm">{topic.reviewer?.full_name ?? "—"}</td>
                                         <td className="px-5 py-3 text-sm">
                                             <span className={`font-semibold ${VNTopicStatus[topic.status]?.color}`}>
                                                 {VNTopicStatus[topic.status]?.label}
@@ -457,7 +460,7 @@ const SAClassDetail: React.FC = () => {
                                 ))}
                                 {topics.length === 0 && (
                                     <tr>
-                                        <td colSpan={5} className="py-20 text-center text-gray italic">Chưa có đề tài nào trong lớp này</td>
+                                        <td colSpan={6} className="py-20 text-center text-gray italic">Chưa có đề tài nào trong lớp này</td>
                                     </tr>
                                 )}
                             </tbody>

@@ -24,9 +24,7 @@ const RACommittee = () => {
     const [member, setMember] = useState("")
     const [secretary, setSecretary] = useState("")
 
-    // Get lecturers (exclude supervisors - simplified for now)
-    const allMembers = membersData?.data ? Object.values(membersData.data).flat() : []
-    const lecturers = allMembers.filter(m => m.role === "lecturer")
+    const lecturers = membersData?.data?.lecturer || []
     const milestones = progress?.milestones || []
 
     // Load data on mount
@@ -42,7 +40,7 @@ const RACommittee = () => {
         await ProgressService.getProgressDetail(classData.id)
 
         // Load members
-        const membersResult = await ClassService.getMembers(1, 200, undefined, "lecturer")
+        const membersResult = await ClassService.getMembers(1, 200)
         if (membersResult && membersResult.data) {
             dispatch(currentClass_SetMembers(membersResult))
         }

@@ -153,4 +153,18 @@ export default class TopicsService {
         }
         return null
     }
+
+    static async assignReviewer(topicId: string, classId: string, reviewerId: string) {
+        let loading
+        try {
+            loading = toast.loading("Đang phân công phản biện...")
+            const { status, data } = await api.patch<TopicDetail>(`${apiPath.topics.getOneTopic}/${topicId}/assign-reviewer`, { classId, reviewerId })
+            if (status >= 200 && status < 300) { toast.success("Đã phân công giảng viên phản biện"); return data }
+        } catch (error) {
+            errorCatch(error)
+        } finally {
+            toast.dismiss(loading)
+        }
+        return null
+    }
 }

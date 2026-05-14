@@ -26,13 +26,14 @@ const LTTopics: React.FC = () => {
     const topics = useSelector((state: RootState) => state.topics.myTopicsAsLecturer)
 
     const [loading, setLoading] = useState(true)
-    const [activeTab, setActiveTab] = useState<"invitations" | "supervised">("invitations")
+    const [activeTab, setActiveTab] = useState<"invitations" | "supervised" | "reviewing">("invitations")
     const [rejectNotes, setRejectNotes] = useState<Record<string, string>>({})
 
     const registrationMilestone = progress?.milestones?.find((m: any) => m.is_registration_milestone)
 
     const invitations = topics.filter(t => t.status === TopicStatus.INVITED)
     const supervised = topics.filter(t => SUPERVISED_STATUSES.includes(t.status as any))
+    const reviewing = topics.filter(t => t.reviewer?.id === userData?.id)
 
     const fetchTopics = async () => {
         if (!classId || !registrationMilestone?.id) { setLoading(false); return }
@@ -93,6 +94,13 @@ const LTTopics: React.FC = () => {
                     Đang hướng dẫn
                     {supervised.length > 0 && (
                         <span className="ml-2 px-1.5 py-0.5 bg-gray/20 text-gray text-tinySize rounded-full">{supervised.length}</span>
+                    )}
+                </button>
+                <button onClick={() => setActiveTab("reviewing")}
+                    className={`px-4 py-2 text-normalSize font-medium transition-colors relative ${activeTab === "reviewing" ? "text-mainColor after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-mainColor" : "text-gray hover:text-mainColor"}`}>
+                    Đang phản biện
+                    {reviewing.length > 0 && (
+                        <span className="ml-2 px-1.5 py-0.5 bg-gray/20 text-gray text-tinySize rounded-full">{reviewing.length}</span>
                     )}
                 </button>
             </div>
@@ -172,8 +180,60 @@ const LTTopics: React.FC = () => {
                                     <p className="text-smallSize text-gray italic">Loại đề tài</p>
                                     <p className="font-medium dark:text-white">{VNThesisType[topic.thesis_type]}</p>
                                 </div>
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-smallSize text-gray italic">Phản biện</p>
+                                    <p className="font-medium dark:text-white">{topic.reviewer?.full_name ?? "—"}</p>
+                                </div>
                             </div>
 
+                            {topic.outline_file_url && (
+                                <div className="border-t border-gray/10 pt-4">
+                                    <a href={topic.outline_file_url} target="_blank" rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 px-4 py-2 border border-mainColor text-mainColor rounded-md text-normalSize font-medium hover:bg-mainColor hover:text-white transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                        </svg>
+                                        Xem đề cương
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </>
+            )}
+
+            {/* Tab: Đang phản biện */}
+            {activeTab === "reviewing" && (
+                <>
+                    {reviewing.length === 0 && (
+                        <p className="text-gray italic">Chưa có đề tài nào được phân công phản biện.</p>
+                    )}
+                    {reviewing.map(topic => (
+                        <div key={topic.id} className="flex flex-col gap-4 p-7 shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-normal dark:bg-lightDark">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex flex-col gap-1">
+                                    <h3 className="font-bold text-bigSize dark:text-white">{topic.title}</h3>
+                                    {topic.description && <p className="text-gray text-smallSize">{topic.description}</p>}
+                                </div>
+                                <span className={`text-smallSize font-semibold shrink-0 ${VNTopicStatus[topic.status]?.color}`}>
+                                    {VNTopicStatus[topic.status]?.label}
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1 border-t border-gray/10 pt-4">
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-smallSize text-gray italic">Sinh viên</p>
+                                    <p className="font-medium dark:text-white">{topic.student.full_name}</p>
+                                    <p className="text-smallSize text-gray">{topic.student.email}</p>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-smallSize text-gray italic">Loại đề tài</p>
+                                    <p className="font-medium dark:text-white">{VNThesisType[topic.thesis_type]}</p>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-smallSize text-gray italic">GVHD</p>
+                                    <p className="font-medium dark:text-white">{topic.supervisor?.full_name ?? "—"}</p>
+                                </div>
+                            </div>
                             {topic.outline_file_url && (
                                 <div className="border-t border-gray/10 pt-4">
                                     <a href={topic.outline_file_url} target="_blank" rel="noopener noreferrer"
