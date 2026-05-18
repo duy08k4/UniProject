@@ -78,12 +78,12 @@ const OutlineReviewPanel: React.FC<Props> = ({ topics, isFetching, rejectNotes, 
                                     className="flex-1 border border-gray/30 rounded-md px-3 py-2 dark:bg-dark dark:text-white text-smallSize disableState"
                                     placeholder="Lý do từ chối (nếu có)..." disabled={isFetching} />
                             )}
-                            <button onClick={() => onReview(selected.id, true)} disabled={isFetching || selected.status === "approved"}
-                                className="px-5 py-2 bg-mainColor text-white rounded-md text-smallSize font-medium hover:opacity-80 transition-opacity disableState shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
-                                Duyệt
+                            <button onClick={async () => { await onReview(selected.id, true); onClose() }} disabled={isFetching || selected.status === "approved"}
+                                className="px-5 py-2 bg-mainColor text-white rounded-md text-smallSize font-bold hover:opacity-80 transition-opacity disableState shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
+                                {selected.status === "outline_pending" ? "Duyệt & Gửi Khoa" : "Phê duyệt chính thức"}
                             </button>
-                            <button onClick={() => onReview(selected.id, false)} disabled={isFetching || selected.status === "outline_rejected"}
-                                className="px-5 py-2 bg-red text-white rounded-md text-smallSize font-medium hover:opacity-80 transition-opacity disableState shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
+                            <button onClick={async () => { await onReview(selected.id, false); onClose() }} disabled={isFetching || selected.status === "outline_rejected"}
+                                className="px-5 py-2 bg-red text-white rounded-md text-smallSize font-bold hover:opacity-80 transition-opacity disableState shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
                                 Từ chối
                             </button>
                         </div>

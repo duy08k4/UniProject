@@ -78,14 +78,14 @@ export class AuthService {
 
             if (status >= 200 && status <300) {
                 toast.success("Đã thoát tài khoản")
-                store.dispatch(updateUser(null))
+                store.dispatch({ type: 'RESET_STORE' })
                 return true
             }
 
         } catch (error) {
             const errorStatus = (error as AxiosError).status
             if (errorStatus === 401 || errorStatus === 403) {
-                store.dispatch(updateUser(null))
+                store.dispatch({ type: 'RESET_STORE' })
                 return true
             }
 

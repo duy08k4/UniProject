@@ -13,6 +13,7 @@ import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 const SUPERVISED_STATUSES = [
     TopicStatus.SUPERVISOR_ACCEPTED,
     TopicStatus.OUTLINE_PENDING,
+    TopicStatus.OUTLINE_WAITING_UNIADMIN,
     TopicStatus.OUTLINE_REJECTED,
     TopicStatus.APPROVED,
 ]

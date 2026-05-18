@@ -4,28 +4,18 @@ import type { RootState } from "../../../redux/store"
 import CommitteeService from "../../../services/committee/committee.service"
 import { ClassService } from "../../../services/class/class.service"
 import ProgressService from "../../../services/progress/progress.service"
-import type { Committee, CommitteeMember } from "../../../services/committee/committee.type"
-import { CommitteeRole, VNCommitteeRole } from "../../../config/enum"
+import type { Committee } from "../../../services/committee/committee.type"
+import { VNCommitteeRole } from "../../../config/enum"
 import { ScaleLoader } from "react-spinners"
 import { currentClass_SetMembers } from "../../../redux/reducers/classSlice.reducer"
-import { toast } from "sonner"
 
 const RACommittee = () => {
     const dispatch = useDispatch()
     const classData = useSelector((state: RootState) => state.class.currentClass.info)
-    const progress = useSelector((state: RootState) => state.progress.currentProgress)
-    const membersData = useSelector((state: RootState) => state.class.currentClass.members)
 
     const [loading, setLoading] = useState(false)
     const [committee, setCommittee] = useState<Committee | null>(null)
-    const [selectedMilestone, setSelectedMilestone] = useState("")
-    const [chairman, setChairman] = useState("")
-    const [reviewer, setReviewer] = useState("")
-    const [member, setMember] = useState("")
-    const [secretary, setSecretary] = useState("")
-
-    const lecturers = membersData?.data?.lecturer || []
-    const milestones = progress?.milestones || []
+    
 
     // Load data on mount
     useEffect(() => {
@@ -49,71 +39,15 @@ const RACommittee = () => {
         const committeeResult = await CommitteeService.getByClassId(classData.id)
         if (committeeResult) {
             setCommittee(committeeResult)
-            setSelectedMilestone(committeeResult.milestone.id)
-
-            const chairmanMember = committeeResult.members.find(m => m.role === CommitteeRole.CHAIRMAN)
-            const reviewerMember = committeeResult.members.find(m => m.role === CommitteeRole.REVIEWER)
-            const memberMember = committeeResult.members.find(m => m.role === CommitteeRole.MEMBER)
-            const secretaryMember = committeeResult.members.find(m => m.role === CommitteeRole.SECRETARY)
-
-            if (chairmanMember) setChairman(chairmanMember.user.id)
-            if (reviewerMember) setReviewer(reviewerMember.user.id)
-            if (memberMember) setMember(memberMember.user.id)
-            if (secretaryMember) setSecretary(secretaryMember.user.id)
         }
 
         setLoading(false)
     }
-
-    const handleSave = async () => {
-        if (!selectedMilestone || !chairman || !reviewer || !member) {
-            return
-        }
-
-        // Validate: must have 3 different required roles
-        const requiredMembers = [chairman, reviewer, member]
-        const uniqueRequired = new Set(requiredMembers)
-
-        if (uniqueRequired.size < 3) {
-            toast.error("Chủ tịch, Ủy viên phản biện và Ủy viên phải là 3 người khác nhau")
-            return
-        }
-
-        // Validate: secretary (if exists) must be different from required roles
-        if (secretary && requiredMembers.includes(secretary)) {
-            toast.error("Thư ký phải khác với Chủ tịch, Ủy viên phản biện và Ủy viên")
-            return
-        }
-
-        const membersData: CommitteeMember[] = [
-            { userId: chairman, role: CommitteeRole.CHAIRMAN },
-            { userId: reviewer, role: CommitteeRole.REVIEWER },
-            { userId: member, role: CommitteeRole.MEMBER },
-        ]
-
-        if (secretary) {
-            membersData.push({ userId: secretary, role: CommitteeRole.SECRETARY })
-        }
-
-        setLoading(true)
-        const result = await CommitteeService.upsert({
-            classId: classData.id,
-            milestoneId: selectedMilestone,
-            members: membersData
-        })
-        setLoading(false)
-
-        if (result) {
-            setCommittee(result)
-        }
-    }
-
-    const canSave = selectedMilestone && chairman && reviewer && member
 
     return (
         <div className="w-full h-full overflow-y-auto p-6">
             <div className="max-w-4xl mx-auto">
-                <h1 className="text-2xl font-bold mb-6 dark:text-white">Quản lý Hội đồng</h1>
+                <h1 className="text-2xl font-bold mb-6 dark:text-white">Thông tin Hội đồng</h1>
 
                 {loading && (
                     <div className="mb-4 p-3 bg-gray-50 border rounded-lg text-center">
@@ -123,8 +57,8 @@ const RACommittee = () => {
                 )}
 
                 {/* Info banners */}
-                <div className="mb-5 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-                    ⚠️ Chỉ quản trị viên hệ thống mới có thể xóa hội đồng
+                <div className="mb-5 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+                    ℹ️ Chỉ Quản trị viên hệ thống (Khoa) mới có quyền thành lập và thay đổi hội đồng.
                 </div>
 
                 <span className="flex items-center-safe gap-2.5 mb-5">
@@ -137,155 +71,35 @@ const RACommittee = () => {
                 </span>
 
                 {/* Current committee */}
-                {committee && (
-                    <div className="mb-6 p-4 bg-gray-50 border rounded-lg">
-                        <h3 className="font-semibold mb-2">Hội đồng hiện tại</h3>
-                        <p className="text-sm text-gray-600 mb-3"><b>Cột mốc:</b> {committee.milestone.label}</p>
+                {committee ? (
+                    <div className="mb-6 p-8 bg-white dark:bg-lightDark rounded-big border border-lightGray dark:border-gray shadow-sm">
+                        <div className="flex items-center justify-between mb-6 border-b pb-4 dark:border-gray/30">
+                            <h3 className="font-bold text-xl dark:text-white">Hội đồng hiện tại</h3>
+                            <span className="px-3 py-1 bg-mainColor/10 text-mainColor text-xs font-bold rounded-full uppercase">
+                                {committee.milestone.label}
+                            </span>
+                        </div>
 
-                        <div className="space-y-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {committee.members.map(m => (
-                                <div key={m.id} className="flex items-center gap-2 text-sm">
-                                    <span className="font-medium">{VNCommitteeRole[m.role]}:</span>
-                                    <span>{m.user.full_name}</span>
-                                    <span className="text-gray-500">({m.user.email})</span>
+                                <div key={m.id} className="flex items-center gap-4 p-4 rounded-xl border border-lightGray dark:border-gray/30 bg-gray-50/50 dark:bg-dark/30">
+                                    <div className="size-12 rounded-full bg-mainColor flex items-center justify-center text-white font-bold text-lg">
+                                        {m.user.full_name.charAt(0)}
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <p className="font-bold text-normalSize dark:text-white">{m.user.full_name}</p>
+                                        <p className="text-tinySize text-gray dark:text-gray">{VNCommitteeRole[m.role]}</p>
+                                        <p className="text-[10px] text-gray italic">{m.user.email}</p>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
+                ) : (
+                    <div className="p-10 border-2 border-dashed border-lightGray dark:border-gray rounded-big text-center">
+                        <p className="text-gray italic">Chưa có hội đồng nào được thành lập cho lớp học này.</p>
+                    </div>
                 )}
-
-                {/* Form */}
-                <div className="space-y-4">
-                    {/* Milestone */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1 dark:text-white">
-                            Cột mốc <span className="text-red-500">*</span>
-                        </label>
-
-                        <select
-                            value={selectedMilestone}
-                            onChange={(e) => setSelectedMilestone(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray rounded-lg dark:text-white"
-                        >
-                            <option value="">-- Chọn milestone --</option>
-                            {milestones.map(m => (
-                                <option key={m.id} value={m.id}>{m.label}</option>
-                            ))}
-                        </select>
-
-                        <p className="text-xs text-gray-500 mt-1">
-                            Chọn milestone mà hội đồng sẽ đánh giá (ví dụ: Bảo vệ KLTN cuối kỳ)
-                        </p>
-                    </div>
-
-                    {/* Chairman */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1 dark:text-white">
-                            Chủ tịch <span className="text-red-500">*</span>
-                        </label>
-
-                        <select
-                            value={chairman}
-                            onChange={(e) => setChairman(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray rounded-lg dark:text-white"
-                        >
-                            <option value="">-- Chọn Chủ tịch --</option>
-                            {lecturers.map(l => (
-                                <option key={l.user.id} value={l.user.id}>
-                                    {l.user.full_name} ({l.user.email})
-                                </option>
-                            ))}
-                        </select>
-
-                        <p className="text-xs text-gray-500 mt-1">
-                            Chủ trì buổi bảo vệ, có quyền chấm điểm
-                        </p>
-                    </div>
-
-                    {/* Reviewer */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1 dark:text-white">
-                            Ủy viên phản biện <span className="text-red-500">*</span>
-                        </label>
-
-                        <select
-                            value={reviewer}
-                            onChange={(e) => setReviewer(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray rounded-lg dark:text-white"
-                        >
-                            <option value="">-- Chọn Ủy viên phản biện --</option>
-                            {lecturers.map(l => (
-                                <option key={l.user.id} value={l.user.id}>
-                                    {l.user.full_name} ({l.user.email})
-                                </option>
-                            ))}
-                        </select>
-
-                        <p className="text-xs text-gray-500 mt-1">
-                            Đánh giá và phản biện đề tài, có quyền chấm điểm
-                        </p>
-                    </div>
-
-                    {/* Member */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1 dark:text-white">
-                            Ủy viên <span className="text-red-500">*</span>
-                        </label>
-
-                        <select
-                            value={member}
-                            onChange={(e) => setMember(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray rounded-lg dark:text-white"
-                        >
-                            <option value="">-- Chọn Ủy viên --</option>
-                            {lecturers.map(l => (
-                                <option key={l.user.id} value={l.user.id}>
-                                    {l.user.full_name} ({l.user.email})
-                                </option>
-                            ))}
-                        </select>
-
-                        <p className="text-xs text-gray-500 mt-1">
-                            Tham gia đánh giá, có quyền chấm điểm
-                        </p>
-                    </div>
-
-                    {/* Secretary */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1 dark:text-white">
-                            Thư ký (tùy chọn)
-                        </label>
-
-                        <select
-                            value={secretary}
-                            onChange={(e) => setSecretary(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray rounded-lg dark:text-white"
-                        >
-                            <option value="">-- Không có --</option>
-                            {lecturers.map(l => (
-                                <option key={l.user.id} value={l.user.id}>
-                                    {l.user.full_name} ({l.user.email})
-                                </option>
-                            ))}
-                        </select>
-
-                        <p className="text-xs text-gray-500 mt-1">
-                            Ghi biên bản, chuẩn bị hồ sơ, KHÔNG chấm điểm
-                        </p>
-                    </div>
-
-                    {/* Save button */}
-                    <button
-                        onClick={handleSave}
-                        disabled={!canSave || loading}
-                        className={`w-full py-2 px-4 rounded-lg font-medium ${canSave && !loading
-                                ? 'bg-mainColor text-white hoverBtn'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            }`}
-                    >
-                        {committee ? 'Cập nhật hội đồng' : 'Thành lập hội đồng'}
-                    </button>
-                </div>
             </div>
         </div>
     )
