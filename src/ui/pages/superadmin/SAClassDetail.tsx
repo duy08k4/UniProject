@@ -6,7 +6,7 @@ import type { RootState } from "../../../redux/store"
 import { ClassService } from "../../../services/class/class.service"
 import formatVNTime from "../../../utils/formatVNTime"
 import getShortName from "../../../utils/getShortName"
-import { VNRoleName, VNThesisType, VNTopicStatus } from "../../../config/enum"
+import { VNCommitteeRole, VNRoleName, VNThesisType, VNTopicStatus } from "../../../config/enum"
 import { useDebounce } from "../../../hooks/Debounce"
 import { currentClass_SetMembers } from "../../../redux/reducers/classSlice.reducer"
 import { memberSizePage } from "../../../config/pageSize"
@@ -14,6 +14,13 @@ import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import { confirmDialog } from "primereact/confirmdialog"
 import TopicsService from "../../../services/topics/topics.service"
 import type { TopicDetail } from "../../../services/topics/topics.type"
+import CommitteeService from "../../../services/committee/committee.service"
+import type { Committee, CommitteeMember } from "../../../services/committee/committee.type"
+import ProgressService from "../../../services/progress/progress.service"
+import { CommitteeRole, ThesisType, TopicStatus } from "../../../config/enum"
+import { ScaleLoader } from "react-spinners"
+import OutlineReviewPanel from "../../components/OutlineReviewPanel"
+import { toast } from "sonner"
 
 const SAClassDetail: React.FC = () => {
     const { classId } = useParams()
@@ -32,24 +39,123 @@ const SAClassDetail: React.FC = () => {
     const roleSearchDebounce = useDebounce(roleSearch, 1500)
 
     // Tab
-    const [activeTab, setActiveTab] = useState<"members" | "topics">("members")
+    const [activeTab, setActiveTab] = useState<"members" | "topics" | "committee">("members")
 
-    // Topics (read-only)
+    // Topics & Review
     const [topics, setTopics] = useState<TopicDetail[]>([])
+    const [rejectNotes, setRejectNotes] = useState<Record<string, string>>({})
+    const [reviewableTopic, setReviewableTopic] = useState<TopicDetail | null>(null)
+    const [assignTarget, setAssignTarget] = useState<TopicDetail | null>(null)
+    const [assignSearch, setAssignSearch] = useState("")
+    const [assigning, setAssigning] = useState(false)
+
+    // Committee
+    const [committee, setCommittee] = useState<Committee | null>(null)
+    const [selectedMilestone, setSelectedMilestone] = useState("")
+    const [chairman, setChairman] = useState("")
+    const [reviewer, setReviewer] = useState("")
+    const [member, setMember] = useState("")
+    const [secretary, setSecretary] = useState("")
+    const [loadingCommittee, setLoadingCommittee] = useState(false)
+
+    const progress = useSelector((state: RootState) => state.progress.currentProgress)
+    const lecturers = members?.data?.lecturer || []
+    const milestones = progress?.milestones || []
 
     // Get class data
     useEffect(() => {
         if (!classId || !userData.id) return
         ClassService.getClass(classId)
     }, [userData.id, classId])
-
     // Fetch all topics
+    const fetchTopics = async () => {
+        if (!classId) return
+        const data = await TopicsService.getTopics(classId)
+        if (data) setTopics(data)
+    }
+
     useEffect(() => {
         if (!classId || !userData.id) return
-        TopicsService.getTopics(classId).then(data => {
-            if (data) setTopics(data)
-        })
+        fetchTopics()
     }, [classId, userData.id])
+
+    // Load committee & progress
+    useEffect(() => {
+        if (!classId || activeTab !== "committee") return
+        loadCommitteeData()
+    }, [classId, activeTab])
+
+    const loadCommitteeData = async () => {
+        if (!classId) return
+        setLoadingCommittee(true)
+        if (!progress || progress.class?.id !== classId) {
+            await ProgressService.getProgressDetail(classId)
+        }
+
+        const committeeResult = await CommitteeService.getByClassId(classId)
+        if (committeeResult) {
+            setCommittee(committeeResult)
+            setSelectedMilestone(committeeResult.milestone.id)
+            setChairman(committeeResult.members.find(m => m.role === CommitteeRole.CHAIRMAN)?.user.id || "")
+            setReviewer(committeeResult.members.find(m => m.role === CommitteeRole.REVIEWER)?.user.id || "")
+            setMember(committeeResult.members.find(m => m.role === CommitteeRole.MEMBER)?.user.id || "")
+            setSecretary(committeeResult.members.find(m => m.role === CommitteeRole.SECRETARY)?.user.id || "")
+        }
+        setLoadingCommittee(false)
+    }
+
+    const handleSaveCommittee = async () => {
+        if (!classId || !selectedMilestone || !chairman || !reviewer || !member) return
+        const requiredMembers = [chairman, reviewer, member]
+        if (new Set(requiredMembers).size < 3) {
+            toast.error("Chủ tịch, Phản biện và Ủy viên phải là 3 người khác nhau")
+            return
+        }
+        if (secretary && requiredMembers.includes(secretary)) {
+            toast.error("Thư ký phải khác với các thành viên còn lại")
+            return
+        }
+
+        const membersData: CommitteeMember[] = [
+            { userId: chairman, role: CommitteeRole.CHAIRMAN },
+            { userId: reviewer, role: CommitteeRole.REVIEWER },
+            { userId: member, role: CommitteeRole.MEMBER },
+        ]
+        if (secretary) membersData.push({ userId: secretary, role: CommitteeRole.SECRETARY })
+
+        setLoadingCommittee(true)
+        const result = await CommitteeService.upsert({ classId, milestoneId: selectedMilestone, members: membersData })
+        setLoadingCommittee(false)
+        if (result) setCommittee(result)
+    }
+
+    const handleReviewTopic = async (topicId: string, approve: boolean) => {
+        if (!classId) return
+        const result = await TopicsService.reviewTopic(topicId, classId, approve, rejectNotes[topicId])
+        if (result) {
+            setTopics(prev => prev.map(t => t.id === topicId ? result : t))
+            setReviewableTopic(result)
+        }
+    }
+
+    const handleAssignReviewer = async (reviewerId: string) => {
+        if (!classId || !assignTarget) return
+        setAssigning(true)
+        const result = await TopicsService.assignReviewer(assignTarget.id, classId, reviewerId)
+        if (result) {
+            setTopics(prev => prev.map(t => t.id === assignTarget.id ? result : t))
+            setAssignTarget(null)
+            setAssignSearch("")
+        }
+        setAssigning(false)
+    }
+
+    const canSaveCommittee = selectedMilestone && chairman && reviewer && member
+    const filteredLecturers = lecturers.filter(l =>
+        l.user.id !== assignTarget?.supervisor?.id &&
+        (l.user.full_name.toLowerCase().includes(assignSearch.toLowerCase()) ||
+            l.user.email.toLowerCase().includes(assignSearch.toLowerCase()))
+    )
 
     // Get members
     useEffect(() => {
@@ -267,9 +373,15 @@ const SAClassDetail: React.FC = () => {
                         >
                             Đề tài {topics.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-lighterGray dark:bg-white/10 rounded text-xs dark:text-white">{topics.length}</span>}
                         </button>
+                        <button
+                            onClick={() => setActiveTab("committee")}
+                            className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === "committee" ? "border-mainColor text-mainColor" : "border-transparent text-gray hover:text-black dark:hover:text-white"}`}
+                        >
+                            Hội đồng
+                        </button>
                     </div>
 
-                    {activeTab === "members" ? (
+                    {activeTab === "members" && (
                         <div className="flex-1 flex flex-col gap-2.5">
                             <div className="sticky top-0 z-10 left-0 w-full bg-bgLight dark:bg-bgDark flex flex-col gap-5 py-5">
                                 <div className="flex items-center-safe gap-5">
@@ -395,54 +507,203 @@ const SAClassDetail: React.FC = () => {
                                 </table>
                             </div>
                         </div>
-                    ) : (
-                        /* Tab Đề tài — read-only */
-                        <div className="border-[0.5px] border-lightGray dark:border-gray rounded-normal overflow-hidden">
-                            <table className="w-full bg-transparent">
-                                <colgroup>
-                                    <col className="w-[18%]" />
-                                    <col className="w-[28%]" />
-                                    <col className="w-[8%]" />
-                                    <col className="w-[15%]" />
-                                    <col className="w-[15%]" />
-                                    <col className="w-[16%]" />
-                                </colgroup>
-                                <thead className="bg-lightGray/50 dark:bg-white/5">
-                                    <tr>
-                                        <th className="text-left px-5 py-3 dark:text-white text-sm uppercase tracking-wider">Sinh viên</th>
-                                        <th className="text-left dark:text-white text-sm uppercase tracking-wider">Tên đề tài</th>
-                                        <th className="text-left dark:text-white text-sm uppercase tracking-wider">Loại</th>
-                                        <th className="text-left dark:text-white text-sm uppercase tracking-wider">GVHD</th>
-                                        <th className="text-left dark:text-white text-sm uppercase tracking-wider">Phản biện</th>
-                                        <th className="text-left dark:text-white text-sm uppercase tracking-wider">Trạng thái</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {topics.map((topic) => (
-                                        <tr key={topic.id} className="border-t-[0.5px] border-lightGray dark:border-lightGray hover:bg-lighterGray dark:hover:bg-white/5">
-                                            <td className="px-5 py-3 dark:text-white text-sm">{topic.student.full_name}</td>
-                                            <td className="py-3 dark:text-white text-sm max-w-[200px] truncate">{topic.title}</td>
-                                            <td className="py-3 text-gray text-sm">{VNThesisType[topic.thesis_type]?.split(" ")[0]}</td>
-                                            <td className="py-3 text-gray text-sm">{topic.supervisor?.full_name ?? "—"}</td>
-                                            <td className="py-3 text-gray text-sm">{topic.reviewer?.full_name ?? "—"}</td>
-                                            <td className="px-5 py-3 text-sm">
-                                                <span className={`font-semibold ${VNTopicStatus[topic.status]?.color}`}>
-                                                    {VNTopicStatus[topic.status]?.label}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {topics.length === 0 && (
+                    )}
+
+                    {activeTab === "topics" && (
+                        <div className="flex-1 flex flex-col gap-5 pt-5">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold dark:text-white uppercase text-sm tracking-wider">Danh sách đề tài</h3>
+                                <button onClick={fetchTopics} className="p-2 hover:bg-lightGray dark:hover:bg-white/10 rounded-full transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div className="border-[0.5px] border-lightGray dark:border-gray rounded-normal overflow-hidden">
+                                <table className="w-full bg-transparent">
+                                    <colgroup>
+                                        <col className="w-[18%]" />
+                                        <col className="w-[28%]" />
+                                        <col className="w-[8%]" />
+                                        <col className="w-[15%]" />
+                                        <col className="w-[15%]" />
+                                        <col className="w-[16%]" />
+                                    </colgroup>
+                                    <thead className="bg-lightGray/50 dark:bg-white/5">
                                         <tr>
-                                            <td colSpan={6} className="py-20 text-center text-gray italic">Chưa có đề tài nào trong lớp này</td>
+                                            <th className="text-left px-5 py-3 dark:text-white text-sm uppercase tracking-wider">Sinh viên</th>
+                                            <th className="text-left dark:text-white text-sm uppercase tracking-wider">Tên đề tài</th>
+                                            <th className="text-left dark:text-white text-sm uppercase tracking-wider">Loại</th>
+                                            <th className="text-left dark:text-white text-sm uppercase tracking-wider">GVHD</th>
+                                            <th className="text-left dark:text-white text-sm uppercase tracking-wider">Phản biện</th>
+                                            <th className="text-left dark:text-white text-sm uppercase tracking-wider">Trạng thái</th>
                                         </tr>
+                                    </thead>
+                                    <tbody>
+                                        {topics.map((topic) => {
+                                            const isReviewable = topic.status === TopicStatus.OUTLINE_WAITING_UNIADMIN
+                                            const canAssign = topic.thesis_type === ThesisType.CAPSTONE && topic.status === TopicStatus.APPROVED
+                                            return (
+                                                <tr key={topic.id}
+                                                    onClick={() => isReviewable && setReviewableTopic(topic)}
+                                                    className={`border-t-[0.5px] border-lightGray dark:border-lightGray hover:bg-lighterGray dark:hover:bg-white/5 ${isReviewable ? "cursor-pointer" : ""}`}>
+                                                    <td className="px-5 py-3 dark:text-white text-sm">{topic.student.full_name}</td>
+                                                    <td className="py-3 dark:text-white text-sm max-w-[200px] truncate" title={topic.title}>{topic.title}</td>
+                                                    <td className="py-3 text-gray text-sm">{VNThesisType[topic.thesis_type]?.split(" ")[0]}</td>
+                                                    <td className="py-3 text-gray text-sm">{topic.supervisor?.full_name ?? "—"}</td>
+                                                    <td className="py-3 text-sm" onClick={e => e.stopPropagation()}>
+                                                        {canAssign ? (
+                                                            <button onClick={() => setAssignTarget(topic)} className="text-mainColor font-bold hover:underline">
+                                                                {topic.reviewer?.full_name ?? "Chỉ định"}
+                                                            </button>
+                                                        ) : (
+                                                            <span className="text-gray">{topic.reviewer?.full_name ?? "—"}</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-5 py-3 text-sm">
+                                                        <span className={`font-semibold ${VNTopicStatus[topic.status]?.color}`}>
+                                                            {VNTopicStatus[topic.status]?.label}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
+                                        {topics.length === 0 && (
+                                            <tr>
+                                                <td colSpan={6} className="py-20 text-center text-gray italic">Chưa có đề tài nào trong lớp này</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === "committee" && (
+                        <div className="flex-1 flex flex-col gap-8 pt-5 max-w-4xl">
+                            <div className="flex flex-col gap-2">
+                                <h3 className="font-bold dark:text-white uppercase text-sm tracking-wider">Thiết lập Hội đồng</h3>
+                                <p className="text-xs text-gray italic">Chỉ quản trị viên hệ thống mới có quyền thiết lập hội đồng đánh giá cho lớp học.</p>
+                            </div>
+
+                            {loadingCommittee ? (
+                                <div className="py-20 flex justify-center"><ScaleLoader color="#499c40" /></div>
+                            ) : (
+                                <div className="space-y-6">
+                                    {/* Form fields */}
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1 dark:text-white">Cột mốc đánh giá *</label>
+                                            <select value={selectedMilestone} onChange={e => setSelectedMilestone(e.target.value)}
+                                                className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                <option value="">-- Chọn milestone --</option>
+                                                {milestones.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+                                            </select>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+                                            <div>
+                                                <label className="block text-sm font-medium mb-1 dark:text-white">Chủ tịch *</label>
+                                                <select value={chairman} onChange={e => setChairman(e.target.value)}
+                                                    className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                    <option value="">-- Chọn --</option>
+                                                    {lecturers.map(l => <option key={l.user.id} value={l.user.id}>{l.user.full_name}</option>)}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium mb-1 dark:text-white">Ủy viên phản biện *</label>
+                                                <select value={reviewer} onChange={e => setReviewer(e.target.value)}
+                                                    className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                    <option value="">-- Chọn --</option>
+                                                    {lecturers.map(l => <option key={l.user.id} value={l.user.id}>{l.user.full_name}</option>)}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+                                            <div>
+                                                <label className="block text-sm font-medium mb-1 dark:text-white">Ủy viên *</label>
+                                                <select value={member} onChange={e => setMember(e.target.value)}
+                                                    className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                    <option value="">-- Chọn --</option>
+                                                    {lecturers.map(l => <option key={l.user.id} value={l.user.id}>{l.user.full_name}</option>)}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium mb-1 dark:text-white">Thư ký</label>
+                                                <select value={secretary} onChange={e => setSecretary(e.target.value)}
+                                                    className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                    <option value="">-- Không có --</option>
+                                                    {lecturers.map(l => <option key={l.user.id} value={l.user.id}>{l.user.full_name}</option>)}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button onClick={handleSaveCommittee} disabled={!canSaveCommittee || loadingCommittee}
+                                        className={`w-full py-2.5 rounded-lg font-bold text-white transition-all ${canSaveCommittee ? "bg-mainColor hover:opacity-90" : "bg-gray cursor-not-allowed"}`}>
+                                        {committee ? "Cập nhật Hội đồng" : "Thành lập Hội đồng"}
+                                    </button>
+
+                                    {committee && (
+                                        <div className="mt-8 p-6 bg-gray-50 dark:bg-white/5 rounded-big border border-lightGray dark:border-gray/30">
+                                            <h4 className="font-bold mb-4 dark:text-white">Hội đồng hiện tại</h4>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                {committee.members.map(m => (
+                                                    <div key={m.id} className="text-sm">
+                                                        <span className="text-gray font-medium">{VNCommitteeRole[m.role]}:</span>
+                                                        <span className="ml-2 dark:text-white font-bold">{m.user.full_name}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
                                     )}
-                                </tbody>
-                            </table>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* Modals for Topics */}
+            {reviewableTopic && (
+                <OutlineReviewPanel
+                    topics={[reviewableTopic]}
+                    isFetching={isFetching}
+                    rejectNotes={rejectNotes}
+                    onRejectNoteChange={(id, note) => setRejectNotes(prev => ({ ...prev, [id]: note }))}
+                    onReview={handleReviewTopic}
+                    onClose={() => setReviewableTopic(null)}
+                />
+            )}
+
+            {assignTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setAssignTarget(null)}>
+                    <div className="bg-white dark:bg-lightDark shadow-xl w-[460px] rounded-small overflow-hidden flex flex-col max-h-[70vh]" onClick={e => e.stopPropagation()}>
+                        <div className="px-5 py-4 bg-lightGray dark:bg-darkGray flex justify-between items-center">
+                            <h2 className="font-bold dark:text-white">Chỉ định Giảng viên phản biện</h2>
+                            <button onClick={() => setAssignTarget(null)} className="dark:text-white">✕</button>
+                        </div>
+                        <div className="p-5 border-b dark:border-gray/30">
+                            <input value={assignSearch} onChange={e => setAssignSearch(e.target.value)} placeholder="Tìm tên hoặc email..."
+                                className="w-full border p-2 rounded dark:bg-black dark:text-white" />
+                        </div>
+                        <div className="overflow-y-auto flex-1">
+                            {filteredLecturers.map(l => (
+                                <button key={l.user.id} onClick={() => handleAssignReviewer(l.user.id)} disabled={assigning}
+                                    className="w-full p-4 text-left border-b dark:border-gray/10 hover:bg-lightGray dark:hover:bg-white/5 flex justify-between items-center">
+                                    <div>
+                                        <p className="font-bold dark:text-white">{l.user.full_name}</p>
+                                        <p className="text-xs text-gray">{l.user.email}</p>
+                                    </div>
+                                    {l.user.id === assignTarget.reviewer?.id && <span className="text-xs text-mainColor font-bold">✓ Đang chọn</span>}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

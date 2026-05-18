@@ -159,6 +159,7 @@ function App() {
               <Route path=":boardId" element={<LTScoreboardsDetail />} />
             </Route>
             <Route path="topics" element={<LTTopics />} />
+            <Route path="forms" element={<SDForms />} />
             <Route path="milestones" element={<SDMilestones />} />
             <Route path="milestones/:milestoneId" element={<RAMilestoneDetail />} />
           </Route>

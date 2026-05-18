@@ -47,7 +47,7 @@ const SDNewsfeed: React.FC = () => {
                     <div key={n.id} className="w-3/5 max-2xl:w-3/4 max-lg:w-full">
                         <NotificationCard
                             notification={n}
-                            onFormClick={() => navigate(`${basePath}/submission`)}
+                            onFormClick={(formId) => navigate(`${basePath}/forms`, { state: { openFormId: formId } })}
                         />
                     </div>
                 ))}
