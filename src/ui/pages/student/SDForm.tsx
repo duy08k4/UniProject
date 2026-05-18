@@ -1,7 +1,7 @@
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useParams } from "react-router-dom"
+import { useLocation, useParams } from "react-router-dom"
 import { useDebounce } from "../../../hooks/Debounce"
 import { FormsService } from "../../../services/forms/forms.service"
 import type { RootState } from "../../../redux/store"
@@ -19,6 +19,7 @@ const SDForms: React.FC = () => {
     const [page, setPage] = useState(1)
     const [previewForm, setPreviewForm] = useState<DetailForm | null>(null)
 
+    const location = useLocation()
     const searchDebounce = useDebounce(search, 1500)
 
     const formPagination = useSelector((state: RootState) => state.form.formPagination)
@@ -48,6 +49,13 @@ const SDForms: React.FC = () => {
 
     const currentFormRef = useRef(currentForm)
     useEffect(() => { currentFormRef.current = currentForm }, [currentForm])
+
+    useEffect(() => {
+        const state = location.state as { openFormId?: string }
+        if (state?.openFormId && classId) {
+            handlePreview(state.openFormId)
+        }
+    }, [location.state, classId])
 
     const handlePreview = async (formId: string) => {
         if (!classId) return

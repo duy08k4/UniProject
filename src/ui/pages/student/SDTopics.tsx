@@ -291,6 +291,12 @@ const SDTopics: React.FC = () => {
                                 </p>
                             )}
 
+                            {topic.status === TopicStatus.OUTLINE_WAITING_UNIADMIN && (
+                                <p className="text-orange-500 text-smallSize italic border-t border-gray/10 pt-4">
+                                    Đề cương đã qua bước 1, đang chờ Khoa duyệt lần cuối...
+                                </p>
+                            )}
+
                             {topic.status === TopicStatus.APPROVED && (
                                 <div className="flex items-center gap-2 border-t border-gray/10 pt-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5 fill-mainColor">

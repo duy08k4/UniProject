@@ -5,12 +5,12 @@ import { useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store"
 import TopicsService from "../../../services/topics/topics.service"
 import type { TopicDetail } from "../../../services/topics/topics.type"
-import { ThesisType, TopicStatus, VNThesisType, VNTopicStatus } from "../../../config/enum"
+import { ThesisType, VNThesisType, VNTopicStatus } from "../../../config/enum"
 import OutlineReviewPanel from "../../components/OutlineReviewPanel"
 import { ClassService } from "../../../services/class/class.service"
 import type { Members } from "../../../services/class/class.type"
 
-const reviewableStatuses = ["outline_pending", "approved", "outline_rejected"]
+const reviewableStatuses = ["outline_pending"]
 
 const RATopics: React.FC = () => {
     const { classId } = useParams()
@@ -82,12 +82,6 @@ const RATopics: React.FC = () => {
         }
     }
 
-    const openAssignModal = (e: React.MouseEvent, topic: TopicDetail) => {
-        e.stopPropagation()
-        setSearch("")
-        setAssignTarget(topic)
-    }
-
     const filteredLecturers = lecturers.filter(l =>
         l.user.id !== assignTarget?.supervisor?.id &&
         (l.user.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -135,7 +129,6 @@ const RATopics: React.FC = () => {
                     <tbody>
                         {topics.map((topic) => {
                             const isClickable = !!topic.outline_file_url && reviewableStatuses.includes(topic.status)
-                            const canAssignReviewer = topic.thesis_type === ThesisType.CAPSTONE && topic.status === TopicStatus.APPROVED
                             return (
                                 <tr key={topic.id}
                                     onClick={() => handleRowClick(topic)}
@@ -145,27 +138,9 @@ const RATopics: React.FC = () => {
                                     <td className="py-3 text-gray text-sm">{VNThesisType[topic.thesis_type]?.split(" ")[0]}</td>
                                     <td className="py-3 text-sm dark:text-white/70">{topic.supervisor?.full_name ?? "—"}</td>
                                     <td className="py-3 text-sm" onClick={e => e.stopPropagation()}>
-                                        {canAssignReviewer ? (
-                                            <button
-                                                onClick={e => openAssignModal(e, topic)}
-                                                className="flex items-center gap-1.5 text-sm font-medium hover:underline text-mainColor! dark:text-green-400!"
-                                            >
-                                                {topic.reviewer ? (
-                                                    <span className="text-mainColor! dark:text-green-400!">{topic.reviewer.full_name}</span>
-                                                ) : (
-                                                    <>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-3.5 stroke-mainColor! dark:stroke-green-400!">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                                        </svg>
-                                                        <span className="text-mainColor! dark:text-green-400! font-bold">Chỉ định</span>
-                                                    </>
-                                                )}
-                                            </button>
-                                        ) : (
-                                            <span className="text-sm text-gray dark:text-white/50">
-                                                {topic.thesis_type !== ThesisType.CAPSTONE ? "—" : (topic.reviewer?.full_name ?? "Chưa phân công")}
-                                            </span>
-                                        )}
+                                        <span className="text-sm text-gray dark:text-white/50">
+                                            {topic.thesis_type !== ThesisType.CAPSTONE ? "—" : (topic.reviewer?.full_name ?? "Chưa phân công")}
+                                        </span>
                                     </td>
                                     <td className="py-3 text-sm">
                                         <span className={`font-semibold ${VNTopicStatus[topic.status]?.color}`}>

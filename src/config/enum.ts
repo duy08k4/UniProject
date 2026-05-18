@@ -83,6 +83,7 @@ export const TopicStatus = {
   SUPERVISOR_REJECTED: "supervisor_rejected",
   SUPERVISOR_ACCEPTED: "supervisor_accepted",
   OUTLINE_PENDING: "outline_pending",
+  OUTLINE_WAITING_UNIADMIN: "outline_waiting_uniadmin",
   OUTLINE_REJECTED: "outline_rejected",
   APPROVED: "approved",
 } as const
@@ -90,13 +91,14 @@ export const TopicStatus = {
 export type TopicStatusType = typeof TopicStatus[keyof typeof TopicStatus]
 
 export const VNTopicStatus: Record<string, { label: string, color: string }> = {
-  draft:               { label: "Bản nháp",               color: "text-gray" },
-  invited:             { label: "Chờ GVHD phản hồi",      color: "text-yellow-500" },
-  supervisor_rejected: { label: "GVHD từ chối",           color: "text-red" },
-  supervisor_accepted: { label: "GVHD đồng ý",            color: "text-blue-500" },
-  outline_pending:     { label: "Chờ duyệt đề cương",     color: "text-yellow-500" },
-  outline_rejected:    { label: "Đề cương bị từ chối",    color: "text-red" },
-  approved:            { label: "Đã duyệt",               color: "text-mainColor" },
+  draft:                    { label: "Bản nháp",                    color: "text-gray" },
+  invited:                  { label: "Chờ GVHD phản hồi",           color: "text-yellow-500" },
+  supervisor_rejected:      { label: "GVHD từ chối",                color: "text-red" },
+  supervisor_accepted:      { label: "GVHD đồng ý",                 color: "text-blue-500" },
+  outline_pending:          { label: "Chờ Bộ môn duyệt",            color: "text-yellow-500" },
+  outline_waiting_uniadmin: { label: "Chờ Khoa duyệt",              color: "text-orange-500" },
+  outline_rejected:         { label: "Đề cương bị từ chối",         color: "text-red" },
+  approved:                 { label: "Đã duyệt",                    color: "text-mainColor" },
 }
 
 export const ScoreFormStatus = {
