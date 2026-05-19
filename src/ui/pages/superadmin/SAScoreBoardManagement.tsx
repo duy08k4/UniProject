@@ -8,38 +8,42 @@ import type { RootState } from "../../../redux/store"
 import ScoreFormsService from "../../../services/scoreforms/scoreforms.service"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import formatVNTime from "../../../utils/formatVNTime"
-import { VNScoreFormTag, VNScoreFormStatus } from "../../../config/enum"
+import { VNScoreFormTag, VNScoreFormStatus, type ScoreForm_TypeType } from "../../../config/enum"
+import { useDebounce } from "../../../hooks/Debounce"
 
 const SAScoreBoardManagement: React.FC = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const pagination = useSelector((state: RootState) => state.scoreForm.scoreFormPagination)
+    const scoreForms = useSelector((state: RootState) => state.scoreForm.scoreFormPagination)
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
-    const scoreforms = pagination?.data ?? []
+    const scoreforms = scoreForms?.data ?? []
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
+    const [page, setPage] = useState(1)
+    const pageSize = 12
+
+    const [filterStatus, setFilterStatus] = useState<string>("")
+    const [filterType, setFilterType] = useState<string>("")
+    const [filterDeleted, setFilterDeleted] = useState<string>("")
+
+    const searchDebounce = useDebounce(search, 1500)
 
     useEffect(() => {
         const load = async () => {
             setLoading(true)
-            await ScoreFormsService.scoreFormsPagination(1, 100, undefined, false)
+            const isStopped = filterStatus === "true" ? true : filterStatus === "false" ? false : undefined
+            const isDeleted = filterDeleted === "true" ? true : filterDeleted === "false" ? false : undefined
+            await ScoreFormsService.scoreFormsPagination(page, pageSize, undefined, searchDebounce, filterType as ScoreForm_TypeType, isDeleted, isStopped)
             setLoading(false)
         }
         load()
-    }, [])
+    }, [searchDebounce, page, filterStatus, filterType, filterDeleted])
 
-    const [filterStatus, setFilterStatus] = useState("")
-    const [filterType, setFilterType] = useState("")
-    const [filterApproval, setFilterApproval] = useState("")
-
-    const filtered = scoreforms.filter(sf => {
-        const matchSearch = sf.label.toLowerCase().includes(search.toLowerCase()) ||
-            sf.class?.label?.toLowerCase().includes(search.toLowerCase())
-        const matchStatus = filterStatus === "" ? true : filterStatus === "open" ? !sf.is_stopped : sf.is_stopped
-        const matchType = filterType === "" || sf.score_form_type === filterType
-        const matchApproval = filterApproval === "" ? true : filterApproval === "pending" ? sf.status !== "accept" : sf.status === "accept"
-        return matchSearch && matchStatus && matchType && matchApproval
-    })
+    const changePage = (dir: "prev" | "next") => {
+        if (!scoreForms) return
+        if (dir === "next" && page < scoreForms.pagination.totalPages) setPage(p => p + 1)
+        if (dir === "prev" && page > 1) setPage(p => p - 1)
+    }
 
     const handleDelete = (sf: typeof scoreforms[0]) => {
         if (sf.is_stopped) {
@@ -77,33 +81,24 @@ const SAScoreBoardManagement: React.FC = () => {
                 <p className="text-normalSize text-gray">Quản lý tất cả bảng điểm của các lớp</p>
             </div>
 
-            <div className="sticky top-0 left-0 w-full bg-bgLight dark:bg-bgDark flex items-center gap-5 py-5">
-                <span className="relative flex items-center w-1/2 px-2.5 rounded-small shadow-[0_0_10px_rgba(128,128,128,0.25)] dark:bg-black">
+            <div className="sticky top-0 left-0 w-full bg-bgLight dark:bg-bgDark flex items-center gap-5 py-5 flex-wrap z-10">
+                <span className="relative flex items-center w-1/3 px-2.5 rounded-small shadow-[0_0_10px_rgba(128,128,128,0.25)] dark:bg-black">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-6 dark:stroke-white">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                     </svg>
                     <input
                         type="text"
                         value={search}
-                        onChange={e => setSearch(e.target.value)}
+                        onChange={e => { setSearch(e.target.value); setPage(1) }}
                         className="h-10 w-full pl-2.5 focus:[&+#underlineSearch]:w-full dark:text-white outline-none bg-transparent"
                         placeholder="Tìm kiếm tên bảng điểm hoặc tên lớp..."
                     />
                     <span id="underlineSearch" className="absolute bottom-0 left-0 bg-mainColor dark:bg-white w-0 h-px transition-all duration-300" />
                 </span>
 
-                <span className="flex gap-1.5 items-center">
-                    <p className="font-bold dark:text-white">Trạng thái:</p>
-                    <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark">
-                        <option value="">Tất cả</option>
-                        <option value="open">Đang mở</option>
-                        <option value="closed">Đã khóa</option>
-                    </select>
-                </span>
-
-                <span className="flex gap-1.5 items-center">
+                 <span className="flex gap-1.5 items-center">
                     <p className="font-bold dark:text-white">Loại:</p>
-                    <select value={filterType} onChange={e => setFilterType(e.target.value)} className="border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark">
+                    <select value={filterType} onChange={e => { setFilterType(e.target.value); setPage(1) }} className="border-[0.5px] border-lightGray dark:border-darkGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark outline-none">
                         <option value="">Tất cả</option>
                         {Object.entries(VNScoreFormTag).map(([val, label]) => (
                             <option key={val} value={val}>{label}</option>
@@ -112,26 +107,53 @@ const SAScoreBoardManagement: React.FC = () => {
                 </span>
 
                 <span className="flex gap-1.5 items-center">
-                    <p className="font-bold dark:text-white">Duyệt:</p>
-                    <select value={filterApproval} onChange={e => setFilterApproval(e.target.value)} className="border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark">
+                    <p className="font-bold dark:text-white">Trạng thái:</p>
+                    <select value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setPage(1) }} className="border-[0.5px] border-lightGray dark:border-darkGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark outline-none">
                         <option value="">Tất cả</option>
-                        <option value="pending">Chờ duyệt</option>
-                        <option value="accept">Đã duyệt</option>
+                        <option value="false">Đang mở</option>
+                        <option value="true">Đã khóa</option>
                     </select>
                 </span>
 
                 <span className="flex gap-1.5 items-center">
-                    <p className="font-bold dark:text-white">Số lượng:</p>
-                    <p className="dark:text-white">{filtered.length} bảng điểm</p>
+                    <p className="font-bold dark:text-white">Dữ liệu:</p>
+                    <select value={filterDeleted} onChange={e => { setFilterDeleted(e.target.value); setPage(1) }} className="border-[0.5px] border-lightGray dark:border-darkGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark outline-none">
+                        <option value="">Tất cả</option>
+                        <option value="false">Chưa xóa</option>
+                        <option value="true">Đã xóa</option>
+                    </select>
+                </span>
+
+                <span className="flex-1 flex justify-end-safe items-center-safe gap-1.5">
+                    <p className="font-medium mr-3.5 dark:text-white max-sm:text-mobile-smallSize">
+                        Trang {page}/{scoreForms?.pagination.totalPages || 1}
+                    </p>
+                    <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState"
+                        disabled={loading || page <= 1} onClick={() => changePage("prev")}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white stroke-2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                        </svg>
+                    </button>
+
+                    <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState"
+                        disabled={loading || page >= (scoreForms?.pagination.totalPages || 1)} onClick={() => changePage("next")}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white stroke-2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </button>
                 </span>
             </div>
 
+            <span className="flex gap-1.5 items-center">
+                <p className="font-bold dark:text-white">Số lượng:</p>
+                <p className="dark:text-white">{scoreForms?.pagination.total || 0} bảng điểm</p>
+            </span>
             {/* Content */}
             {loading ? (
                 <div className="flex justify-center py-16">
                     <ScaleLoader color="#499c40" />
                 </div>
-            ) : filtered.length === 0 ? (
+            ) : scoreforms.length === 0 ? (
                 <div className="flex flex-col items-center gap-3 py-16 text-gray">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-12 opacity-30">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" />
@@ -140,7 +162,7 @@ const SAScoreBoardManagement: React.FC = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-3 gap-5 max-lg:grid-cols-2 max-md:grid-cols-1">
-                    {filtered.map(sf => {
+                    {scoreforms.map(sf => {
                         const statusInfo = VNScoreFormStatus[sf.status] ?? { label: sf.status, color: "text-gray" }
                         return (
                             <div

@@ -132,7 +132,7 @@ const RAScoreboards: React.FC = () => {
     const loadScoreforms = async () => {
         if (!classId) return
         setLoading(true)
-        await ScoreFormsService.scoreFormsPagination(1, 100, undefined, false, undefined, classId)
+        await ScoreFormsService.scoreFormsPagination(1, 100, classId)
         setLoading(false)
     }
 
@@ -209,7 +209,7 @@ const RAScoreboards: React.FC = () => {
 
                 <span className="flex gap-1.5 items-center">
                     <p className="font-bold dark:text-white">Trạng thái:</p>
-                    <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark">
+                    <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="border-[0.5px] border-lightGray dark:border-darkGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark">
                         <option value="">Tất cả</option>
                         <option value="open">Đang mở</option>
                         <option value="closed">Đã khóa</option>
@@ -218,7 +218,7 @@ const RAScoreboards: React.FC = () => {
 
                 <span className="flex gap-1.5 items-center">
                     <p className="font-bold dark:text-white">Loại:</p>
-                    <select value={filterType} onChange={e => setFilterType(e.target.value)} className="border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark">
+                    <select value={filterType} onChange={e => setFilterType(e.target.value)} className="border-[0.5px] border-lightGray dark:border-darkGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-bgDark">
                         <option value="">Tất cả</option>
                         {SCORE_FORM_TYPES.map(t => (
                             <option key={t.value} value={t.value}>{t.label}</option>

@@ -6,7 +6,7 @@ import type { RootState } from "../../../redux/store"
 import TopicsService from "../../../services/topics/topics.service"
 import ProgressService from "../../../services/progress/progress.service"
 import { setMyTopicsAsLecturer, updateTopicInLecturerList } from "../../../redux/reducers/topicsSlice.reducer"
-import { TopicStatus, VNThesisType, VNTopicStatus } from "../../../config/enum"
+import { ThesisType, TopicStatus, VNThesisType, VNTopicStatus } from "../../../config/enum"
 import Loading from "../../components/Loading"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 
@@ -177,14 +177,18 @@ const LTTopics: React.FC = () => {
                                     <p className="font-medium dark:text-white">{topic.student.full_name}</p>
                                     <p className="text-smallSize text-gray">{topic.student.email}</p>
                                 </div>
+
                                 <div className="flex flex-col gap-1">
                                     <p className="text-smallSize text-gray italic">Loại đề tài</p>
                                     <p className="font-medium dark:text-white">{VNThesisType[topic.thesis_type]}</p>
                                 </div>
-                                <div className="flex flex-col gap-1">
-                                    <p className="text-smallSize text-gray italic">Phản biện</p>
-                                    <p className="font-medium dark:text-white">{topic.reviewer?.full_name ?? "—"}</p>
-                                </div>
+
+                                {topic.thesis_type === ThesisType.CAPSTONE && (
+                                    <div className="flex flex-col gap-1">
+                                        <p className="text-smallSize text-gray italic">Phản biện</p>
+                                        <p className="font-medium dark:text-white">{topic.reviewer?.full_name ?? "—"}</p>
+                                    </div>
+                                )}
                             </div>
 
                             {topic.outline_file_url && (

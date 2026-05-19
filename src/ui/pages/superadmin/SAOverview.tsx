@@ -97,7 +97,7 @@ const SAOverview: React.FC = () => {
         dispatch(changeStateFetching(true))
         await Promise.all([
             ClassService.getAllClasses(1, 1000),
-            ScoreFormsService.scoreFormsPagination(1, 1000, undefined, false),
+            ScoreFormsService.scoreFormsPagination(1, 1000, undefined, undefined, undefined, false),
         ])
         dispatch(changeStateFetching(false))
         setLoading(false)

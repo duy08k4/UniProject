@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@custom-variant dark (&:where([data-theme=light], [data-theme=dark] *));
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @layer utilities {
 
@@ -53,7 +53,10 @@
         cursor: default !important;
     }
 
-    input {
+    input,
+    textarea,
+    select,
+    button {
         outline: none !important;
     }
 
@@ -126,16 +129,17 @@
 
     /* Darkmode */
     --color-bgDark: #171717;
+    --color-dark: #171717;
 }
 
 /* Tiptap dark mode */
-.dark .ProseMirror { color: white; }
-.dark .ProseMirror p,
-.dark .ProseMirror h1,
-.dark .ProseMirror h2,
-.dark .ProseMirror h3,
-.dark .ProseMirror li,
-.dark .ProseMirror blockquote { color: white; }
+[data-theme="dark"] .ProseMirror { color: white; }
+[data-theme="dark"] .ProseMirror p,
+[data-theme="dark"] .ProseMirror h1,
+[data-theme="dark"] .ProseMirror h2,
+[data-theme="dark"] .ProseMirror h3,
+[data-theme="dark"] .ProseMirror li,
+[data-theme="dark"] .ProseMirror blockquote { color: white; }
 .ProseMirror:focus { outline: none; }
 
 /* Dark mode overrides */

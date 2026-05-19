@@ -119,11 +119,12 @@ const SDMilestones: React.FC = () => {
                     <div className="absolute left-[-26px] top-0 bottom-0 w-0.5 bg-mainColor/20 dark:bg-white/10 rounded-full"></div>
 
                     {progress.milestones.map((milestone) => (
-                        <div key={milestone.id} className="relative mb-12 last:mb-0 group" onClick={() => navigate(milestone.id)}>                            <div className={`absolute left-[-42px] top-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shadow-md z-10 transition-all bg-mainColor`}>
-                            {milestone.index > 0 ? milestone.index : "X"}
-                        </div>
+                        <div key={milestone.id} className="relative mb-12 last:mb-0 group" onClick={() => navigate(milestone.id)}>
+                            <div className={`absolute left-[-42px] top-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shadow-md z-10 transition-all bg-mainColor`}>
+                                {milestone.index > 0 ? milestone.index : "X"}
+                            </div>
 
-                            <div className="bg-white dark:bg-lightDark rounded-normal p-6 shadow-[0_2px_15px_rgba(0,0,0,0.05)] border border-lightGray/20 dark:border-white/5 flex flex-col gap-4">
+                            <div className="bg-white dark:bg-lightDark rounded-normal p-6 shadow-[0_2px_15px_rgba(0,0,0,0.05)] hover:shadow-[0_0_10px_1px_rgba(128,128,128,0.5)] hover:cursor-pointer border border-lightGray/20 dark:border-white/5 flex flex-col gap-4">
                                 <div className="flex justify-between items-center-safe gap-4">
                                     <h3 className="text-largeSize font-bold dark:text-white tracking-tight capitalize">
                                         {milestone.label}

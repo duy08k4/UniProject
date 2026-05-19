@@ -79,10 +79,11 @@ const FormManagement: React.FC = () => {
                     </svg>
                 </button>
 
-                <span className="relative flex items-center-safe w-1/4 px-2.5 rounded-small shadow-[0_0_10px_rgba(128,128,128,0.25)] dark:bg-black">
+                <span className="relative flex items-center-safe w-1/3 px-2.5 rounded-small shadow-[0_0_10px_rgba(128,128,128,0.25)] dark:bg-black">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-6 dark:stroke-white">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                     </svg>
+
                     <input type="text" className="h-10 w-full pl-2.5 focus:[&+#underlineInput]:w-full dark:text-white disableState outline-none"
                         disabled={isFetching} placeholder="Tìm kiếm..." value={search}
                         onChange={(e) => setSearch(e.target.value)} />
@@ -91,7 +92,7 @@ const FormManagement: React.FC = () => {
 
                 <span className="flex items-center-safe gap-1.5">
                     <p className="font-bold dark:text-white max-sm:hidden">Trạng thái</p>
-                    <select className="w-40 border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white hover:cursor-pointer disableState outline-none bg-transparent"
+                    <select className="w-40 border-[0.5px] border-lightGray dark:border-darkGray px-2.5 py-1.5 rounded-small dark:text-white hover:cursor-pointer disableState outline-none bg-transparent"
                         disabled={isFetching} value={isStopped}
                         onChange={(e) => { setIsStopped(e.target.value); setPage(1) }}>
                         <option value="" className="dark:text-black">Tất cả</option>
@@ -112,6 +113,7 @@ const FormManagement: React.FC = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                         </svg>
                     </button>
+                    
                     <button className="px-2.5 py-1.5 border-[0.5px] border-lightGray rounded-normal hoverBtn disableState"
                         disabled={isFetching || page >= (formPagination?.pagination.totalPages || 1)} onClick={() => changePage("next")}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 dark:stroke-white stroke-2">

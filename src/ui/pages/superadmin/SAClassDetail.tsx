@@ -70,8 +70,11 @@ const SAClassDetail: React.FC = () => {
     // Fetch all topics
     const fetchTopics = async () => {
         if (!classId) return
-        const data = await TopicsService.getTopics(classId)
+        let loading = toast.loading("Đang tải đề tài...")
+        dispatch(changeStateFetching(true))
+        const data = await TopicsService.getTopics(classId).finally(() => dispatch(changeStateFetching(false)))
         if (data) setTopics(data)
+        toast.dismiss(loading)
     }
 
     useEffect(() => {
@@ -89,7 +92,8 @@ const SAClassDetail: React.FC = () => {
         if (!classId) return
         setLoadingCommittee(true)
         if (!progress || progress.class?.id !== classId) {
-            await ProgressService.getProgressDetail(classId)
+            dispatch(changeStateFetching(true))
+            await ProgressService.getProgressDetail(classId).finally(() => dispatch(changeStateFetching(false)))
         }
 
         const committeeResult = await CommitteeService.getByClassId(classId)
@@ -124,14 +128,17 @@ const SAClassDetail: React.FC = () => {
         if (secretary) membersData.push({ userId: secretary, role: CommitteeRole.SECRETARY })
 
         setLoadingCommittee(true)
-        const result = await CommitteeService.upsert({ classId, milestoneId: selectedMilestone, members: membersData })
+        dispatch(changeStateFetching(true))
+        const result = await CommitteeService.upsert({ classId, milestoneId: selectedMilestone, members: membersData }).finally(() => dispatch(changeStateFetching(false)))
+
         setLoadingCommittee(false)
         if (result) setCommittee(result)
     }
 
     const handleReviewTopic = async (topicId: string, approve: boolean) => {
         if (!classId) return
-        const result = await TopicsService.reviewTopic(topicId, classId, approve, rejectNotes[topicId])
+        dispatch(changeStateFetching(true))
+        const result = await TopicsService.reviewTopic(topicId, classId, approve, rejectNotes[topicId]).finally(() => dispatch(changeStateFetching(false)))
         if (result) {
             setTopics(prev => prev.map(t => t.id === topicId ? result : t))
             setReviewableTopic(result)
@@ -140,8 +147,9 @@ const SAClassDetail: React.FC = () => {
 
     const handleAssignReviewer = async (reviewerId: string) => {
         if (!classId || !assignTarget) return
+        dispatch(changeStateFetching(true))
         setAssigning(true)
-        const result = await TopicsService.assignReviewer(assignTarget.id, classId, reviewerId)
+        const result = await TopicsService.assignReviewer(assignTarget.id, classId, reviewerId).finally(() => dispatch(changeStateFetching(false)))
         if (result) {
             setTopics(prev => prev.map(t => t.id === assignTarget.id ? result : t))
             setAssignTarget(null)
@@ -286,7 +294,7 @@ const SAClassDetail: React.FC = () => {
             <div className="w-full flex gap-5">
                 {/* Left: Info */}
                 <div className="w-1/4 flex flex-col gap-5">
-                    <div className="p-5 border-[0.5px] border-lightGray dark:border-gray rounded-normal flex flex-col gap-4">
+                    <div className="p-5 border-[0.5px] border-lightGray dark:border-darkGray rounded-normal flex flex-col gap-4">
                         <h3 className="font-bold dark:text-white uppercase text-mobile-smallSize text-gray tracking-widest">Thông tin quản lý</h3>
 
                         <div className="flex flex-col gap-3">
@@ -296,6 +304,7 @@ const SAClassDetail: React.FC = () => {
                                     <span className="w-10 h-10 rounded-full bg-lightGray dark:bg-white/10 flex items-center justify-center font-bold dark:text-white">
                                         {getShortName(info.createdBy?.full_name || "")}
                                     </span>
+
                                     <div className="">
                                         <p className="font-semibold dark:text-white leading-tight">{info.createdBy?.full_name}</p>
                                         <p className="text-sm text-gray">{info.createdBy?.email}</p>
@@ -317,13 +326,13 @@ const SAClassDetail: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="border-t-[0.5px] border-lightGray dark:border-gray pt-4 flex flex-col gap-2">
+                        <div className="border-t-[0.5px] border-lightGray dark:border-darkGray pt-4 flex flex-col gap-2">
                             <p className="text-sm text-gray flex justify-between">Ngày tạo: <span className="text-black dark:text-white font-medium">{formatVNTime(info.created_at)}</span></p>
                             <p className="text-sm text-gray flex justify-between">Cập nhật: <span className="text-black dark:text-white font-medium">{formatVNTime(info.updated_at)}</span></p>
                         </div>
                     </div>
 
-                    <div className="p-5 border-[0.5px] border-lightGray dark:border-gray rounded-normal">
+                    <div className="p-5 border-[0.5px] border-lightGray dark:border-darkGray rounded-normal">
                         <h3 className="font-bold dark:text-white uppercase text-mobile-smallSize text-gray tracking-widest mb-3">Mô tả lớp học</h3>
                         <p className="text-normalSize text-gray italic">"{info.description || "Chưa có mô tả"}"</p>
                     </div>
@@ -335,7 +344,7 @@ const SAClassDetail: React.FC = () => {
                         <span className="flex-1 flex items-center-safe justify-between px-7 py-3.5 shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-small dark:bg-black/20">
                             <span className="">
                                 <h4 className="text-normalSize text-gray">Sinh viên</h4>
-                                <p className="text-largeSize font-semibold dark:text-white">{info.counts.student}</p>
+                                <p className="text-largeSize font-semibold dark:text-white">{Number(info.counts.student) < 10 ? `0${Number(info.counts.student)}` : Number(info.counts.student)}</p>
                             </span>
 
                             <span className="h-fit aspect-square bg-lightGray dark:bg-white/10 p-3 rounded-normal">
@@ -348,7 +357,7 @@ const SAClassDetail: React.FC = () => {
                         <span className="flex-1 flex items-center-safe justify-between px-7 py-3.5 shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-small dark:bg-black/20">
                             <span className="">
                                 <h4 className="text-normalSize text-gray">Giảng viên</h4>
-                                <p className="text-largeSize font-semibold dark:text-white">{info.counts.lecturer}</p>
+                                <p className="text-largeSize font-semibold dark:text-white">{Number(info.counts.lecturer) < 10 ? `0${Number(info.counts.lecturer)}` : Number(info.counts.lecturer)}</p>
                             </span>
 
                             <span className="h-fit aspect-square bg-lightGray dark:bg-white/10 p-3 rounded-normal">
@@ -410,7 +419,7 @@ const SAClassDetail: React.FC = () => {
                                         <p className="font-bold dark:text-white">Vai trò</p>
 
                                         <select
-                                            className="w-48 border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white max-sm:text-mobile-smallSize max-sm:w-full hover:cursor-pointer disableState"
+                                            className="w-48 border-[0.5px] border-lightGray dark:border-darkGray px-2.5 py-1.5 rounded-small dark:text-white max-sm:text-mobile-smallSize max-sm:w-full hover:cursor-pointer disableState"
                                             disabled={isFetching}
                                             onChange={(e) => { setRoleSearch(e.target.value) }}
                                         >
@@ -447,7 +456,7 @@ const SAClassDetail: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="border-[0.5px] border-lightGray dark:border-gray rounded-normal overflow-hidden">
+                            <div className="border-[0.5px] border-lightGray dark:border-darkGray rounded-normal overflow-hidden">
                                 <table className="w-full bg-transparent">
                                     <colgroup>
                                         <col className="w-[40%]" />
@@ -467,7 +476,7 @@ const SAClassDetail: React.FC = () => {
 
                                     <tbody className="">
                                         {Object.values(members.data).flat().map((member, index) => (
-                                            <tr key={index} className="border-t-[0.5px] border-lightGray dark:border-lightGray hover:bg-lighterGray dark:hover:bg-white/5 hover:cursor-pointer">
+                                            <tr key={index} className="border-t-[0.5px] border-lightGray dark:border-darkGray hover:bg-lighterGray dark:hover:bg-white/5 hover:cursor-pointer">
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center-safe gap-3">
                                                         <span className="w-9 h-9 rounded-full bg-lightGray dark:bg-white/10 flex items-center justify-center font-bold text-mobile-smallSize dark:text-white">
@@ -513,14 +522,15 @@ const SAClassDetail: React.FC = () => {
                         <div className="flex-1 flex flex-col gap-5 pt-5">
                             <div className="flex justify-between items-center">
                                 <h3 className="font-bold dark:text-white uppercase text-sm tracking-wider">Danh sách đề tài</h3>
-                                <button onClick={fetchTopics} className="p-2 hover:bg-lightGray dark:hover:bg-white/10 rounded-full transition-colors">
+
+                                <button onClick={fetchTopics} className="p-2 hover:bg-lightGray dark:hover:bg-white/10 rounded-full transition-colors disableState" disabled={isFetching}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                                     </svg>
                                 </button>
                             </div>
 
-                            <div className="border-[0.5px] border-lightGray dark:border-gray rounded-normal overflow-hidden">
+                            <div className="border-[0.5px] border-lightGray dark:border-darkGray rounded-normal overflow-hidden">
                                 <table className="w-full bg-transparent">
                                     <colgroup>
                                         <col className="w-[18%]" />
@@ -542,12 +552,11 @@ const SAClassDetail: React.FC = () => {
                                     </thead>
                                     <tbody>
                                         {topics.map((topic) => {
-                                            const isReviewable = topic.status === TopicStatus.OUTLINE_WAITING_UNIADMIN
                                             const canAssign = topic.thesis_type === ThesisType.CAPSTONE && topic.status === TopicStatus.APPROVED
                                             return (
                                                 <tr key={topic.id}
-                                                    onClick={() => isReviewable && setReviewableTopic(topic)}
-                                                    className={`border-t-[0.5px] border-lightGray dark:border-lightGray hover:bg-lighterGray dark:hover:bg-white/5 ${isReviewable ? "cursor-pointer" : ""}`}>
+                                                    onClick={() =>  setReviewableTopic(topic)}
+                                                    className={`border-t-[0.5px] border-lightGray dark:border-darkGray hover:bg-lighterGray dark:hover:bg-white/5 cursor-pointer`}>
                                                     <td className="px-5 py-3 dark:text-white text-sm">{topic.student.full_name}</td>
                                                     <td className="py-3 dark:text-white text-sm max-w-[200px] truncate" title={topic.title}>{topic.title}</td>
                                                     <td className="py-3 text-gray text-sm">{VNThesisType[topic.thesis_type]?.split(" ")[0]}</td>
@@ -583,8 +592,7 @@ const SAClassDetail: React.FC = () => {
                     {activeTab === "committee" && (
                         <div className="flex-1 flex flex-col gap-8 pt-5 max-w-4xl">
                             <div className="flex flex-col gap-2">
-                                <h3 className="font-bold dark:text-white uppercase text-sm tracking-wider">Thiết lập Hội đồng</h3>
-                                <p className="text-xs text-gray italic">Chỉ quản trị viên hệ thống mới có quyền thiết lập hội đồng đánh giá cho lớp học.</p>
+                                <h1 className="font-bold dark:text-white uppercase text-sm">Thành lập Hội đồng bảo vệ khóa luận</h1>
                             </div>
 
                             {loadingCommittee ? (
@@ -594,9 +602,9 @@ const SAClassDetail: React.FC = () => {
                                     {/* Form fields */}
                                     <div className="grid grid-cols-1 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium mb-1 dark:text-white">Cột mốc đánh giá *</label>
+                                            <label className="block text-sm font-medium mb-1 dark:text-white">Cột mốc <b className="text-red">*</b></label>
                                             <select value={selectedMilestone} onChange={e => setSelectedMilestone(e.target.value)}
-                                                className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                className="w-full px-3 py-3.5 border border-lightGray dark:border-darkGray rounded-lg dark:bg-black dark:text-white">
                                                 <option value="">-- Chọn milestone --</option>
                                                 {milestones.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
                                             </select>
@@ -604,17 +612,18 @@ const SAClassDetail: React.FC = () => {
 
                                         <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                                             <div>
-                                                <label className="block text-sm font-medium mb-1 dark:text-white">Chủ tịch *</label>
+                                                <label className="block text-sm font-medium mb-1 dark:text-white">Chủ tịch <b className="text-red">*</b></label>
                                                 <select value={chairman} onChange={e => setChairman(e.target.value)}
-                                                    className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                    className="w-full px-3 py-3.5 border border-lightGray dark:border-darkGray rounded-lg dark:bg-black dark:text-white">
                                                     <option value="">-- Chọn --</option>
                                                     {lecturers.map(l => <option key={l.user.id} value={l.user.id}>{l.user.full_name}</option>)}
                                                 </select>
                                             </div>
+
                                             <div>
-                                                <label className="block text-sm font-medium mb-1 dark:text-white">Ủy viên phản biện *</label>
+                                                <label className="block text-sm font-medium mb-1 dark:text-white">Ủy viên phản biện <b className="text-red">*</b></label>
                                                 <select value={reviewer} onChange={e => setReviewer(e.target.value)}
-                                                    className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                    className="w-full px-3 py-3.5 border border-lightGray dark:border-darkGray rounded-lg dark:bg-black dark:text-white">
                                                     <option value="">-- Chọn --</option>
                                                     {lecturers.map(l => <option key={l.user.id} value={l.user.id}>{l.user.full_name}</option>)}
                                                 </select>
@@ -623,17 +632,18 @@ const SAClassDetail: React.FC = () => {
 
                                         <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                                             <div>
-                                                <label className="block text-sm font-medium mb-1 dark:text-white">Ủy viên *</label>
+                                                <label className="block text-sm font-medium mb-1 dark:text-white">Ủy viên <b className="text-red">*</b></label>
                                                 <select value={member} onChange={e => setMember(e.target.value)}
-                                                    className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                    className="w-full px-3 py-3.5 border border-lightGray dark:border-darkGray rounded-lg dark:bg-black dark:text-white">
                                                     <option value="">-- Chọn --</option>
                                                     {lecturers.map(l => <option key={l.user.id} value={l.user.id}>{l.user.full_name}</option>)}
                                                 </select>
                                             </div>
+                                            
                                             <div>
                                                 <label className="block text-sm font-medium mb-1 dark:text-white">Thư ký</label>
                                                 <select value={secretary} onChange={e => setSecretary(e.target.value)}
-                                                    className="w-full px-3 py-2 border border-lightGray rounded-lg dark:bg-black dark:text-white">
+                                                    className="w-full px-3 py-3.5 border border-lightGray dark:border-darkGray rounded-lg dark:bg-black dark:text-white">
                                                     <option value="">-- Không có --</option>
                                                     {lecturers.map(l => <option key={l.user.id} value={l.user.id}>{l.user.full_name}</option>)}
                                                 </select>
@@ -675,6 +685,7 @@ const SAClassDetail: React.FC = () => {
                     onRejectNoteChange={(id, note) => setRejectNotes(prev => ({ ...prev, [id]: note }))}
                     onReview={handleReviewTopic}
                     onClose={() => setReviewableTopic(null)}
+                    refreshTopics={fetchTopics}
                 />
             )}
 

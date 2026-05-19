@@ -92,9 +92,9 @@ export type TopicStatusType = typeof TopicStatus[keyof typeof TopicStatus]
 
 export const VNTopicStatus: Record<string, { label: string, color: string }> = {
   draft:                    { label: "Bản nháp",                    color: "text-gray" },
-  invited:                  { label: "Chờ GVHD phản hồi",           color: "text-yellow-500" },
-  supervisor_rejected:      { label: "GVHD từ chối",                color: "text-red" },
-  supervisor_accepted:      { label: "GVHD đồng ý",                 color: "text-blue-500" },
+  invited:                  { label: "Đã gửi lời mời",              color: "text-yellow-500" },
+  supervisor_rejected:      { label: "Đã từ chối hướng dẫn",        color: "text-red" },
+  supervisor_accepted:      { label: "Đã đồng ý hướng dẫn",         color: "text-mainColor" },
   outline_pending:          { label: "Chờ Bộ môn duyệt",            color: "text-yellow-500" },
   outline_waiting_uniadmin: { label: "Chờ Khoa duyệt",              color: "text-orange-500" },
   outline_rejected:         { label: "Đề cương bị từ chối",         color: "text-red" },
@@ -123,7 +123,7 @@ export const VNScoreFormTag: Record<string, string> = {
   supervisor_score: "Điểm GVHD",
   reviewer_score: "Điểm phản biện",
   committee_score: "Điểm hội đồng",
-  attendance_check: "Chuyên cần / Tiến độ",
+  attendance_check: "Chuyên cần",
   bonus_score: "Điểm cộng",
   others: "Khác",
 }
@@ -147,10 +147,10 @@ export const Field_Label = {
 export type Field_LabelType = typeof Field_Label[keyof typeof Field_Label]
 
 export const VNFieldLabel: Record<string, string> = {
-  null: "Không xác định",
+  null: "Khác",
   outline_file: "Đề cương",
   report_file: "Báo cáo tiến độ",
-  final_thesis: "Khóa luận / Báo cáo cuối",
+  final_thesis: "Báo cáo đề tài",
   supervisor_review_file: "Phiếu nhận xét GVHD",
   revision_file: "Giải trình chỉnh sửa",
 }
@@ -165,9 +165,9 @@ export const CommitteeRole = {
 export type CommitteeRoleType = typeof CommitteeRole[keyof typeof CommitteeRole]
 
 export const VNCommitteeRole: Record<string, string> = {
-  chairman: "Chủ tịch",
+  chairman: "Chủ tịch hội đồng",
   reviewer: "Ủy viên phản biện",
-  member: "Ủy viên",
+  member: "Ủy viên hội đồng",
   secretary: "Thư ký",
 }
 
@@ -182,11 +182,11 @@ export const ColumnAllowedRole = {
 export type ColumnAllowedRoleType = typeof ColumnAllowedRole[keyof typeof ColumnAllowedRole]
 
 export const VNColumnAllowedRole: Record<string, string> = {
-  roomadmin: "Quản lý lớp",
+  roomadmin: "Quản trị viên lớp học",
   lecturer: "Giảng viên",
-  chairman: "Chủ tịch HĐ",
+  chairman: "Chủ tịch hội đồng",
   reviewer: "Ủy viên phản biện",
-  member: "Ủy viên HĐ",
+  member: "Ủy viên hội đồng",
 }
 
 export const ColumnType = {

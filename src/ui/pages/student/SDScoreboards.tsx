@@ -18,7 +18,7 @@ const SDScoreboards: React.FC = () => {
     const loadScoreforms = async () => {
         if (!classId) return
         setLoading(true)
-        await ScoreFormsService.scoreFormsPagination(1, 100, undefined, false, undefined, classId)
+        await ScoreFormsService.scoreFormsPagination(1, 100, classId)
         setLoading(false)
     }
 
@@ -49,7 +49,7 @@ const SDScoreboards: React.FC = () => {
                         <div
                             key={sf.id}
                             onClick={() => navigate(sf.id)}
-                            className="group p-6 bg-white dark:bg-lightDark border border-lightGray dark:border-gray rounded-big hover:border-mainColor/30 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col gap-4"
+                            className="group p-6 bg-white dark:bg-lightDark border border-lightGray dark:border-darkGray rounded-small hover:border-mainColor/30 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col gap-4"
                         >
                             <div className="flex flex-col gap-1">
                                 <h3 className="text-normalSize font-bold dark:text-white group-hover:text-mainColor transition-colors">{sf.label}</h3>

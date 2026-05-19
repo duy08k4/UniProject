@@ -126,18 +126,26 @@ const RoomAdminLayout: React.FC = () => {
         <>
             <div className="w-full h-full flex bg-bgLight dark:bg-bgDark overflow-hidden">
                 {/* Side bar */}
-                <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-gray px-[20px] py-5 max-sm:fixed max-sm:z-10 max-sm:w-2/3 max-sm:bg-bgLight dark:max-sm:bg-bgDark">
+                <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-darkGray px-[20px] py-5 max-sm:fixed max-sm:z-10 max-sm:w-2/3 max-sm:bg-bgLight dark:max-sm:bg-bgDark">
                     <button className="absolute hidden top-10 left-full -translate-x-1/2 h-8 aspect-square bg-bgLight dark:max-sm:bg-bgDark border-[0.5px] rounded-full border-lightGray max-sm:flex justify-center-safe items-center-safe">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="dark:stroke-white size-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                         </svg>
                     </button>
 
-                    <NavLink to={isFetching ? pathLocation.pathname : "/main"} className="flex items-center-safe gap-2.5">
+                    <div className="flex items-center-safe gap-2.5">
                         <img src={UniLogo} className="h-10" loading="lazy" />
                         <span className="">
                             <h4 className="text-normalSize font-bold dark:text-white">UniProject</h4>
                         </span>
+                    </div>
+
+                    <NavLink to={isFetching ? pathLocation.pathname : "/main"} className={`disableState flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer rounded-small bg-gray/25`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white max-sm:size-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+                        </svg>
+
+                        <p className="text-smallSize max-sm:text-mobile-smallSize font-semibold dark:text-white">Danh sách lớp học</p>
                     </NavLink>
 
                     <span className="flex-1 flex flex-col gap-2.5">
@@ -178,7 +186,7 @@ const RoomAdminLayout: React.FC = () => {
 
                 {/* Body */}
                 <div className="flex-1 flex flex-col">
-                    <header className="w-full border-b-[0.5px] border-lightGray dark:border-gray flex justify-between gap-10 px-mainTwoSidePadding py-5">
+                    <header className="w-full border-b-[0.5px] border-lightGray dark:border-darkGray flex justify-between gap-10 px-mainTwoSidePadding py-5">
                         <span className="relative w-3/5 flex items-center-safe gap-5 px-2.5 rounded-small">
                             {pathLocation.pathname !== `/main/roomadmin/class/${classId}` && <h1 className="text-largeSize font-bold dark:text-white line-clamp-1">{classData.info.label}</h1>}
                         </span>

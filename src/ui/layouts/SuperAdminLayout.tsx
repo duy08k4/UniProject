@@ -78,7 +78,7 @@ const SuperAdminLayout: React.FC = () => {
     return (
         <div className="w-full h-full flex bg-bgLight dark:bg-bgDark">
             {/* Side bar */}
-            <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-gray px-[20px] py-5">
+            <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-darkGray px-[20px] py-5">
                 <NavLink to={"/super-admin"} className="flex items-center-safe gap-2.5">
                     <img src={UniLogo} className="h-10" loading="lazy" />
                     <span className="">
@@ -108,7 +108,7 @@ const SuperAdminLayout: React.FC = () => {
 
             {/* Body */}
             <div className="flex-1 flex flex-col">
-                <header className="w-full border-b-[0.5px] border-lightGray dark:border-gray flex justify-end-safe gap-10 px-mainTwoSidePadding py-5">
+                <header className="w-full border-b-[0.5px] border-lightGray dark:border-darkGray flex justify-end-safe gap-10 px-mainTwoSidePadding py-5">
                     <span className="flex items-center-safe gap-2.5">
                         <span className="flex items-center-safe gap-2.5">
                             <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium p-2.5">
