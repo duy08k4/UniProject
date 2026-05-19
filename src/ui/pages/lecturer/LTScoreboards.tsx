@@ -19,7 +19,7 @@ const LTScoreboards: React.FC = () => {
     const loadScoreforms = async () => {
         if (!classId) return
         setLoading(true)
-        await ScoreFormsService.scoreFormsPagination(1, 100, undefined, false, undefined, classId)
+        await ScoreFormsService.scoreFormsPagination(1, 100, classId)
         setLoading(false)
     }
 

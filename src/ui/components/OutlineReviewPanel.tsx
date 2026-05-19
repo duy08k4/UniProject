@@ -1,7 +1,9 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import type { TopicDetail } from "../../services/topics/topics.type"
-import { VNThesisType, VNTopicStatus } from "../../config/enum"
+import { MainRole, Role, TopicStatus, VNThesisType, VNTopicStatus } from "../../config/enum"
+import { useSelector } from "react-redux"
+import type { RootState } from "../../redux/store"
 
 type Props = {
     topics: TopicDetail[]
@@ -9,11 +11,14 @@ type Props = {
     rejectNotes: Record<string, string>
     onRejectNoteChange: (id: string, note: string) => void
     onReview: (id: string, approve: boolean) => Promise<void>
+    refreshTopics: () => Promise<void>
     onClose: () => void
 }
 
-const OutlineReviewPanel: React.FC<Props> = ({ topics, isFetching, rejectNotes, onRejectNoteChange, onReview, onClose }) => {
+const OutlineReviewPanel: React.FC<Props> = ({ topics, isFetching, rejectNotes, onRejectNoteChange, onReview, refreshTopics, onClose }) => {
     const [selected, setSelected] = useState<TopicDetail>(topics[0])
+    const userData = useSelector((state: RootState) => state.auth.user.info)
+    const currentClass = useSelector((state: RootState) => state.class.currentClass.info)
 
     useEffect(() => {
         setSelected(prev => topics.find(t => t.id === prev?.id) ?? topics[0])
@@ -22,22 +27,33 @@ const OutlineReviewPanel: React.FC<Props> = ({ topics, isFetching, rejectNotes, 
     return (
         <div className="fixed inset-0 z-50 flex bg-black/60">
             {/* Cột trái — danh sách đề cương */}
-            <div className="w-80 shrink-0 bg-bgLight dark:bg-bgDark flex flex-col border-r border-gray/10 overflow-y-auto">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray/10">
-                    <h3 className="font-bold dark:text-white">Đề cương chờ duyệt ({topics.length})</h3>
-                    <button onClick={onClose} className="text-gray hover:text-red transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+            <div className="w-96 shrink-0 bg-bgLight dark:bg-bgDark flex flex-col border-r border-gray/10 overflow-y-auto">
+                <div className="flex flex-col px-5 py-4 border-b border-gray/10 gap-3.5">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-bold dark:text-white">Đề cương chờ duyệt ({topics.length})</h3>
+
+                        <button onClick={onClose} className="hover:cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="size-5 stroke-red">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <button onClick={refreshTopics} className="w-fit hover:cursor-pointer flex items-center border border-lightGray px-2.5 py-1.5 rounded-small">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-5 dark:stroke-white">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
+
+                        <p className="text-smallSize text-black dark:text-white ml-2">Làm mới</p>
                     </button>
                 </div>
 
                 <div className="flex flex-col gap-1 p-3">
                     {topics.map(topic => (
                         <button key={topic.id} onClick={() => setSelected(topic)}
-                            className={`text-left px-4 py-3 rounded-normal transition-colors ${selected?.id === topic.id ? "bg-mainColorRGB text-mainColor" : "hover:bg-gray/5 dark:text-white"}`}>
+                            className={`text-left px-4 py-3 rounded-small transition-colors ${selected?.id === topic.id ? "bg-mainColorRGB text-mainColor" : "hover:bg-gray/5 dark:text-white"}`}>
                             <p className="font-medium text-smallSize line-clamp-1 dark:text-white">{topic.title}</p>
-                            <p className="text-tinySize text-gray mt-0.5">{topic.student.full_name} — {VNThesisType[topic.thesis_type]?.split(" ")[0]}</p>
+                            <p className="text-tinySize text-gray mt-0.5">{topic.student.full_name} — {VNThesisType[topic.thesis_type]?.split("(")[0]}</p>
                         </button>
                     ))}
                 </div>
@@ -72,20 +88,28 @@ const OutlineReviewPanel: React.FC<Props> = ({ topics, isFetching, rejectNotes, 
                         </div>
 
                         {/* Actions */}
-                        <div className="px-6 py-4 border-t border-gray/10 flex items-center gap-3">
-                            {selected.status !== "outline_rejected" && (
-                                <input value={rejectNotes[selected.id] ?? ""} onChange={e => onRejectNoteChange(selected.id, e.target.value)}
-                                    className="flex-1 border border-gray/30 rounded-md px-3 py-2 dark:bg-dark dark:text-white text-smallSize disableState"
-                                    placeholder="Lý do từ chối (nếu có)..." disabled={isFetching} />
+                        <div className="px-6 py-4 border-t border-gray/10 flex flex-col gap-2.5">
+                            {currentClass && currentClass.user.role === Role.ROOMADMIN && (
+                                <p className="text-smallSize text-oranged font-semibold">Quyết định sẽ không thể thay đổi sau khi đã thực hiện</p>
                             )}
-                            <button onClick={async () => { await onReview(selected.id, true); onClose() }} disabled={isFetching || selected.status === "approved"}
-                                className="px-5 py-2 bg-mainColor text-white rounded-md text-smallSize font-bold hover:opacity-80 transition-opacity disableState shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
-                                {selected.status === "outline_pending" ? "Duyệt & Gửi Khoa" : "Phê duyệt chính thức"}
-                            </button>
-                            <button onClick={async () => { await onReview(selected.id, false); onClose() }} disabled={isFetching || selected.status === "outline_rejected"}
-                                className="px-5 py-2 bg-red text-white rounded-md text-smallSize font-bold hover:opacity-80 transition-opacity disableState shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
-                                Từ chối
-                            </button>
+
+                            <div className="flex items-center gap-3">
+                                <button onClick={async () => { await onReview(selected.id, true); onClose() }} disabled={isFetching || selected.status === TopicStatus.APPROVED || (userData.role === MainRole.USER && currentClass?.user?.role === Role.ROOMADMIN && selected.status === TopicStatus.OUTLINE_REJECTED) || (userData.role === MainRole.USER && currentClass?.user?.role === Role.ROOMADMIN && selected.status !== TopicStatus.OUTLINE_PENDING)}
+                                    className="px-5 py-2 bg-mainColor text-white rounded-md text-smallSize font-bold hover:opacity-80 transition-opacity disableState shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
+                                    {selected.status === TopicStatus.OUTLINE_PENDING ? "Duyệt và gửi Khoa" : "Phê duyệt chính thức"}
+                                </button>
+
+                                <button onClick={async () => { await onReview(selected.id, false); onClose() }} disabled={isFetching || selected.status === TopicStatus.OUTLINE_REJECTED || (userData.role === MainRole.USER && currentClass?.user?.role === Role.ROOMADMIN && selected.status === TopicStatus.APPROVED) || (userData.role === MainRole.USER && currentClass?.user?.role === Role.ROOMADMIN && selected.status !== TopicStatus.OUTLINE_PENDING)}
+                                    className="px-5 py-2 bg-red text-white rounded-md text-smallSize font-bold hover:opacity-80 transition-opacity disableState shrink-0 disabled:opacity-40 disabled:cursor-not-allowed">
+                                    Từ chối
+                                </button>
+
+                                {selected.status !== TopicStatus.OUTLINE_REJECTED && (
+                                    <input value={rejectNotes[selected.id] ?? ""} onChange={e => onRejectNoteChange(selected.id, e.target.value)}
+                                        className="flex-1 border border-gray/30 rounded-md px-3 py-2 dark:bg-dark dark:text-white text-smallSize disableState"
+                                        placeholder="Lý do từ chối (nếu có)..." disabled={isFetching || (userData.role === MainRole.USER && currentClass?.user?.role === Role.ROOMADMIN && selected.status !== TopicStatus.OUTLINE_PENDING)} />
+                                )}
+                            </div>
                         </div>
                     </>
                 )}

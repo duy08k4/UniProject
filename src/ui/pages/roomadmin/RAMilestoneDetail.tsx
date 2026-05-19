@@ -1,6 +1,6 @@
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, NavLink } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store"
 import ProgressService from "../../../services/progress/progress.service"
@@ -19,6 +19,7 @@ const RAMilestoneDetail: React.FC = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
+    const currentClass = useSelector((state: RootState) => state.class.currentClass)
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
     const currentForm = useSelector((state: RootState) => state.form.currentForm)
     const milestone = useSelector((state: RootState) => state.progress.currentMilestone)
@@ -40,15 +41,15 @@ const RAMilestoneDetail: React.FC = () => {
 
     useEffect(() => {
         if (!classId || !milestoneId) return
-        ;(async () => {
-            dispatch(changeStateFetching(true))
-            const data = await ProgressService.getOneMilestone(milestoneId, classId).finally(() => {
-                dispatch(changeStateFetching(false))
-            })
-            if (data && typeof data !== "boolean") {
-                dispatch(setCurrentMilestone(data))
-            }
-        })()
+            ; (async () => {
+                dispatch(changeStateFetching(true))
+                const data = await ProgressService.getOneMilestone(milestoneId, classId).finally(() => {
+                    dispatch(changeStateFetching(false))
+                })
+                if (data && typeof data !== "boolean") {
+                    dispatch(setCurrentMilestone(data))
+                }
+            })()
 
         return () => { dispatch(setCurrentMilestone(null)) }
     }, [classId, milestoneId])
@@ -78,7 +79,7 @@ const RAMilestoneDetail: React.FC = () => {
 
                 {/* Index + Title */}
                 <div className="flex flex-col gap-1">
-                    <span className="text-tinySize text-gray font-medium uppercase tracking-widest">Cột mốc #{milestone.index}</span>
+                    <span className="text-tinySize text-mainColor font-semibold uppercase">Cột mốc {milestone.index + 1}</span>
                     <h1 className="text-bigSize font-bold dark:text-white leading-tight">{milestone.label}</h1>
 
                     {milestone.description && (
@@ -87,24 +88,33 @@ const RAMilestoneDetail: React.FC = () => {
                 </div>
 
                 {/* Divider + Meta */}
-                <div className="flex items-center gap-6 pt-4 border-t border-lightGray/20 dark:border-white/5 flex-wrap">
-                    <div className="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4 stroke-gray shrink-0">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                        </svg>
+                <div className="flex justify-between pt-4 border-t border-lightGray/20 dark:border-white/5 flex-wrap">
 
-                        <span className="text-tinySize text-gray">Khởi tạo:</span>
-                        <span className="text-tinySize font-semibold dark:text-white">{formatVNTime(milestone.created_at)}</span>
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4 stroke-gray shrink-0">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                            </svg>
+
+                            <span className="text-tinySize text-gray">Khởi tạo:</span>
+                            <span className="text-tinySize font-semibold dark:text-white">{formatVNTime(milestone.created_at)}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4 stroke-gray shrink-0">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
+
+                            <span className="text-tinySize text-gray">Cập nhật:</span>
+                            <span className="text-tinySize font-semibold dark:text-white">{formatVNTime(milestone.updated_at)}</span>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4 stroke-gray shrink-0">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                        </svg>
-
-                        <span className="text-tinySize text-gray">Cập nhật:</span>
-                        <span className="text-tinySize font-semibold dark:text-white">{formatVNTime(milestone.updated_at)}</span>
-                    </div>
+                    {milestone.is_registration_milestone && (
+                        <div className="">
+                            <NavLink to={`/main/${currentClass.info.user.role}/class/${classId}/topics`} className="text-smallSize text-white bg-mainColor px-3.5 py-1.5 rounded-small">Xem đề tài</NavLink>
+                        </div>
+                    )}
                 </div>
             </div>
 

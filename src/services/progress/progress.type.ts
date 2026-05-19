@@ -78,6 +78,7 @@ export type MilestoneDetail = {
     description: string,
     is_deleted: boolean,
     is_stopped: boolean,
+    is_registration_milestone: boolean,
     updated_at: string,
     created_at: string,
     forms: {

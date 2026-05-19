@@ -44,6 +44,14 @@ const RoomLecturerLayout: React.FC = () => {
         },
         {
             icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+            </svg>
+            ,
+            label: "Hội đồng",
+            path: `/main/lecturer/class/${classId}/committee`
+        },
+        {
+            icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
             </svg>,
             label: "Đề tài",
@@ -63,17 +71,6 @@ const RoomLecturerLayout: React.FC = () => {
             </svg>,
             label: "Biểu mẫu",
             path: `/main/lecturer/class/${classId}/forms`
-        },
-    ])
-
-    const sidebarTabCommittee = useRef<SidebarTab[]>([
-        {
-            icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
-            </svg>
-            ,
-            label: "Hội đồng",
-            path: `/main/lecturer/class/${classId}/committee`
         },
         {
             icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5 dark:stroke-white">
@@ -112,25 +109,24 @@ const RoomLecturerLayout: React.FC = () => {
     return (
         <div className="w-full h-full flex bg-bgLight dark:bg-bgDark">
             {/* Side bar */}
-            <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-gray px-[20px] py-5">
-                <NavLink to={isFetching ? pathLocation.pathname : "/main"} className="flex items-center-safe gap-2.5">
+            <div className="w-1/7 h-full flex flex-col gap-5 border-r-[0.5px] border-lightGray dark:border-darkGray px-[20px] py-5">
+                <div className="flex items-center-safe gap-2.5">
                     <img src={UniLogo} className="h-10" loading="lazy" />
                     <span className="">
                         <h4 className="text-normalSize font-bold dark:text-white">UniProject</h4>
                     </span>
+                </div>
+
+                <NavLink to={isFetching ? pathLocation.pathname : "/main"} className={`disableState flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer rounded-small bg-gray/25`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 dark:stroke-white">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+                    </svg>
+
+                    <p className="text-smallSize font-semibold dark:text-white">Danh sách lớp học</p>
                 </NavLink>
 
                 <span className="flex-1 flex flex-col gap-2.5">
                     {sidebarTab.current.map((tab, index) => {
-                        return (
-                            <NavLink key={index} to={isFetching ? pathLocation.pathname : tab.path} className={`disableState flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname === tab.path && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
-                                {tab.icon}
-                                <p className="text-smallSize font-semibold dark:text-white">{tab.label}</p>
-                            </NavLink>
-                        )
-                    })}
-
-                    {sidebarTabCommittee.current.map((tab, index) => {
                         return (
                             <NavLink key={index} to={isFetching ? pathLocation.pathname : tab.path} className={`disableState flex items-center-safe gap-2.5 px-2.5 py-3.5 hover:cursor-pointer hover:bg-mainColorRGB rounded-small ${pathLocation.pathname === tab.path && "bg-mainColorRGB [&_p]:text-mainColor [&_svg]:stroke-mainColor"}`}>
                                 {tab.icon}
@@ -158,7 +154,7 @@ const RoomLecturerLayout: React.FC = () => {
 
             {/* Body */}
             <div className="flex-1 flex flex-col">
-                <header className="w-full border-b-[0.5px] border-lightGray dark:border-gray flex justify-end-safe gap-10 px-mainTwoSidePadding py-5">
+                <header className="w-full border-b-[0.5px] border-lightGray dark:border-darkGray flex justify-end-safe gap-10 px-mainTwoSidePadding py-5">
                     <span className="flex items-center-safe gap-2.5">
                         <p className="h-full aspect-square rounded-full bg-mainColor flex justify-center-safe items-center-safe text-white font-medium">{getShortName(userData.full_name)}</p>
                         <span className="">

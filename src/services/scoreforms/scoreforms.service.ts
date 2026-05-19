@@ -3,7 +3,7 @@ import errorCatch from "../../config/errorCatch"
 import api from "../../config/gateway"
 import apiPath from "../path"
 import { store } from "../../redux/store"
-import { Role } from "../../config/enum"
+import { Role, type ScoreForm_TypeType } from "../../config/enum"
 import type { DetailScoreForm, ScoreFormPaginationType, ScoreFormRow, UpdateScoreFormType } from "./scoreforms.type"
 import {
     removeScoreFormFromPagination,
@@ -14,7 +14,7 @@ import {
 
 export default class ScoreFormsService {
     // Score form (pagination)
-    static async scoreFormsPagination(page: number, size: number, search?: string, is_deleted?: boolean, is_stopped?: boolean, classId?: string) {
+    static async scoreFormsPagination(page: number, size: number, classId?: string, search?: string, scoreform_type?: ScoreForm_TypeType, is_deleted?: boolean, is_stopped?: boolean) {
         let loading
         try {
             if (!page || !size) {
@@ -32,6 +32,7 @@ export default class ScoreFormsService {
 
             const params: any = { page, size, classId }
             if (search) params.search = search
+            if (scoreform_type) params.scoreform_type = scoreform_type
             if (typeof is_deleted === "boolean") params.is_deleted = is_deleted
             if (typeof is_stopped === "boolean") params.is_stopped = is_stopped
 
