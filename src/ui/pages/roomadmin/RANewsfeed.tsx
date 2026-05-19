@@ -146,7 +146,7 @@ const RANewsfeed: React.FC = () => {
                                 <option value="">Không chọn</option>
                                 {progress?.milestones.map((m: any) => <option key={m.id} value={m.id}>{m.label}</option>)}
                             </select>
-                            <p className="text-tinySize text-gray flex items-center gap-1">
+                            <p className="text-tinySize text-mainColor font-semibold flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-3 fill-mainColor shrink-0">
                                     <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
                                 </svg>
@@ -167,11 +167,11 @@ const RANewsfeed: React.FC = () => {
                                     <option key={f.id} value={f.id} className="dark:text-white py-1">{f.label}</option>
                                 ))}
                             </select>
-                            <p className="text-tinySize text-gray flex items-center gap-1">
+                            <p className="text-tinySize text-mainColor font-semibold flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-3 fill-mainColor shrink-0">
                                     <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
                                 </svg>
-                                Giữ <kbd className="px-1 py-0.5 bg-lighterGray dark:bg-bgDark rounded text-tinySize font-mono">Ctrl</kbd> để chọn nhiều
+                                Giữ <kbd className="px-1 py-0.5 bg-lighterGray dark:bg-bgDark dark:text-mainColor rounded text-tinySize font-bold">Ctrl</kbd> để chọn nhiều
                             </p>
                         </div>
                     </div>

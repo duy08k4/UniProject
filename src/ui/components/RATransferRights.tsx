@@ -31,7 +31,7 @@ const RATransferRights: React.FC<RATransferRights_Interface> = ({ togglePopup })
 
         (async () => {
             dispatch(changeStateFetching(true))
-            await ClassService.getMembers(1, 200, searchTerm).then((data) => {
+            await ClassService.getMembers(1, 150, searchTerm).then((data) => {
                 if (data) {
                     dispatch(currentClass_SetMembers(data))
                     const membersArray = Object.values(data.data).flat()
@@ -69,7 +69,7 @@ const RATransferRights: React.FC<RATransferRights_Interface> = ({ togglePopup })
 
     return (
         <div className="fixed z-50 top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.75)] flex justify-center-safe items-center-safe animate-fade-in">
-            <div className="w-[500px] h-[600px] max-h-[90vh] bg-bgLight dark:bg-bgDark flex flex-col p-6 rounded-normal shadow-2xl overflow-hidden max-sm:w-11/12 max-sm:h-[80vh]">
+            <div className="w-[600px] h-[600px] max-h-[90vh] bg-bgLight dark:bg-bgDark flex flex-col p-6 rounded-normal shadow-2xl overflow-hidden max-sm:w-11/12 max-sm:h-[80vh]">
 
                 <div className="flex flex-col gap-2 mb-6">
                     <h1 className="text-bigSize font-bold dark:text-white max-sm:text-mediumSize">Bàn giao quyền quản trị</h1>

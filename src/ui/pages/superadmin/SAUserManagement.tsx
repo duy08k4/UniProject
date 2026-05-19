@@ -126,7 +126,7 @@ const UserManagement: React.FC = () => {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-                        className="w-40 border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white dark:bg-transparent"
+                        className="w-52 border-[0.5px] border-lightGray dark:border-darkGray px-3.5 py-1.5 rounded-small dark:text-white dark:bg-transparent"
                     >
                         <option value="">Tất cả</option>
                         <option value="active">Hoạt động</option>
@@ -163,7 +163,7 @@ const UserManagement: React.FC = () => {
                         <col className="w-[15%]" />
                     </colgroup>
                     <thead className="border-b border-lighterGray dark:border-gray/20 bg-lighterGray/30 dark:bg-white/5">
-                        <tr className="[&_th]:px-5 [&_th]:py-4 [&_th]:text-[12px] [&_th]:font-bold [&_th]:text-gray [&_th]:uppercase [&_th]:tracking-widest [&_th]:text-left">
+                        <tr className="[&_th]:px-5 [&_th]:py-4 [&_th]:text-mobile-smallSize [&_th]:font-bold [&_th]:text-gray [&_th]:uppercase [&_th]:tracking-widest [&_th]:text-left">
                             <th>Người dùng</th>
                             <th>Email</th>
                             <th>Vai trò</th>
@@ -191,7 +191,7 @@ const UserManagement: React.FC = () => {
                             >
                                 <td>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-full bg-mainColor/10 flex items-center justify-center text-[12px] font-bold text-mainColor border border-mainColor/20 shrink-0">
+                                        <div className="w-9 h-9 rounded-full bg-mainColor/10 flex items-center justify-center text-mobile-smallSize font-bold text-mainColor border border-mainColor/20 shrink-0">
                                             {getShortName(user.full_name)}
                                         </div>
                                         <span className="font-semibold dark:text-white group-hover:text-mainColor transition-colors">{user.full_name}</span>
@@ -232,7 +232,7 @@ const UserManagement: React.FC = () => {
                             <>
                                 {/* Avatar + name */}
                                 <div className="px-5 pt-5 pb-4 flex items-center gap-4 border-b border-lightGray dark:border-gray/20">
-                                    <div className="w-14 h-14 rounded-full bg-mainColor/10 flex items-center justify-center text-[18px] font-bold text-mainColor border border-mainColor/20 shrink-0">
+                                    <div className="w-14 h-14 rounded-full bg-mainColor/10 flex items-center justify-center text-normalSize font-bold text-mainColor border border-mainColor/20 shrink-0">
                                         {getShortName(selectedUser.full_name)}
                                     </div>
                                     <div>

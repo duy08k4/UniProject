@@ -126,7 +126,7 @@ const RAForms: React.FC = () => {
                 </button>
 
                 {/* Search */}
-                <span className="relative flex items-center-safe w-1/4 px-2.5 rounded-small shadow-[0_0_10px_rgba(128,128,128,0.25)] dark:bg-black">
+                <span className="relative flex items-center-safe w-1/3 px-2.5 rounded-small shadow-[0_0_10px_rgba(128,128,128,0.25)] dark:bg-black">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-6 dark:stroke-white">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                     </svg>
@@ -144,7 +144,7 @@ const RAForms: React.FC = () => {
                 <span className="flex items-center-safe gap-1.5">
                     <p className="font-bold dark:text-white max-sm:hidden">Trạng thái</p>
                     <select
-                        className="w-40 border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white hover:cursor-pointer disableState outline-none bg-transparent"
+                        className="w-40 border-[0.5px] border-lightGray dark:border-darkGray px-2.5 py-1.5 rounded-small dark:text-white hover:cursor-pointer disableState outline-none bg-transparent"
                         disabled={isFetching}
                         value={isStopped}
                         onChange={(e) => { setIsStopped(e.target.value); setPage(1); }}
@@ -159,7 +159,7 @@ const RAForms: React.FC = () => {
                 <span className="flex items-center-safe gap-1.5">
                     <p className="font-bold dark:text-white max-sm:hidden">Lưu trữ</p>
                     <select
-                        className="w-40 border-[0.5px] border-lightGray px-2.5 py-1.5 rounded-small dark:text-white hover:cursor-pointer disableState outline-none bg-transparent"
+                        className="w-40 border-[0.5px] border-lightGray dark:border-darkGray px-2.5 py-1.5 rounded-small dark:text-white hover:cursor-pointer disableState outline-none bg-transparent"
                         disabled={isFetching}
                         value={isDeleted.toString()}
                         onChange={(e) => { setIsDeleted(e.target.value === "true"); setPage(1); }}

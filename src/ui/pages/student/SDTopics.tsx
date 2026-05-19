@@ -197,19 +197,28 @@ const SDTopics: React.FC = () => {
                                 </span>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1 border-t border-gray/10 pt-4">
+                            <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 border-t border-gray/10 pt-4">
                                 <div className="flex flex-col gap-1">
                                     <p className="text-smallSize text-gray italic">Loại đề tài</p>
                                     <p className="font-medium dark:text-white">{VNThesisType[topic.thesis_type]}</p>
                                 </div>
+
                                 <div className="flex flex-col gap-1">
                                     <p className="text-smallSize text-gray italic">GVHD</p>
                                     <p className="font-medium dark:text-white">{topic.supervisor?.full_name ?? "Chưa có"}</p>
                                 </div>
+
                                 <div className="flex flex-col gap-1">
-                                    <p className="text-smallSize text-gray italic">GVPB</p>
-                                    <p className="font-medium dark:text-white">{topic.reviewer?.full_name ?? "Chưa phân công"}</p>
+                                    <p className="text-smallSize text-gray italic">Email GVHD</p>
+                                    <p className="font-medium dark:text-white">{topic.supervisor?.email ?? "Chưa có"}</p>
                                 </div>
+                                
+                                {topic.thesis_type === ThesisType.CAPSTONE && (
+                                    <div className="flex flex-col gap-1">
+                                        <p className="text-smallSize text-gray italic">GVPB</p>
+                                        <p className="font-medium dark:text-white">{topic.reviewer?.full_name ?? "Chưa phân công"}</p>
+                                    </div>
+                                )}
                             </div>
 
                             {topic.rejection_note && (
@@ -236,9 +245,6 @@ const SDTopics: React.FC = () => {
 
                             {topic.status === TopicStatus.INVITED && (
                                 <div className="flex items-center justify-between gap-3 border-t border-gray/10 pt-4">
-                                    <p className="text-yellow-500 text-smallSize italic">
-                                        Đang chờ GVHD <b>{topic.supervisor?.full_name}</b> phản hồi...
-                                    </p>
                                     <button onClick={async () => {
                                         if (!classId) return
                                         dispatch(changeStateFetching(true))
@@ -255,9 +261,9 @@ const SDTopics: React.FC = () => {
                             {[TopicStatus.SUPERVISOR_ACCEPTED, TopicStatus.OUTLINE_REJECTED].includes(topic.status as any) && (
                                 <div className="flex flex-col gap-3 border-t border-gray/10 pt-4">
                                     <p className="text-smallSize text-gray italic font-medium">
-                                        {topic.status === TopicStatus.OUTLINE_REJECTED ? "Nộp lại file đề cương (PDF)" : "Nộp file đề cương (PDF)"}
+                                        {topic.status === TopicStatus.OUTLINE_REJECTED ? "Nộp lại file đề cương (PDF - Tối đa 50MB)" : "Nộp file đề cương (PDF - Tối đa 50MB)"}
                                     </p>
-                                    
+
                                     <input type="file" accept=".pdf" disabled={isFetching}
                                         onChange={async (e) => {
                                             const file = e.target.files?.[0]
@@ -276,10 +282,11 @@ const SDTopics: React.FC = () => {
                                             dispatch(changeStateFetching(false))
                                         }}
                                         className="border border-gray/30 rounded-md px-3 py-2 dark:bg-dark dark:text-white text-normalSize disableState" />
-                                    <p className="text-tinySize text-gray italic">Chỉ chấp nhận file PDF, tối đa 50MB</p>
-                                    {outlineUrl && <p className="text-smallSize text-mainColor">✓ File đã tải lên</p>}
+                                    {outlineUrl && (
+                                        <a href={outlineUrl} className="text-mainColor" target="_blank">Xem lại đề cương</a>
+                                    )}
                                     <button onClick={handleSubmitOutline} disabled={isFetching || !outlineUrl}
-                                        className="self-start px-5 py-2 bg-mainColor text-white rounded-md text-normalSize font-medium hover:opacity-80 transition-opacity disableState">
+                                        className="self-start px-5 py-2 mt-2.5 bg-mainColor text-white rounded-md text-normalSize font-medium hover:opacity-80 transition-opacity disableState">
                                         Nộp đề cương
                                     </button>
                                 </div>

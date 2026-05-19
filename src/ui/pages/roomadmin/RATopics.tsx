@@ -1,7 +1,7 @@
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store"
 import TopicsService from "../../../services/topics/topics.service"
 import type { TopicDetail } from "../../../services/topics/topics.type"
@@ -9,13 +9,14 @@ import { ThesisType, VNThesisType, VNTopicStatus } from "../../../config/enum"
 import OutlineReviewPanel from "../../components/OutlineReviewPanel"
 import { ClassService } from "../../../services/class/class.service"
 import type { Members } from "../../../services/class/class.type"
-
-const reviewableStatuses = ["outline_pending"]
+import { toast } from "sonner"
+import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 
 const RATopics: React.FC = () => {
     const { classId } = useParams()
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
     const userData = useSelector((state: RootState) => state.auth.user.info)
+    const dispatch = useDispatch()
 
     const [topics, setTopics] = useState<TopicDetail[]>([])
     const [rejectNotes, setRejectNotes] = useState<Record<string, string>>({})
@@ -32,13 +33,18 @@ const RATopics: React.FC = () => {
 
     const fetchTopics = async () => {
         if (!classId) return
-        const data = await TopicsService.getTopics(classId)
+        let loading = toast.loading("Đang tải đề tài...")
+        
+        dispatch(changeStateFetching(true))
+        const data = await TopicsService.getTopics(classId).finally(() => dispatch(changeStateFetching(false)))
         if (data) setTopics(data)
+        toast.dismiss(loading)
     }
 
     const fetchLecturers = async () => {
         if (lecturersLoaded.current || !classId) return
-        const result = await ClassService.getMembers(1, 500, "", "lecturer", classId)
+        dispatch(changeStateFetching(true))
+        const result = await ClassService.getMembers(1, 500, "", "lecturer", classId).finally(() => dispatch(changeStateFetching(false)))
         if (result && typeof result !== "boolean") {
             setLecturers(result.data.lecturer)
             lecturersLoaded.current = true
@@ -57,7 +63,8 @@ const RATopics: React.FC = () => {
 
     const handleReviewTopic = async (topicId: string, approve: boolean) => {
         if (!classId) return
-        const result = await TopicsService.reviewTopic(topicId, classId, approve, rejectNotes[topicId])
+        dispatch(changeStateFetching(true))
+        const result = await TopicsService.reviewTopic(topicId, classId, approve, rejectNotes[topicId]).finally(() => dispatch(changeStateFetching(false)))
         if (result) {
             setTopics(prev => prev.map(t => t.id === topicId ? result : t))
             setReviewableTopic(result)
@@ -66,8 +73,9 @@ const RATopics: React.FC = () => {
 
     const handleAssignReviewer = async (reviewerId: string) => {
         if (!classId || !assignTarget) return
+        dispatch(changeStateFetching(true))
         setAssigning(true)
-        const result = await TopicsService.assignReviewer(assignTarget.id, classId, reviewerId)
+        const result = await TopicsService.assignReviewer(assignTarget.id, classId, reviewerId).finally(() => dispatch(changeStateFetching(false)))
         if (result) {
             setTopics(prev => prev.map(t => t.id === assignTarget.id ? result : t))
             setAssignTarget(null)
@@ -77,7 +85,7 @@ const RATopics: React.FC = () => {
     }
 
     const handleRowClick = (topic: TopicDetail) => {
-        if (topic.outline_file_url && reviewableStatuses.includes(topic.status)) {
+        if (topic.outline_file_url) {
             setReviewableTopic(topic)
         }
     }
@@ -104,14 +112,14 @@ const RATopics: React.FC = () => {
                 </button>
             </div>
 
-            <div className="border-[0.5px] border-lightGray dark:border-gray rounded-normal overflow-hidden">
+            <div className="border-[0.5px] border-lightGray dark:border-darkGray rounded-small overflow-hidden">
                 <table className="w-full bg-transparent">
                     <colgroup>
                         <col className="w-[15%]" />
                         <col className="w-[22%]" />
-                        <col className="w-[8%]" />
-                        <col className="w-[18%]" />
-                        <col className="w-[18%]" />
+                        <col className="w-[14%]" />
+                        <col className="w-[15%]" />
+                        <col className="w-[15%]" />
                         <col className="w-[12%]" />
                         <col className="w-[7%]" />
                     </colgroup>
@@ -128,14 +136,14 @@ const RATopics: React.FC = () => {
                     </thead>
                     <tbody>
                         {topics.map((topic) => {
-                            const isClickable = !!topic.outline_file_url && reviewableStatuses.includes(topic.status)
+                            const isClickable = !!topic.outline_file_url
                             return (
                                 <tr key={topic.id}
                                     onClick={() => handleRowClick(topic)}
-                                    className={`border-t-[0.5px] border-lightGray dark:border-lightGray hover:bg-lighterGray dark:hover:bg-white/5 ${isClickable ? "cursor-pointer" : ""}`}>
+                                    className={`border-t-[0.5px] border-lightGray dark:border-darkGray hover:bg-lighterGray dark:hover:bg-white/5 ${isClickable ? "cursor-pointer" : ""}`}>
                                     <td className="px-5 py-3 dark:text-white text-sm">{topic.student.full_name}</td>
                                     <td className="py-3 dark:text-white text-sm max-w-[200px] truncate" title={topic.title}>{topic.title}</td>
-                                    <td className="py-3 text-gray text-sm">{VNThesisType[topic.thesis_type]?.split(" ")[0]}</td>
+                                    <td className="py-3 text-gray text-sm">{VNThesisType[topic.thesis_type]?.split("(")[0]}</td>
                                     <td className="py-3 text-sm dark:text-white/70">{topic.supervisor?.full_name ?? "—"}</td>
                                     <td className="py-3 text-sm" onClick={e => e.stopPropagation()}>
                                         <span className="text-sm text-gray dark:text-white/50">
@@ -236,6 +244,7 @@ const RATopics: React.FC = () => {
                     onRejectNoteChange={(id, note) => setRejectNotes(prev => ({ ...prev, [id]: note }))}
                     onReview={handleReviewTopic}
                     onClose={() => setReviewableTopic(null)}
+                    refreshTopics={fetchTopics}
                 />
             )}
         </div>

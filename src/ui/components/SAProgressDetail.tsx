@@ -107,16 +107,16 @@ const SAProgressDetail: React.FC = () => {
                 {/* Side Info Panel */}
                 <div className="sticky top-10 h-fit w-[30%] flex flex-col gap-6">
                     {/* Stats or Status info */}
-                    <div className="p-6 border-[0.5px] border-lightGray dark:border-gray rounded-normal bg-white dark:bg-black/10 flex flex-col gap-4 shadow-sm">
-                        <h3 className="font-bold dark:text-white uppercase text-mobile-smallSize text-gray tracking-widest">Trạng thái quy trình</h3>
+                    <div className="p-6 border-[0.5px] border-lightGray dark:border-darkGray rounded-normal bg-white dark:bg-black/10 flex flex-col gap-4 shadow-sm">
+                        <h3 className="font-bold dark:text-white uppercase text-smallSize text-gray">Trạng thái quy trình</h3>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="p-3 rounded-normal bg-lighterGray dark:bg-white/5 flex flex-col items-center border border-lightGray/20">
-                                <span className="text-hugeSize font-bold text-mainColor leading-none">{currentProgress.milestones.length}</span>
-                                <span className="text-[10px] text-gray uppercase font-bold mt-1">Giai đoạn</span>
+                                <span className="text-hugeSize font-bold text-mainColor leading-none">{Number(currentProgress.milestones.length) < 10 ? `0${Number(currentProgress.milestones.length)}` : Number(currentProgress.milestones.length)}</span>
+                                <span className="text-[10px] text-gray uppercase font-bold mt-1">Cột mốc</span>
                             </div>
 
                             <div className="p-3 rounded-normal bg-lighterGray dark:bg-white/5 flex flex-col items-center border border-lightGray/20">
-                                <span className="text-hugeSize font-bold text-red leading-none">{currentProgress.milestones.filter(m => m.is_deleted).length}</span>
+                                <span className="text-hugeSize font-bold text-red leading-none">{currentProgress.milestones.filter(m => m.is_deleted).length < 10 && "0"}{currentProgress.milestones.filter(m => m.is_deleted).length}</span>
                                 <span className="text-[10px] text-gray uppercase font-bold mt-1">Bị xóa</span>
                             </div>
                         </div>
@@ -148,28 +148,28 @@ const SAProgressDetail: React.FC = () => {
                     </div>
 
                     {/* Progress Source info */}
-                    <div className="p-6 border-[0.5px] border-lightGray dark:border-gray rounded-normal bg-white dark:bg-black/10 flex flex-col gap-5 shadow-sm">
+                    <div className="p-6 border-[0.5px] border-lightGray dark:border-darkGray rounded-normal bg-white dark:bg-black/10 flex flex-col gap-5 shadow-sm">
 
                         <div className="flex flex-col gap-5">
                             <div className="space-y-2">
-                                <p className="text-mobile-smallSize text-gray uppercase tracking-widest font-bold">Người tạo</p>
+                                <p className="font-bold dark:text-white uppercase text-smallSize text-gray">Người tạo</p>
 
-                                <div className="flex items-center-safe gap-3 p-2.5 rounded-medium bg-lighterGray/50 dark:bg-white/5 border border-lightGray/30 dark:border-gray/30">
-                                    <span className="w-12 h-12 rounded-full bg-mainColor text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+                                <div className="flex items-center-safe gap-3 p-2.5 rounded-small bg-lighterGray/50 dark:bg-white/5 border border-lightGray/30 dark:border-gray/30">
+                                    <span className="w-12 h-12 rounded-full bg-mainColor text-white flex items-center justify-center font-bold text-normalSize shadow-sm shrink-0">
                                         {getShortName(currentProgress.createdBy.full_name)}
                                     </span>
 
-                                    <div className="overflow-hidden">
-                                        <p className="font-bold dark:text-white text-mediumSize leading-tight truncate">{currentProgress.createdBy.full_name}</p>
+                                    <div className="overflow-hidden py-1">
+                                        <p className="font-bold dark:text-white text-normalSize truncate">{currentProgress.createdBy.full_name}</p>
                                         <p className="text-smallSize text-gray truncate">{currentProgress.createdBy.email}</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <p className="text-mobile-smallSize text-gray uppercase tracking-widest font-bold">Lớp học</p>
+                                <p className="font-bold dark:text-white uppercase text-smallSize text-gray">Lớp học</p>
 
-                                <div className="p-4 rounded-medium border border-mainColor/20 bg-mainColor/5">
+                                <div className="p-4 rounded-small border border-mainColor/20 bg-mainColor/5">
                                     <p className="font-bold text-mainColor text-normalSize line-clamp-1">{currentProgress.class.label}</p>
 
                                     <div className="mt-2 space-y-1">
@@ -198,9 +198,9 @@ const SAProgressDetail: React.FC = () => {
                 <div className="flex-1 flex flex-col gap-8">
                     {/* Description Section */}
                     {currentProgress.description && (
-                        <div className="p-8 border-[0.5px] border-lightGray dark:border-gray rounded-normal bg-white dark:bg-black/20 shadow-sm relative overflow-hidden">
+                        <div className="p-8 border-[0.5px] border-lightGray dark:border-darkGray rounded-normal bg-white dark:bg-black/20 shadow-sm relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-1.5 h-full bg-mainColor"></div>
-                            <h3 className="font-bold dark:text-white uppercase text-mediumSize text-gray tracking-widest mb-4">Mô tả quy trình</h3>
+                            <h3 className="font-bold dark:text-white uppercase text-mediumSize text-gray mb-4">Mô tả quy trình</h3>
 
                             <p className="text-normalSize dark:text-white leading-relaxed whitespace-pre-line italic text-gray/80">
                                 {currentProgress.description}
@@ -211,7 +211,7 @@ const SAProgressDetail: React.FC = () => {
                     {/* Milestones Area */}
                     <div className="flex flex-col gap-5">
                         <div className="flex items-center justify-between px-2">
-                            <h3 className="font-bold dark:text-white uppercase text-mediumSize text-gray tracking-widest flex items-center gap-2">
+                            <h3 className="font-bold dark:text-white uppercase text-mediumSize text-gray flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-6 stroke-mainColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-3.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                 </svg>
@@ -223,7 +223,7 @@ const SAProgressDetail: React.FC = () => {
                         <div className="flex flex-col gap-4">
                             {/* Milestone Item Example */}
                             {currentProgress.milestones.map((milestone) => (
-                                <div key={milestone.id} className="group relative p-6 border-[0.5px] border-lightGray dark:border-gray rounded-normal bg-white dark:bg-black/10 flex gap-6 items-start hover:border-mainColor/50 hover:shadow-md transition-all">
+                                <div key={milestone.id} className="group relative p-6 border-[0.5px] border-lightGray dark:border-darkGray rounded-normal bg-white dark:bg-black/10 flex gap-6 items-start hover:border-mainColor/50 hover:shadow-md transition-all">
                                     <div className="w-14 h-14 rounded-full bg-mainColor/10 text-mainColor flex items-center justify-center font-bold text-bigSize shrink-0 shadow-inner group-hover:bg-mainColor group-hover:text-white transition-colors duration-300">
                                         {milestone.index + 1}
                                     </div>

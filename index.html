@@ -25,7 +25,9 @@
         window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     if (isDark) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
     }
   </script>
 </body>
