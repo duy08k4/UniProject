@@ -37,7 +37,7 @@ const UserManagement: React.FC = () => {
     const fetchUsers = async (p = page) => {
         setLoading(true)
         const filters = statusFilterMap[statusFilter]
-        const data = await AdminService.getUsers(p, 10, searchDebounce || undefined, filters.is_banned, filters.is_deleted)
+        const data = await AdminService.getUsers(p, 100, searchDebounce || undefined, filters.is_banned, filters.is_deleted)
         if (data) setResult(data)
         setLoading(false)
     }
