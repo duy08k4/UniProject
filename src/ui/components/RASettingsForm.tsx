@@ -170,7 +170,7 @@ const RASettingsForm: React.FC<RASettingsForm_Interface> = ({ toggleForm }) => {
                         />
                     </div>
 
-                    <div className="flex flex-col gap-4 pt-2">
+                    {/* <div className="flex flex-col gap-4 pt-2">
                         <p className="text-normalSize font-bold dark:text-white">Cấu hình nâng cao</p>
 
                         <div className="flex flex-col gap-3">
@@ -202,7 +202,7 @@ const RASettingsForm: React.FC<RASettingsForm_Interface> = ({ toggleForm }) => {
                                 />
                             </label>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className="flex items-center-safe gap-4 mt-2">
