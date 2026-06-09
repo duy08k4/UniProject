@@ -64,7 +64,7 @@ const RASettingsForm: React.FC<RASettingsForm_Interface> = ({ toggleForm }) => {
     }
 
     const handleClose = () => {
-        const isChanged = 
+        const isChanged =
             formValues.className !== classInfo.label ||
             formValues.subject !== classInfo.subject ||
             formValues.description !== (classInfo.description || "") ||
@@ -172,15 +172,15 @@ const RASettingsForm: React.FC<RASettingsForm_Interface> = ({ toggleForm }) => {
 
                     {/* <div className="flex flex-col gap-4 pt-2">
                         <p className="text-normalSize font-bold dark:text-white">Cấu hình nâng cao</p>
-                        
+
                         <div className="flex flex-col gap-3">
                             <label className="flex items-center-safe justify-between p-3 rounded-small border-[0.5px] border-lightGray dark:border-darkGray hover:border-mainColor transition-all cursor-pointer group">
                                 <div className="flex flex-col">
                                     <p className="font-medium dark:text-white group-hover:text-mainColor transition-colors text-smallSize">Yêu cầu phê duyệt</p>
                                     <p className="text-tinySize text-gray font-medium">Phê duyệt thành viên mới khi họ tham gia</p>
                                 </div>
-                                <input 
-                                    type="checkbox" 
+                                <input
+                                    type="checkbox"
                                     checked={formValues.requiredApproval}
                                     onChange={handleChange("requiredApproval")}
                                     className="size-5 accent-mainColor cursor-pointer"
@@ -193,8 +193,8 @@ const RASettingsForm: React.FC<RASettingsForm_Interface> = ({ toggleForm }) => {
                                     <p className="font-medium dark:text-white group-hover:text-mainColor transition-colors text-smallSize">Yêu cầu form tham gia</p>
                                     <p className="text-tinySize text-gray font-medium">Yêu cầu sinh viên điền thông tin trước khi vào lớp</p>
                                 </div>
-                                <input 
-                                    type="checkbox" 
+                                <input
+                                    type="checkbox"
                                     checked={formValues.requiredJoinForm}
                                     onChange={handleChange("requiredJoinForm")}
                                     className="size-5 accent-mainColor cursor-pointer"
@@ -206,14 +206,14 @@ const RASettingsForm: React.FC<RASettingsForm_Interface> = ({ toggleForm }) => {
                 </div>
 
                 <div className="flex items-center-safe gap-4 mt-2">
-                    <button 
+                    <button
                         className="flex-1 hoverBtn bg-redRGB text-red py-2.5 rounded-small font-bold transition-all disableState"
                         onClick={handleClose}
                         disabled={isUpdating}
                     >
                         Hủy
                     </button>
-                    <button 
+                    <button
                         className="flex-2 hoverBtn bg-mainColor text-white py-2.5 rounded-small font-bold shadow-lg shadow-mainColorRGB transition-all disableState"
                         onClick={handleUpdateClass}
                         disabled={isUpdating}

@@ -12,6 +12,7 @@ import { ThesisType, TopicStatus, VNThesisType, VNTopicStatus } from "../../../c
 import Loading from "../../components/Loading"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import { toast } from "sonner"
+import { NonProgress } from "./SDMilestones"
 
 const SDTopics: React.FC = () => {
     const { classId } = useParams()
@@ -98,7 +99,7 @@ const SDTopics: React.FC = () => {
 
     if (loading) return <Loading />
 
-    if (progress && progress.created_approval) {
+    if (progress && progress.created_approval && !progress.is_banned) {
         if (!registrationMilestone) {
             return (
                 <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-6 p-10 bg-white dark:bg-lightDark rounded-normal shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-lightGray/10 mt-5">
@@ -212,7 +213,7 @@ const SDTopics: React.FC = () => {
                                     <p className="text-smallSize text-gray italic">Email GVHD</p>
                                     <p className="font-medium dark:text-white">{topic.supervisor?.email ?? "Chưa có"}</p>
                                 </div>
-                                
+
                                 {topic.thesis_type === ThesisType.CAPSTONE && (
                                     <div className="flex flex-col gap-1">
                                         <p className="text-smallSize text-gray italic">GVPB</p>
@@ -317,28 +318,30 @@ const SDTopics: React.FC = () => {
                 </div>
             )
         }
-    } else {
+    } else if (progress && progress.created_approval && progress.is_banned) {
         return (
-            <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-6 p-10 bg-white dark:bg-lightDark rounded-normal shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-lightGray/10 mt-5">
-                {/* Icon Lock với hiệu ứng Ping nhẹ để tạo sự chú ý */}
-                <div className="relative">
+            <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-6 p-10 bg-white dark:bg-lightDark rounded-normal shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-lightGray/10 mt-5" >
+                {/* Icon Ban với hiệu ứng Ping nhẹ để tạo sự chú ý */}
+                <div className="relative" >
                     <div className="absolute inset-0 bg-red/10 rounded-full animate-ping"></div>
                     <div className="relative bg-redRGB/10 p-6 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-16 stroke-red">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-16 stroke-red">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
                     </div>
-                </div>
+                </div >
 
                 {/* Nội dung thông báo */}
-                <div className="flex flex-col items-center text-center gap-2">
-                    <h2 className="text-hugeSize font-bold text-gray dark:text-white uppercase tracking-wider">Quy trình đang đợi duyệt</h2>
+                <div className="flex flex-col items-center text-center gap-2" >
+                    <h2 className="text-hugeSize font-bold text-gray dark:text-white uppercase tracking-wider">Quy trình đã bị khóa</h2>
                     <p className="text-normalSize text-gray dark:text-gray/70 italic max-w-md">
-                        Bạn chưa thể cung cấp thông tin đề tài. Hiện tại quy trình thực hiện đồ án của lớp học chưa được phê duyệt.
+                        Rất tiếc, quy trình thực hiện đồ án của lớp học đã bị khóa. Vui lòng liên hệ với quản trị viên lớp học để được hỗ trợ.
                     </p>
-                </div>
-            </div>
+                </div >
+            </div >
         )
+    } else {
+        return <NonProgress />
     }
 }
 

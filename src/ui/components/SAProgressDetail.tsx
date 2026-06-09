@@ -225,7 +225,7 @@ const SAProgressDetail: React.FC = () => {
                             {currentProgress.milestones.map((milestone) => (
                                 <div key={milestone.id} className="group relative p-6 border-[0.5px] border-lightGray dark:border-darkGray rounded-normal bg-white dark:bg-black/10 flex gap-6 items-start hover:border-mainColor/50 hover:shadow-md transition-all">
                                     <div className="w-14 h-14 rounded-full bg-mainColor/10 text-mainColor flex items-center justify-center font-bold text-bigSize shrink-0 shadow-inner group-hover:bg-mainColor group-hover:text-white transition-colors duration-300">
-                                        {milestone.index + 1}
+                                        {milestone.index}
                                     </div>
 
                                     <div className="flex-1">

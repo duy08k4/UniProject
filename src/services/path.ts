@@ -3,7 +3,9 @@ const apiPath = {
         signUp: "/auth/signup",
         signIn: "/auth/signin",
         signOut: "/auth/signout",
-        authUser: "/auth/me"
+        authUser: "/auth/me",
+        requireResetPassword: "/auth/password/require-reset",
+        resetPassword: "/auth/password/update",
     },
 
     class: {

@@ -72,7 +72,7 @@ const SAScoreboardsDetail: React.FC = () => {
 
     const handleDelete = () => {
         if (!detail) return
-        if (detail.is_stopped) {
+        if (detail.status === "accept") {
             confirmDialog({
                 header: "Lưu trữ bảng điểm",
                 message: <p>Bảng điểm <b>"{detail.label}"</b> đã được duyệt và sẽ được <b>lưu trữ</b> (xóa mềm). Bạn có chắc chắn?</p>,
@@ -115,7 +115,7 @@ const SAScoreboardsDetail: React.FC = () => {
         <div className="w-full flex flex-col gap-6 pt-topPadding pb-BottomPadding">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <button onClick={() => navigate(-1)} className="p-2.5 hover:bg-lightGray dark:hover:bg-gray rounded-full transition-colors flex-shrink-0">
+                <button onClick={() => navigate(-1)} className="p-2.5 hover:bg-lightGray dark:hover:bg-gray rounded-full transition-colors shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="size-5 dark:stroke-white">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                     </svg>
@@ -130,7 +130,7 @@ const SAScoreboardsDetail: React.FC = () => {
                     {detail.description && <p className="text-smallSize text-gray mt-0.5">{detail.description}</p>}
                 </div>
 
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                     <span className="text-smallSize text-gray dark:text-gray-400 mr-2">
                         <b className="text-mainColor dark:text-white">{filledRows}</b>/{rows.length} SV có điểm
                         {" · "}
