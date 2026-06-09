@@ -22,6 +22,7 @@ const RAMilestoneDetail: React.FC = () => {
     const currentClass = useSelector((state: RootState) => state.class.currentClass)
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
     const currentForm = useSelector((state: RootState) => state.form.currentForm)
+    const progress = useSelector((state: RootState) => state.progress.currentProgress)
     const milestone = useSelector((state: RootState) => state.progress.currentMilestone)
     const currentFormRef = useRef(currentForm)
     useEffect(() => { currentFormRef.current = currentForm }, [currentForm])
@@ -56,6 +57,9 @@ const RAMilestoneDetail: React.FC = () => {
 
     if (isFetching && !milestone) return <Loading />
     if (!milestone) return null
+    if (progress && progress.is_banned) {
+        navigate(`/main/${currentClass.info.user.role}/class/${classId}/milestones/`, { replace: true })
+    }
 
     return (
         <div className="w-full h-fit flex flex-col gap-6 pt-topPadding pb-20">
