@@ -123,4 +123,56 @@ export class AuthService {
             toast.dismiss(loading)
         }
     }
+
+    static async requireResetPassword (email: string) {
+        let loading
+        try {
+            loading = toast.loading('Đang xử lý yêu cầu...')
+            if (email) {
+                const { status } = await api.post(apiPath.auth.requireResetPassword, { email })
+
+                if (status >= 200 && status < 300) {
+                    toast.success("Vui lòng kiểm tra gmail để đặt lại mật khẩu")
+                    return true
+                }
+                
+            } else {
+                toast.error("Vui lòng cung cấp gmail")
+                return false
+            }
+
+        } catch (error) {
+            errorCatch(error)
+            return false
+        } finally {
+            toast.dismiss(loading)
+        }
+    }
+
+    static async resetPassword (data: { accessToken: string | null, refreshToken: string | null, newPassword: string}) {
+        let loading
+        try {
+            const { accessToken, refreshToken, newPassword } = data
+
+            loading = toast.loading('Đang đặt lại mật khẩu...')
+            if (accessToken && refreshToken && newPassword) {
+                const { status } = await api.post(apiPath.auth.resetPassword, data)
+
+                if (status >= 200 && status < 300) {
+                    toast.success("Mật khẩu đã được đặt lại! Vui lòng đăng nhập lại")
+                    return true
+                }
+                
+            } else {
+                toast.error("Vui lòng cung cấp đầy đủ thông tin và đảm bảo mật khẩu trùng khớp")
+                return false
+            }
+
+        } catch (error) {
+            errorCatch(error)
+            return false
+        } finally {
+            toast.dismiss(loading)
+        }
+    }
 }

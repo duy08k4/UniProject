@@ -1,6 +1,12 @@
 import type React from "react"
 import { useState } from "react"
 import type { formValidationConfig_type } from "./SignUp"
+import { toast } from "sonner"
+import { AuthService } from "../../services/auth/auth.service"
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "../../redux/store"
+import { changeStateFetching } from "../../redux/reducers/global.reducer"
+import { useNavigate } from "react-router-dom"
 
 type FormValues = {
     password: string,
@@ -8,6 +14,12 @@ type FormValues = {
 }
 
 const ResetPassword: React.FC = () => {
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+    const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
     const [formValues, setFormValues] = useState<FormValues>({
         password: "",
         confirmPassword: ""
@@ -67,6 +79,25 @@ const ResetPassword: React.FC = () => {
             }))
         }
 
+    const handleSubmit = async () => {
+        if (isFormValid && formValues.password === formValues.confirmPassword) {
+            dispatch(changeStateFetching(true))
+
+            await AuthService.resetPassword({ accessToken, newPassword: formValues.password, refreshToken }).finally(() => {
+                dispatch(changeStateFetching(false))
+                setFormValues({
+                    password: "",
+                    confirmPassword: ""
+                })
+                setTimeout(() => {
+                    navigate("/")
+                }, 5000)
+            })
+        } else {
+            toast.error("Dữ liệu không hợp lệ")
+        }
+    }
+
     return (
         <div className="h-full w-full flex justify-center-safe items-center-safe gap-10 max-sm:flex max-sm:flex-col">
             <div className="h-fit w-[450px] flex flex-col gap-5 px-10 py-15 rounded-normal shadow-[0_0_50px_20px_rgba(128,128,128,0.25)] max-sm:w-full max-sm:px-5 max-sm:py-10">
@@ -80,17 +111,17 @@ const ResetPassword: React.FC = () => {
                 <div className="w-full flex flex-col gap-3.5">
                     <span className="w-full">
                         <p className="font-medium dark:text-white">Mập khẩu <b className="text-red">*</b></p>
-                        <input type="password" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("password")} placeholder="..." />
+                        <input type="password" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize disableState" disabled={isFetching} onChange={handleChange("password")} placeholder="..." />
                     </span>
 
                     <span className="w-full">
                         <p className="font-medium dark:text-white">Nhập lại mật khẩu <b className="text-red">*</b></p>
-                        <input type="password" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize" onChange={handleChange("confirmPassword")} placeholder="..." />
+                        <input type="password" className="w-full border-[0.5px] border-lightGray dark:border-gray px-2.5 py-2.5 rounded-small dark:text-white max-sm:text-smallSize disableState" disabled={isFetching} onChange={handleChange("confirmPassword")} placeholder="..." />
                     </span>
                 </div>
 
                 <div className="w-full">
-                    <button className="hoverBtn w-full bg-mainColor text-white py-2.5 rounded-small hover:cursor-pointer max-sm:text-smallSize">Cập nhật</button>
+                    <button className="hoverBtn w-full bg-mainColor text-white py-2.5 rounded-small hover:cursor-pointer max-sm:text-smallSize disableState hoverBtn" onClick={handleSubmit}>Cập nhật</button>
                 </div>
             </div>
 
