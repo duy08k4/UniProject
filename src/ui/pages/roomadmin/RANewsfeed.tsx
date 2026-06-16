@@ -33,9 +33,11 @@ const RANewsfeed: React.FC = () => {
         ;(async () => {
             dispatch(changeStateFetching(true))
             try {
-                await ProgressService.getProgressDetail(classId)
-                await FormsService.formsPagination(1, 100, undefined, false, undefined, classId)
-                await NotificationsService.notificationPagination(classId, 1, 20)
+                Promise.all([
+                    NotificationsService.notificationPagination(classId, 1, 20),
+                    ProgressService.getProgressDetail(classId),
+                    FormsService.formsPagination(1, 100, undefined, false, undefined, classId)
+                ])
             } catch { } finally {
                 dispatch(changeStateFetching(false))
             }

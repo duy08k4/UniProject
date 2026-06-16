@@ -1,3 +1,5 @@
+import type { RoomRoleType } from "../../config/enum";
+
 export type ClassType = {
     id: string,
     join_code: string,
@@ -12,7 +14,7 @@ export type ClassType = {
     created_at: string,
     updated_at: string,
     user: {
-        role: string,
+        role: RoomRoleType,
         is_banned: boolean,
         roomadmin_approved: boolean
     }

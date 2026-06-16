@@ -79,7 +79,9 @@ export default class SubmissionService {
                 return true
             }
         } catch (error) {
-            errorCatch(error)
+            errorCatch(error, {
+                404: { message: "Không tìm thấy bài nộp", type: "error" }
+            })
             return false
         } finally {
             if (toast) toast.dismiss(loading)

@@ -42,14 +42,6 @@ const RADetailForms: React.FC = () => {
     const [showPreview, setShowPreview] = useState(false);
     const [formOriginalState, setFormOriginalState] = useState<boolean>() // Open and close the current form automaticaly when original state is true
 
-    const mockSubmissions = [
-        { id: "1", studentName: "Nguyễn Văn A", submittedAt: "20-03-2024 10:30", status: "graded" },
-        { id: "2", studentName: "Trần Thị B", submittedAt: "21-03-2024 14:15", status: "submitted" },
-        { id: "3", studentName: "Lê Văn C", submittedAt: "22-03-2024 09:00", status: "pending" },
-        { id: "4", studentName: "Phạm Minh D", submittedAt: "22-03-2024 11:20", status: "submitted" },
-        { id: "5", studentName: "Hoàng Anh E", submittedAt: "23-03-2024 16:45", status: "graded" },
-    ];
-
     useEffect(() => {
         if (formId && classId) {
             fetchDetail();
@@ -376,102 +368,71 @@ const RADetailForms: React.FC = () => {
             <div className={`grid grid-cols-1 lg:grid-cols-12 gap-6 ${isEdit && formType === null ? 'hidden' : ''}`}>
 
                 <div className="lg:col-span-4 flex flex-col gap-6">
-                    {formId && !isEdit ? (
-                        <div className="bg-white dark:bg-lightDark p-6 rounded-normal shadow-sm border-[0.5px] border-lightGray/20 flex flex-col gap-5 h-fit max-h-[calc(100vh-200px)] sticky top-28 transition-all">
-                            <div className="flex flex-col border-b border-lightGray/10 pb-3">
-                                <p className="font-bold text-normalSize dark:text-white uppercase tracking-tighter">Danh sách bài nộp</p>
-                                <p className="text-[10px] text-gray font-bold">TỔNG CỘNG: {mockSubmissions.length}</p>
-                            </div>
+                    <div className="flex flex-col gap-6 sticky top-28">
+                        <div className="bg-white dark:bg-lightDark p-6 rounded-normal shadow-sm border-[0.5px] border-lightGray/20 flex flex-col gap-5 transition-all">
+                            <p className="font-bold text-normalSize dark:text-white border-b border-lightGray/10 pb-2 uppercase tracking-tighter">Thông tin chung</p>
 
-                            <div className="flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar max-h-[750px]">
-                                {mockSubmissions
-                                    .filter(s => s.studentName.toLowerCase().includes(submissionSearch.toLowerCase()))
-                                    .map((sub) => (
-                                        <div key={sub.id} className="p-4 rounded-normal border border-lightGray/10 bg-gray/5 dark:bg-white/5 hover:bg-mainColor/5 hover:border-mainColor/30 transition-all cursor-pointer group">
-                                            <div className="flex justify-between items-start mb-1.5">
-                                                <p className="font-bold text-smallSize dark:text-white group-hover:text-mainColor transition-colors">{sub.studentName}</p>
-                                                <span className={`text-[8px] font-black px-1.5 py-0.5 rounded text-white tracking-tighter ${sub.status === 'graded' ? 'bg-mainColor' : sub.status === 'submitted' ? 'bg-blue-500' : 'bg-gray'}`}>
-                                                    {sub.status === 'graded' ? 'ĐÃ CHẤM' : sub.status === 'submitted' ? 'ĐÃ NỘP' : 'CHỜ'}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-1.5 opacity-60">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="size-3 dark:text-white"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /></svg>
-                                                <p className="text-[10px] dark:text-white font-medium">{sub.submittedAt}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                {mockSubmissions.filter(s => s.studentName.toLowerCase().includes(submissionSearch.toLowerCase())).length === 0 && (
-                                    <p className="text-center text-tinySize text-gray py-10 italic">Không tìm thấy kết quả</p>
+                            <div className="flex flex-col gap-4">
+                                <span className="flex flex-col gap-1.5">
+                                    <p className="font-bold text-smallSize dark:text-white opacity-60 uppercase">Tiêu đề</p>
+                                    {isEdit ? <input type="text" disabled={isFetching} placeholder="Nhập tiêu đề biểu mẫu..." className="w-full border-b border-lightGray px-1 py-1.5 dark:text-white outline-none focus:border-mainColor bg-transparent text-normalSize font-bold disableState" value={formInfo.label} onChange={(e) => setFormInfo({ ...formInfo, label: e.target.value })} /> : <p className="text-normalSize font-bold dark:text-white py-1">{formInfo.label}</p>}
+                                </span>
+
+                                <span className="flex flex-col gap-1.5">
+                                    <p className="font-bold text-smallSize dark:text-white opacity-60 uppercase">Mô tả</p>
+                                    {isEdit ? <textarea rows={4} disabled={isFetching} placeholder="Nhập mô tả biểu mẫu..." className="w-full border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none focus:border-mainColor bg-transparent resize-none text-smallSize disableState" value={formInfo.description} onChange={(e) => setFormInfo({ ...formInfo, description: e.target.value })} /> : <p className="text-smallSize dark:text-white leading-relaxed">{formInfo.description || "Không có mô tả"}</p>}
+                                </span>
+                            </div>
+                        </div>
+                        {formType === 'milestone' && (
+                            <div className="bg-white dark:bg-lightDark p-6 rounded-normal shadow-sm border-[0.5px] border-lightGray/20 flex flex-col gap-4 transition-all">
+                                <p className="font-bold text-normalSize dark:text-white border-b border-lightGray/10 pb-2 uppercase tracking-tighter">Cột mốc</p>
+                                {isEdit ? (
+                                    <select
+                                        disabled={isFetching}
+                                        className="w-full border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none focus:border-mainColor bg-transparent text-smallSize font-bold cursor-pointer disableState"
+                                        value={milestoneId || ""}
+                                        onChange={(e) => setMilestoneId(e.target.value || null)}
+                                    >
+                                        <option value="">-- Chọn cột mốc --</option>
+                                        {milestoneList.map(m => (
+                                            <option key={m.id} value={m.id} disabled={m.is_stopped}>
+                                                {m.index}. {m.label}{m.is_stopped ? ' (Đã dừng)' : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <p className="text-smallSize dark:text-white font-bold">
+                                        {currentForm?.milestone?.label || "Chưa gắn cột mốc"}
+                                    </p>
                                 )}
                             </div>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col gap-6 sticky top-28">
-                            <div className="bg-white dark:bg-lightDark p-6 rounded-normal shadow-sm border-[0.5px] border-lightGray/20 flex flex-col gap-5 transition-all">
-                                <p className="font-bold text-normalSize dark:text-white border-b border-lightGray/10 pb-2 uppercase tracking-tighter">Thông tin chung</p>
-                                
-                                <div className="flex flex-col gap-4">
-                                    <span className="flex flex-col gap-1.5">
-                                        <p className="font-bold text-smallSize dark:text-white opacity-60 uppercase">Tiêu đề</p>
-                                        {isEdit ? <input type="text" disabled={isFetching} placeholder="Nhập tiêu đề biểu mẫu..." className="w-full border-b border-lightGray px-1 py-1.5 dark:text-white outline-none focus:border-mainColor bg-transparent text-normalSize font-bold disableState" value={formInfo.label} onChange={(e) => setFormInfo({ ...formInfo, label: e.target.value })} /> : <p className="text-normalSize font-bold dark:text-white py-1">{formInfo.label}</p>}
-                                    </span>
-                                    
-                                    <span className="flex flex-col gap-1.5">
-                                        <p className="font-bold text-smallSize dark:text-white opacity-60 uppercase">Mô tả</p>
-                                        {isEdit ? <textarea rows={4} disabled={isFetching} placeholder="Nhập mô tả biểu mẫu..." className="w-full border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none focus:border-mainColor bg-transparent resize-none text-smallSize disableState" value={formInfo.description} onChange={(e) => setFormInfo({ ...formInfo, description: e.target.value })} /> : <p className="text-smallSize dark:text-white leading-relaxed">{formInfo.description || "Không có mô tả"}</p>}
-                                    </span>
-                                </div>
-                            </div>
-                            {formType === 'milestone' && (
-                                <div className="bg-white dark:bg-lightDark p-6 rounded-normal shadow-sm border-[0.5px] border-lightGray/20 flex flex-col gap-4 transition-all">
-                                    <p className="font-bold text-normalSize dark:text-white border-b border-lightGray/10 pb-2 uppercase tracking-tighter">Cột mốc</p>
-                                    {isEdit ? (
-                                        <select
-                                            disabled={isFetching}
-                                            className="w-full border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none focus:border-mainColor bg-transparent text-smallSize font-bold cursor-pointer disableState"
-                                            value={milestoneId || ""}
-                                            onChange={(e) => setMilestoneId(e.target.value || null)}
-                                        >
-                                            <option value="">-- Chọn cột mốc --</option>
-                                            {milestoneList.map(m => (
-                                                <option key={m.id} value={m.id} disabled={m.is_stopped}>
-                                                    {m.index}. {m.label}{m.is_stopped ? ' (Đã dừng)' : ''}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <p className="text-smallSize dark:text-white font-bold">
-                                            {currentForm?.milestone?.label || "Chưa gắn cột mốc"}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                            <div className="bg-white dark:bg-lightDark p-6 rounded-normal shadow-sm border-[0.5px] border-lightGray/20 flex flex-col gap-4 transition-all">
-                                <p className="font-bold text-normalSize dark:text-white border-b border-lightGray/10 pb-2 uppercase tracking-tighter">Thời hạn</p>
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex items-center justify-between"><p className="text-smallSize dark:text-white font-bold uppercase">Mở tự động</p>{isEdit ? <input type="checkbox" checked={formInfo.is_auto_open} onChange={(e) => setFormInfo({ ...formInfo, is_auto_open: e.target.checked })} className="size-5 accent-mainColor" /> : <p className="text-[11px] font-bold text-mainColor">{formInfo.is_auto_open ? "BẬT" : "TẮT"}</p>}</div>
-                                    
-                                    {formInfo.is_auto_open && (
-                                        isEdit ? (
-                                            <div className="flex gap-2">
-                                                <input type="date" className="flex-1 border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none text-smallSize focus:border-mainColor bg-transparent" value={formatToInputDate(formInfo.open_at)} onChange={(e) => setFormInfo({ ...formInfo, open_at: mergeDateTimeToISO(e.target.value, formatToInputTime(formInfo.open_at)) })} />
-                                                <input type="time" disabled={!formatToInputDate(formInfo.open_at)} className="border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none text-smallSize focus:border-mainColor bg-transparent disabled:opacity-30" value={formatToInputTime(formInfo.open_at)} onChange={(e) => setFormInfo({ ...formInfo, open_at: mergeDateTimeToISO(formatToInputDate(formInfo.open_at), e.target.value) })} /></div>
-                                        ) :
-                                            <p className="text-smallSize dark:text-white opacity-70 italic">{formInfo.open_at ? formatVNTime(formInfo.open_at) : "Chưa thiết lập"}</p>
-                                    )}
+                        )}
+                        <div className="bg-white dark:bg-lightDark p-6 rounded-normal shadow-sm border-[0.5px] border-lightGray/20 flex flex-col gap-4 transition-all">
+                            <p className="font-bold text-normalSize dark:text-white border-b border-lightGray/10 pb-2 uppercase tracking-tighter">Thời hạn</p>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center justify-between"><p className="text-smallSize dark:text-white font-bold uppercase">Mở tự động</p>{isEdit ? <input type="checkbox" checked={formInfo.is_auto_open} onChange={(e) => setFormInfo({ ...formInfo, is_auto_open: e.target.checked })} className="size-5 accent-mainColor" /> : <p className="text-[11px] font-bold text-mainColor">{formInfo.is_auto_open ? "BẬT" : "TẮT"}</p>}</div>
 
-                                    <div className="flex items-center justify-between mt-1"><p className="text-smallSize dark:text-white font-bold uppercase">Đóng tự động</p>{isEdit ? <input type="checkbox" checked={formInfo.is_auto_close} onChange={(e) => setFormInfo({ ...formInfo, is_auto_close: e.target.checked })} className="size-5 accent-mainColor" /> : <p className="text-[11px] font-bold text-red">{formInfo.is_auto_close ? "BẬT" : "TẮT"}</p>}</div>
-                                    
-                                    {formInfo.is_auto_close && (
-                                        isEdit ? (
+                                {formInfo.is_auto_open && (
+                                    isEdit ? (
+                                        <div className="flex gap-2">
+                                            <input type="date" className="flex-1 border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none text-smallSize focus:border-mainColor bg-transparent" value={formatToInputDate(formInfo.open_at)} onChange={(e) => setFormInfo({ ...formInfo, open_at: mergeDateTimeToISO(e.target.value, formatToInputTime(formInfo.open_at)) })} />
+                                            <input type="time" disabled={!formatToInputDate(formInfo.open_at)} className="border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none text-smallSize focus:border-mainColor bg-transparent disabled:opacity-30" value={formatToInputTime(formInfo.open_at)} onChange={(e) => setFormInfo({ ...formInfo, open_at: mergeDateTimeToISO(formatToInputDate(formInfo.open_at), e.target.value) })} /></div>
+                                    ) :
+                                        <p className="text-smallSize dark:text-white opacity-70 italic">{formInfo.open_at ? formatVNTime(formInfo.open_at) : "Chưa thiết lập"}</p>
+                                )}
+
+                                <div className="flex items-center justify-between mt-1"><p className="text-smallSize dark:text-white font-bold uppercase">Đóng tự động</p>{isEdit ? <input type="checkbox" checked={formInfo.is_auto_close} onChange={(e) => setFormInfo({ ...formInfo, is_auto_close: e.target.checked })} className="size-5 accent-mainColor" /> : <p className="text-[11px] font-bold text-red">{formInfo.is_auto_close ? "BẬT" : "TẮT"}</p>}</div>
+
+                                {formInfo.is_auto_close && (
+                                    isEdit ? (
                                         <div className="flex gap-2"><input type="date" className="flex-1 border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none text-smallSize focus:border-mainColor bg-transparent" value={formatToInputDate(formInfo.close_at)} onChange={(e) => setFormInfo({ ...formInfo, close_at: mergeDateTimeToISO(e.target.value, formatToInputTime(formInfo.close_at)) })} />
-                                        <input type="time" disabled={!formatToInputDate(formInfo.close_at)} className="border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none text-smallSize focus:border-mainColor bg-transparent disabled:opacity-30" value={formatToInputTime(formInfo.close_at)} onChange={(e) => setFormInfo({ ...formInfo, close_at: mergeDateTimeToISO(formatToInputDate(formInfo.close_at), e.target.value) })} /></div>
-                                    ) : 
-                                    <p className="text-smallSize dark:text-white opacity-70 italic">{formInfo.close_at ? formatVNTime(formInfo.close_at) : "Chưa thiết lập"}</p>)}
-                                </div>
+                                            <input type="time" disabled={!formatToInputDate(formInfo.close_at)} className="border border-lightGray rounded-small px-3 py-2 dark:text-white outline-none text-smallSize focus:border-mainColor bg-transparent disabled:opacity-30" value={formatToInputTime(formInfo.close_at)} onChange={(e) => setFormInfo({ ...formInfo, close_at: mergeDateTimeToISO(formatToInputDate(formInfo.close_at), e.target.value) })} /></div>
+                                    ) :
+                                        <p className="text-smallSize dark:text-white opacity-70 italic">{formInfo.close_at ? formatVNTime(formInfo.close_at) : "Chưa thiết lập"}</p>)}
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 <div className="lg:col-span-8 flex flex-col gap-6">
@@ -479,7 +440,7 @@ const RADetailForms: React.FC = () => {
                         <div className="grid grid-cols-1 gap-6">
                             <div className="bg-white dark:bg-lightDark p-6 rounded-normal shadow-sm border-[0.5px] border-lightGray/20 flex flex-col gap-5 transition-all">
                                 <p className="font-bold text-normalSize dark:text-white border-b border-lightGray/10 pb-2 uppercase tracking-tighter">Thông tin chung</p>
-                                    
+
                                 <div className="flex flex-col gap-4">
                                     <span className="flex flex-col gap-1.5">
                                         <p className="font-bold text-smallSize dark:text-white opacity-60 uppercase">Tiêu đề</p>
@@ -495,11 +456,11 @@ const RADetailForms: React.FC = () => {
 
                             <div className="bg-white dark:bg-lightDark p-6 rounded-normal shadow-sm border-[0.5px] border-lightGray/20 flex flex-col gap-4 transition-all">
                                 <p className="font-bold text-normalSize dark:text-white border-b border-lightGray/10 pb-2 uppercase tracking-tighter">Thời hạn</p>
-                                
+
                                 <div className="flex flex-col gap-4">
                                     <div className="flex items-center justify-between"><p className="text-smallSize dark:text-white font-bold uppercase">Mở tự động</p><p className="text-[11px] font-bold text-mainColor">{formInfo.is_auto_open ? "BẬT" : "TẮT"}</p></div>
                                     {formInfo.is_auto_open && <p className="text-smallSize dark:text-white opacity-70 italic">{formInfo.open_at ? formatVNTime(formInfo.open_at) : "Chưa thiết lập"}</p>}
-                                    
+
                                     <div className="flex items-center justify-between mt-1"><p className="text-smallSize dark:text-white font-bold uppercase">Đóng tự động</p><p className="text-[11px] font-bold text-red">{formInfo.is_auto_close ? "BẬT" : "TẮT"}</p></div>
                                     {formInfo.is_auto_close && <p className="text-smallSize dark:text-white opacity-70 italic">{formInfo.close_at ? formatVNTime(formInfo.close_at) : "Chưa thiết lập"}</p>}
                                 </div>
