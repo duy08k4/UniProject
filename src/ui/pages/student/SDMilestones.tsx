@@ -2,11 +2,12 @@ import type React from "react"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../../redux/store"
 import { useParams, useNavigate } from "react-router-dom"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import ProgressService from "../../../services/progress/progress.service"
 import { changeStateFetching } from "../../../redux/reducers/global.reducer"
 import Loading from "../../components/Loading"
 import formatVNTime from "../../../utils/formatVNTime"
+import TopicsService from "../../../services/topics/topics.service"
 
 export const NonProgress: React.FC = () => {
     return (
@@ -36,7 +37,9 @@ const SDMilestones: React.FC = () => {
     const isFetching = useSelector((state: RootState) => state.stateGlobal.isFetching)
     const userData = useSelector((state: RootState) => state.auth.user.info)
     const progress = useSelector((state: RootState) => state.progress.currentProgress)
+    const currentClass = useSelector((state: RootState) => state.class.currentClass)
     const dispatch = useDispatch()
+    const [isApprovedToppic, setIsApprovedToppic] = useState<boolean>(false)
 
 
     const { classId } = useParams()
@@ -54,6 +57,24 @@ const SDMilestones: React.FC = () => {
         })()
     }, [userData.id, classId])
 
+    const registrationMilestone = progress?.milestones?.find((m: any) => m.is_registration_milestone)
+
+    useEffect(() => {
+        (async () => {
+            if (!progress || !classId || !registrationMilestone?.id || !userData?.id) return
+            if (currentClass.info.user.role !== "student") {
+                setIsApprovedToppic(true)
+                return
+            }
+
+            const getToppic = await TopicsService.getMyTopic(classId, registrationMilestone.id, userData.id)
+
+            if (getToppic) {
+                setIsApprovedToppic(true)
+            } else setIsApprovedToppic(false)
+        })()
+    }, [progress])
+
     const refreshProgress = async () => {
         if (!classId || !userData.id) return
 
@@ -63,14 +84,30 @@ const SDMilestones: React.FC = () => {
             dispatch(changeStateFetching(false))
         })
     }
+    if (isFetching) return <Loading />
 
-    if (!classId || !progress || !progress.id) {
-        if (isFetching) return <Loading />
+    if (!isApprovedToppic) {
+        return (
+            <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-2.5 p-10 bg-white dark:bg-lightDark rounded-normal shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-lightGray/10 mt-5">
+                {/* Icon Warning với hiệu ứng Ping nhẹ để tạo sự chú ý */}
+                <div className="bg-orangedRGB rounded-full animate-pulse p-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-25 stroke-oranged">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                    </svg>
+                </div>
 
-        return <NonProgress />
+                {/* Nội dung thông báo */}
+                <div className="flex flex-col items-center text-center gap-2">
+                    <h2 className="text-hugeSize font-bold text-oranged uppercase tracking-wider">Chưa phê duyệt đề tài</h2>
+                    <p className="text-normalSize text-gray dark:text-gray/70 italic max-w-md">
+                        Đề tài của bạn chưa được phê duyệt bởi Khoa nên không thể truy cập quy trình của lớp học. Vui lòng truy cập trang "Đề tài" để cung cấp thông tin đề tài.
+                    </p>
+                </div>
+            </div>
+        )
     }
 
-    if (progress.created_approval && !progress.is_banned) {
+    if (progress && progress.created_approval && !progress.is_banned) {
         return (
             <div className="w-full h-fit flex flex-col gap-5 pt-topPadding pb-20">
                 {/* Quy trình Header Card */}
@@ -156,7 +193,7 @@ const SDMilestones: React.FC = () => {
                 </div>
             </div>
         )
-    } else if (progress.created_approval && progress.is_banned) {
+    } else if (progress && progress.created_approval && progress.is_banned) {
         return (
             <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-6 p-10 bg-white dark:bg-lightDark rounded-normal shadow-[0_0_15px_rgba(0,0,0,0.05)] border border-lightGray/10 mt-5" >
                 {/* Icon Ban với hiệu ứng Ping nhẹ để tạo sự chú ý */}

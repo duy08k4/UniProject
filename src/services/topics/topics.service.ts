@@ -30,7 +30,7 @@ export default class TopicsService {
 
     static async getMyTopic(classId: string, milestoneId: string, studentId: string) {
         const topics = await this.getTopics(classId, milestoneId)
-        return topics?.find(t => t.student.id === studentId) ?? null
+        return topics?.find(t => t.student?.id === studentId) ?? null
     }
 
     static async createTopic(classId: string, milestoneId: string, title: string, thesis_type: ThesisTypeType, description?: string) {

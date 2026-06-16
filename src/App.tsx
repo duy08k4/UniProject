@@ -142,7 +142,6 @@ function App() {
               <Route index element={<SDScoreboards />} />
               <Route path=":boardId" element={<SDScoreboardsDetail />} />
             </Route>
-            {/* <Route path="submission" element={<SDSubmission />} /> */}
             <Route path="forms" element={<SDForms />} />
             <Route path="topics" element={<SDTopics />} />
             <Route path="milestones" element={<SDMilestones />} />

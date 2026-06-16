@@ -31,7 +31,8 @@ const MemberPendingCard: React.FC<MemberCard> = ({ memberData }) => {
         dispatch(changeStateFetching(true))
 
         const userUpdate = await ClassService.updateMember(classData.id, memberData.user.id, {
-            roomadmin_approved: true
+            roomadmin_approved: true,
+            role: "student"
         }).finally(() => {
             dispatch(changeStateFetching(false))
         })

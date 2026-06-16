@@ -67,9 +67,9 @@ const LTCommittee: React.FC = () => {
             ) : (
                 <div className="flex flex-col gap-6">
                     {/* Milestone info */}
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
-                            Cột mốc: {committee.milestone.label}
+                    <div className="p-4 bg-mainColorRGB rounded-lg">
+                        <p className="text-sm font-medium text-mainColor">
+                            <b className="text-mainColor">Cột mốc:</b> {committee.milestone.label}
                         </p>
                     </div>
 

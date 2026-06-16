@@ -1,73 +1,51 @@
-# React + TypeScript + Vite
+# Xây dựng trang web hỗ trợ Khoa Môi trường và Tài nguyên quản lý đồ án tốt nghiệp - Giao diện (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Tài liệu này hướng dẫn các bước để khởi chạy giao diện người dùng (UniProject) trên máy cục bộ, kết nối với máy chủ Backend để thực hiện Demo.
 
-Currently, two official plugins are available:
+## 1. Yêu cầu hệ thống
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Node.js:** Phiên bản 18.x hoặc cao hơn.
+- **Trình quản lý gói:** npm.
 
-## React Compiler
+## 2. Cấu hình môi trường (.env)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Tạo tệp `.env` tại thư mục gốc của dự án `UniProject` để định nghĩa đường dẫn kết nối đến API:
 
-## Expanding the ESLint configuration
+```env
+# Địa chỉ máy chủ Backend đang chạy cục bộ
+VITE_API_URL_LOCAL=http://localhost:3000
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# (Tùy chọn) Địa chỉ máy chủ khi đã triển khai chính thức
+VITE_API_URL=https://your-production-url.com
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 3. Các bước cài đặt và khởi chạy
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **Cài đặt thư viện phụ thuộc**:Đảm bảo bạn đang ở trong thư mục dự án và chạy lệnh:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+   ```bash
+   npm install
+   ```
+
+2. **Khởi chạy giao diện người dùng**:Sử dụng Vite để chạy ứng dụng ở chế độ phát triển:
+
+   ```bash
+   npm run dev
+   ```
+
+   *Mặc định giao diện sẽ chạy tại địa chỉ: http://localhost:5173*
+
+## 4. Các vai trò đăng nhập thử nghiệm (Demo)
+
+Ứng dụng thực hiện phân quyền dựa trên tài khoản, bạn có thể thử nghiệm các giao diện khác nhau bằng cách đăng nhập với các vai trò:
+
+- **Quản trị viên (Admin/RoomAdmin):** Quản lý lớp học, hội đồng và bảng điểm.
+- **Giảng viên (Lecturer):** Duyệt đề tài và nhập điểm.
+- **Sinh viên (Student):** Đăng ký đề tài và nộp báo cáo.
+
+## 5. Danh mục công nghệ chính
+
+- **Cốt lõi:** React 19, Vite.
+- **Giao diện:** PrimeReact, TailwindCSS.
+- **Quản lý trạng thái:** Redux Toolkit.
+- **Biểu đồ:** Recharts.
