@@ -13,7 +13,8 @@ export const VNRoleName = {
   uniadmin: "Quản trị viên hệ thống",
   roomadmin: "Quản trị viên lớp học",
   student: "Sinh viên",
-  lecturer: "Giảng viên"
+  lecturer: "Giảng viên",
+  "": ""
 }
 
 export const MainRole = {
