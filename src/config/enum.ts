@@ -29,7 +29,7 @@ export const RoomRole = {
   LECTURER: "lecturer",
 } as const
 
-export type RoomRoleType = typeof RoomRole[keyof typeof RoomRole];
+export type RoomRoleType = typeof RoomRole[keyof typeof RoomRole] | "";
 
 export const Field_Type = {
   STRING: "string",
