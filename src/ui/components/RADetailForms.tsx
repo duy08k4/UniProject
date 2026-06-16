@@ -38,7 +38,6 @@ const RADetailForms: React.FC = () => {
     });
 
     const [allFields, setAllFields] = useState<any[]>([]);
-    const [submissionSearch] = useState<string>("");
     const [showPreview, setShowPreview] = useState(false);
     const [formOriginalState, setFormOriginalState] = useState<boolean>() // Open and close the current form automaticaly when original state is true
 

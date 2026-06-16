@@ -13,7 +13,8 @@ export const VNRoleName = {
   uniadmin: "Quản trị viên hệ thống",
   roomadmin: "Quản trị viên lớp học",
   student: "Sinh viên",
-  lecturer: "Giảng viên"
+  lecturer: "Giảng viên",
+  "": ""
 }
 
 export const MainRole = {
@@ -29,7 +30,7 @@ export const RoomRole = {
   LECTURER: "lecturer",
 } as const
 
-export type RoomRoleType = typeof RoomRole[keyof typeof RoomRole] | "";
+export type RoomRoleType = typeof RoomRole[keyof typeof RoomRole];
 
 export const Field_Type = {
   STRING: "string",

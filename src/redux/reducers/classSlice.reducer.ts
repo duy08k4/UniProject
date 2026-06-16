@@ -36,7 +36,7 @@ const initialState: ClassSlice = {
             created_at: "",
             updated_at: "",
             user: {
-                role: "",
+                role: "student",
                 is_banned: false,
                 roomadmin_approved: false
             },
@@ -153,7 +153,7 @@ export const classSlice = createSlice({
                     created_at: "",
                     updated_at: "",
                     user: {
-                        role: "",
+                        role: "student",
                         is_banned: false,
                         roomadmin_approved: false
                     },
